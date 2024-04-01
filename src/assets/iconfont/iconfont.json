@@ -1,0 +1,65 @@
+{
+  "id": "4463451",
+  "name": "ydyl",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "2205622",
+      "name": "股票",
+      "font_class": "gupiao",
+      "unicode": "e788",
+      "unicode_decimal": 59272
+    },
+    {
+      "icon_id": "31069803",
+      "name": "显示器",
+      "font_class": "a-shujukeshihua1",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "1456786",
+      "name": "会中",
+      "font_class": "huizhong",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "6540379",
+      "name": "草稿箱",
+      "font_class": "caogaoxiang",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "6742355",
+      "name": "稿件",
+      "font_class": "gaojian",
+      "unicode": "e687",
+      "unicode_decimal": 59015
+    },
+    {
+      "icon_id": "12889882",
+      "name": "统计分析-项目表格统计",
+      "font_class": "tongjifenxi-xiangmubiaogetongji",
+      "unicode": "e626",
+      "unicode_decimal": 58918
+    },
+    {
+      "icon_id": "14772197",
+      "name": "审核通过",
+      "font_class": "shenhetongguo",
+      "unicode": "e622",
+      "unicode_decimal": 58914
+    },
+    {
+      "icon_id": "27882123",
+      "name": "07_箭头_向下",
+      "font_class": "goit",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+.flexcenter {
+    display: flex;
+    align-items: center;
+}
+
+.hoverpointer {
+    cursor: pointer;
+}
+
+.mid-content {
+    min-height: calc(100vh - 190px)
+}
+
+/* select input全局样式 */
+.el-select__wrapper,
+.el-input__wrapper,
+.el-date-editor .el-range-input {
+    background-color: #f5f6fa;
+    font-size: 16px;
+    color: #7a7f94;
+}
+
+.el-select__placeholder {
+    color: #7a7f94;
+}
+
+.el-date-editor .el-range-separator {
+    flex: none;
+    padding: 0;
+}
+
+.el-button {
+    font-size: 16px;
+
+    i {
+        font-size: 16px;
+    }
+}
+
+//表格悬停
+.el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell {
+    background-color: #e5f1fe;
+}
+
+/* 分页器样式 */
+.el-pagination-style {
+    padding: 28px 0;
+    justify-content: center;
+
+    .btn-prev {
+        margin-right: 70px !important;
+    }
+
+    .el-pagination-style-leftpagination {
+        position: relative;
+        margin-right: 150px;
+
+        .el-pagination-style-leftpagination-total {
+            font-size: 16px;
+        }
+
+        .el-pagination-style-leftpagination-percent {
+            position: absolute;
+            right: -253px;
+            width: 65px;
+            height: 30px;
+            border: 1px solid #ccc;
+            justify-content: center;
+        }
+    }
+
+    .el-pagination-style-rightpagination {
+        position: relative;
+
+        .el-pagination__sizes {
+            position: absolute;
+            left: -150px;
+        }
+
+        .el-pagination__classifier {
+            display: none;
+        }
+
+        .el-pagination__jump {
+            position: relative;
+
+            .el-pagination__goto {
+                position: absolute;
+                right: -48px;
+                width: 40px;
+                height: 30px;
+                line-height: 30px;
+                color: #fff;
+                background-color: #1890ff;
+                text-align: center;
+            }
+        }
+    }
+
+    .el-select__wrapper,
+    .el-input__wrapper {
+        background-color: #fff;
+    }
+
+    .el-pagination.is-background .btn-next,
+    .el-pagination.is-background .btn-prev {
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+}
+
+.mid-divider {
+    height: 1px;
+    width: 98%;
+    background-color: #f2f3f6;
+    margin: 0 1%;
+}
