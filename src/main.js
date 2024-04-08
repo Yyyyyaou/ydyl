@@ -2,6 +2,14 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+
+//执行一下axios
+// eslint-disable-next-line
+import httpAxiosO from 'ROOT_URL/api/http/httpAxios.js'
+
+
+
+
 //引入element-plus
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -11,6 +19,7 @@ import "@/assets/iconfont/iconfont.css";
 import "@/assets/style.less";
 
 const app = createApp(App)
+
 //注册element-plus icon
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)

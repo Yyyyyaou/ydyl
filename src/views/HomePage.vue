@@ -469,9 +469,10 @@
   </div>
 </template>
 <script>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
     //稿件统计数据
@@ -863,6 +864,30 @@ export default {
     function handleCurrentChange1(val) {
       page1.value = val;
     }
+
+    //我的投稿 接口请求
+    function getArticleListAjaxFn(){
+      httpAxiosO({
+        method: 'get',
+        url: '/api/web/article/articleList.do',
+        params:{
+          language:0//所有语种
+        }
+      })
+      .then((D)=>{
+        console.log('我的投稿 D',D);
+      })
+      .catch((error)=>{
+        console.log('我的投稿 接口请求 error',error);
+      })
+      ;
+      return;
+    }
+
+    onMounted(() => {
+      getArticleListAjaxFn();
+    });
+
     return {
       statisticsData,
       activities,
@@ -905,6 +930,15 @@ export default {
       handleCurrentChange1,
     };
   },
+  // mounted() {
+  //   this.$nextTick(()=>{
+  //     console.log('mounted TEST2',this.TEST2);
+  //     // this.getArticleListAjaxFn();
+  //   });
+  // },
+  // methods:{
+
+  // },
 };
 </script>
 <style lang="less" scoped>
