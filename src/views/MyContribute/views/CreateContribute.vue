@@ -13,6 +13,7 @@
         >
           {{ item.name }}
         </div>
+        <div class="create-btngroup-i hoverpointer"><i class="iconfont icon-wenhao" /></div>
       </div>
       <div>
         <CreateOrigin v-if="selectIndex == 0" />
@@ -76,6 +77,7 @@ export default {
     .create-btngroup {
       justify-content: center;
       padding: 30px 0;
+      position: relative;
       .create-btngroup-btn {
         width: 115px;
         height: 32px;
@@ -93,6 +95,14 @@ export default {
       .isSelected {
         color: #fff;
         background: #1890ff;
+      }
+      .create-btngroup-i{
+        position: absolute;
+        right: 193px;
+        color: #f2ba6b;
+        i{
+          font-size: 20px;
+        }
       }
     }
   }

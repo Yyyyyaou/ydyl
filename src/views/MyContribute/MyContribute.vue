@@ -1,6 +1,6 @@
 <template>
-<router-view></router-view>
-  <div class="mid-content" >
+  <router-view></router-view>
+  <div class="mid-content">
     <div class="mid-content-mycontribute">
       <div class="mid-content-mycontribute-header flexcenter">
         <div class="flexcenter">
@@ -14,12 +14,17 @@
       <div class="mid-content-mycontribute-table-content">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
-            <el-button class="btn-tougao" @click="toPage('/MyContribute/CreateContribute')">
+            <el-button
+              class="btn-tougao"
+              @click="toPage('/MyContribute/CreateContribute')"
+            >
               <el-icon><Plus /></el-icon>
               &nbsp;&nbsp;&nbsp;投稿
             </el-button>
           </div>
-          <div class="mid-content-mycontribute-table-btngroup-search flexcenter">
+          <div
+            class="mid-content-mycontribute-table-btngroup-search flexcenter"
+          >
             <div class="mid-content-mycontribute-table-btngroup-search-keyword">
               <el-select
                 v-model="searchSelectValue"
@@ -130,7 +135,7 @@
             <el-table-column prop="operate" label="操作" width="200">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div>查看</div>
+                  <div @click="showDetailClick(scope)">查看</div>
                   <span></span>
                   <div v-if="scope.row.status == '已发布'">链接</div>
                   <span v-if="scope.row.status == '已发布'"></span>
@@ -325,6 +330,16 @@ export default {
     function handleCurrentChange(val) {
       page.value = val;
     }
+    function showDetailClick(scope) {
+      const c = router.resolve({
+        path: "/Notice/NoticeDetail",
+        query: {
+          title: scope.row.title,
+          time: scope.row.date,
+        },
+      });
+      window.open(c.href, "_blank");
+    }
     return {
       toPage,
       searchInput,
@@ -341,6 +356,7 @@ export default {
       page,
       handleSizeChange,
       handleCurrentChange,
+      showDetailClick
     };
   },
 };
