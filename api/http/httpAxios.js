@@ -15,17 +15,13 @@ httpAxiosO.interceptors.request.use(
   config => {
 
     const { headers } = config;
-    console.log('config',config);
+
     if(//如果不是用户登录
       !headers.methodName
     ){
-      // const { appToken,requestToken } = store.state.StroeLoginO;
-      // appToken
-
-      // headers.Authorization = 'Bearer '+requestToken;
-      // console.log('headers',headers);
+      //to do
     }
-    console.log('config',config);
+
     return config;
   },
   error => {
