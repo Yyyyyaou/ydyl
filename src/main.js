@@ -7,6 +7,10 @@ import store from './store'
 // eslint-disable-next-line
 import httpAxiosO from 'ROOT_URL/api/http/httpAxios.js'
 
+//初始化一些值
+import { initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
+initLanguageListFn();
+
 
 
 

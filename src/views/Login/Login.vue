@@ -67,6 +67,9 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import { HomeFilled,Lock,Iphone } from "@element-plus/icons-vue";
+import { initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
+
+
 
 export default {
   name: "LoginPage",
@@ -74,8 +77,7 @@ export default {
 
   },
   setup() {
-
-
+    
     //创建store实例
     const store = useStore();
     const inputValueO = ref({
@@ -93,7 +95,7 @@ export default {
         loginCaptcha:inputValueO.value.loginCaptcha||'004241',
       })
       .then((D)=>{
-        console.log('D',D);
+        console.log('用户登录 D',D);
         ElMessage({
           message: '登录成功',
           type: 'success',
@@ -109,6 +111,10 @@ export default {
         sessionStorage.setItem('loginUser',JSON.stringify(loginUser));
 
         store.commit('MStroeLoginOIsLogin',true);//改变登录状态
+
+        //初始化语种列表
+        initLanguageListFn();
+        
       })
       .catch((error)=>{
         ElMessage({

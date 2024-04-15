@@ -46,7 +46,9 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getArticleDraftListAjaxFn"
+            >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
@@ -75,22 +77,22 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="稿件标题">
+            <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
                 <span
                   style="display: flex; justify-content: left; text-align: left"
                 >
-                  {{ scope.row.title }}
+                  {{ scope.row.articleTitle }}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="稿件来源" width="125" />
-            <el-table-column prop="lang" label="语种" width="120" />
-            <el-table-column prop="date" label="创建日期" width="140" />
+            <el-table-column prop="articleSource" label="稿件来源" width="125" />
+            <el-table-column prop="languageName" label="语种" width="120" />
+            <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
             <el-table-column prop="operate" label="操作" width="200">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div v-if="scope.row.title !== ''">编辑</div>
+                  <div :title="scope.row.articleTitle">编辑</div>
                   <span></span>
                   <div>删除</div>
                   <span></span>
@@ -101,23 +103,23 @@
           <div class="flexcenter el-pagination-style">
             <el-pagination
               layout="slot"
-              :total="tableData.length"
+              :total="pageTotal"
               class="el-pagination-style-leftpagination"
             >
               <span class="el-pagination-style-leftpagination-total">
-                共{{ tableData.length }}条
+                共{{ pageTotal }}条
               </span>
               <span
                 class="el-pagination-style-leftpagination-percent flexcenter"
               >
-                {{ page }}/{{ Math.ceil(tableData.length / limit) }}
+                {{ page }}/{{ Math.ceil(pageTotal / limit) }}
               </span>
             </el-pagination>
             <el-config-provider :locale="locale">
               <el-pagination
                 background
                 layout="prev, next, sizes, jumper"
-                :total="tableData.length"
+                :total="pageTotal"
                 :page-sizes="[15, 20, 30, 40, 50]"
                 :page-size="limit"
                 @size-change="handleSizeChange"
@@ -133,10 +135,20 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, reactive, onMounted } from "vue";
+import { useStore } from "vuex"
+import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import { ElMessage,ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
+    //路由实例
+    const router = useRouter();
+    //vuex实例
+    const store = useStore();
+
     //关键词
     const searchInput = ref("");
     const searchSelectValue = ref(0);
@@ -151,111 +163,130 @@ export default {
       },
     ];
     //日期选择 数据
-    const dateDefaultTime = ref([]);
+    const dateDefaultTime = ref('');
     //表格数据
-    const tableData = [
-      {
-        title:
-          "(Musiècleشي يقول إنه مستعد لتعزيز العلاقات بين الصين ونيكاراغوا لتحقيق إنجازات جديدة مع اتخاذ الشراكة الاستراتيجية نقطة انطلاق جديدةشي يقول إنه مستعد لتعزيز العلاقات بين الصين ونيكاراغوا لتحقيق إنجازات جديدة مع اتخاذ الشراكة الاستراتيجية نقطة انطلاق جديدةشي يقو الاستراتيجية نقطة انطلاق جديدة",
-        date: "2016-05-03",
-        origin: "新华社1",
-        lang: "中文",
-        status: "已发布",
-      },
-      {
-        title:
-          "(Musiècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title:
-          "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-    ];
+    const tableData = reactive([]);
+
     //分页器
     let limit = ref(15);
     function handleSizeChange(val) {
       limit.value = val;
     }
     let page = ref(1);
+    let pageTotal = ref(0);
     function handleCurrentChange(val) {
       page.value = val;
+      getArticleDraftListAjaxFn();
     }
 
     function tableSelectionChange(val){
         console.log(val)
     }
+
+    /**
+     * 草稿箱/回收站 共用 接口
+     * 以下注释摘抄至接口文档（20240412.1733）
+     * articleType 非必填 稿件类别（0：普通稿件 1：转载稿件）
+     * articleStatus 非必填 稿件状态 （-1：已删除，0：草稿，1：已投稿）
+     * articleTitle 非必填 关键字搜索
+     * articleContent 非必填 正文搜索
+     * crtime 非必填 起始时间
+     * endtime 非必填 结束时间
+     * currPage 非必填 开始页数
+     * pageSize 非必填 页面条数
+     * 
+     * 接口返回数据字段，线上文档有写，很详细
+    */
+    function getArticleDraftListAjaxFn(){
+
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
+        return o.desc
+      });
+      languageNameArr.unshift('全部');
+
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const paramsO = {
+        articleStatus:0,//0 代表草稿
+        currPage:page.value,//当前页
+        pageSize:limit.value,//每页条数
+      }
+
+      // statusSelectValue.value&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
+
+      switch(searchSelectValue.value){
+        case 0:
+        paramsO.articleTitle = searchInput.value;//按标题搜索
+          break;
+        case 1:
+        paramsO.articleContent = searchInput.value;//按正文搜索
+          break;
+      }
+
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      }
+
+
+      httpAxiosO({
+        method: 'get',
+        url: '/api/web/article/draftList.do',
+        params:paramsO,
+      })
+      .then((D)=>{
+        console.log('草稿箱 D',D);
+        const { data,success } = D?.data
+        data
+        if(!success){
+          ElMessage({
+            message: '草稿箱数据请求失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '草稿箱数据请求成功',
+          type: 'success',
+          plain: true,
+        })
+        
+        tableData.splice(0,tableData.length);   //清空tableData
+        data.ldata.forEach((o)=>{
+          let _o = o;
+          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
+          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
+          tableData.push(_o);
+        });
+        pageTotal.value = data.totalResults;
+
+      })
+      .catch((error)=>{
+        console.log('草稿箱 接口请求 error',error);
+        ElMessage({
+          message: '草稿箱接口请求失败',
+          type: 'error',
+          plain: true,
+        })
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+      return;
+    }
+    // end of getArticleDraftListAjaxFn
+
+    onMounted(() => {
+      getArticleDraftListAjaxFn();
+    });
+
     return {
+      router,
+
       searchInput,
       searchSelectValue,
       searchOptions,
@@ -264,9 +295,13 @@ export default {
       tableData,
       limit,
       page,
+      pageTotal,
       handleSizeChange,
       handleCurrentChange,
       tableSelectionChange,
+
+      getArticleDraftListAjaxFn,
+
     };
   },
 };

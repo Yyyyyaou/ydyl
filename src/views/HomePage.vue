@@ -62,7 +62,7 @@
                       :class="{ isClicked: isClickedArr.includes(index) }"
                       @click="elTimelineClick(index)"
                     >
-                      {{ activity.content }}
+                      {{ activity.noticeTitle }}
                     </el-timeline-item>
                   </el-timeline>
                 </div>
@@ -126,157 +126,9 @@
                   </span>
                 </template>
                 <div class="mid-divider" style="margin-top: 1px"></div>
-                <div class="mid-content-statistics-table-content">
-                  <div class="mid-content-statistics-table-btngroup flexcenter">
-                    <div></div>
-                    <div
-                      class="mid-content-statistics-table-btngroup-search flexcenter"
-                    >
-                      <div
-                        class="mid-content-statistics-table-btngroup-search-keyword"
-                      >
-                        <el-select
-                          v-model="originSelectValue"
-                          placeholder="来源"
-                          style="width: 140px"
-                        >
-                          <el-option
-                            v-for="item in originOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          />
-                        </el-select>
-                        <el-select
-                          v-model="searchSelectValue1"
-                          placeholder=""
-                          style="width: 80px"
-                          class="marl10"
-                        >
-                          <el-option
-                            v-for="item in searchOptions1"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          />
-                        </el-select>
-                        <el-input
-                          v-model="searchInput1"
-                          style="width: 190px"
-                          placeholder="请输入关键词"
-                        />
-                      </div>
-                      <el-select
-                        v-model="langSelectValue1"
-                        placeholder="语种"
-                        style="width: 140px"
-                        class="marl10"
-                      >
-                        <el-option
-                          v-for="item in langOptions1"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                        />
-                      </el-select>
-                      <el-config-provider :locale="locale">
-                        <el-date-picker
-                          v-model="dateDefaultTime1"
-                          type="daterange"
-                          start-placeholder="创建起始日期"
-                          end-placeholder="创建结束日期"
-                          :locale="locale"
-                          style="margin-left: 10px; width: 270px"
-                        />
-                      </el-config-provider>
-                      <el-button
-                        type="primary"
-                        class="marl10"
-                        style="width: 78px"
-                      >
-                        <el-icon style="margin-right: 5px"><Search /></el-icon>
-                        搜索
-                      </el-button>
-                    </div>
-                  </div>
-                  <div class="mid-content-statistics-table-tabledata">
-                    <el-table
-                      :data="
-                        tableData1.slice((page1 - 1) * limit1, page1 * limit1)
-                      "
-                      border
-                      style="width: 100%"
-                      :header-cell-style="{
-                        'text-align': 'center',
-                        color: '#6a6d74',
-                        'font-size': '16px',
-                      }"
-                      :cell-style="{
-                        'text-align': 'center',
-                        color: '#727789',
-                        'font-size': '16px',
-                      }"
-                    >
-                      <el-table-column label="序号" width="100">
-                        <template #default="scope">
-                          {{ scope.$index + 1 }}
-                        </template>
-                      </el-table-column>
-                      <el-table-column prop="title" label="稿件标题">
-                        <template #default="scope">
-                          <span
-                            style="
-                              display: flex;
-                              justify-content: left;
-                              text-align: left;
-                            "
-                          >
-                            {{ scope.row.title }}
-                          </span>
-                        </template>
-                      </el-table-column>
-                      <el-table-column
-                        prop="origin"
-                        label="稿件来源"
-                        width="125"
-                      />
-                      <el-table-column prop="lang" label="语种" width="120" />
-                      <el-table-column
-                        prop="date"
-                        label="创建日期"
-                        width="140"
-                      />
-                    </el-table>
-                  </div>
-                  <div class="flexcenter el-pagination-style">
-                    <el-pagination
-                      layout="slot"
-                      :total="tableData1.length"
-                      class="el-pagination-style-leftpagination"
-                    >
-                      <span class="el-pagination-style-leftpagination-total">
-                        共{{ tableData1.length }}条
-                      </span>
-                      <span
-                        class="el-pagination-style-leftpagination-percent flexcenter"
-                      >
-                        {{ page1 }}/{{ Math.ceil(tableData1.length / limit1) }}
-                      </span>
-                    </el-pagination>
-                    <el-config-provider :locale="locale">
-                      <el-pagination
-                        background
-                        layout="prev, next, sizes, jumper"
-                        :total="tableData1.length"
-                        :page-sizes="[15, 20, 30, 40, 50]"
-                        :page-size="limit1"
-                        @size-change="handleSizeChange1"
-                        @current-change="handleCurrentChange1"
-                        class="el-pagination-style-rightpagination"
-                      />
-                    </el-config-provider>
-                  </div>
-                </div>
+
+                <PublishedManuscript />
+
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -290,14 +142,17 @@
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading } from "element-plus";
-import zhCn from "element-plus/es/locale/lang/zh-cn";
+
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import MySubmission from "@/components/MySubmission.vue";
+import PublishedManuscript from "@/components/PublishedManuscript.vue";
 export default {
   components:{
     MySubmission,//我的投稿组件
+    PublishedManuscript,//已发表稿件组件
   },
   setup() {
+
     //稿件统计数据
     const statisticsData = reactive([
       {
@@ -318,18 +173,7 @@ export default {
     ]);
 
     //通知公告数据
-    const activities = reactive([
-      {
-        content: "中国一带一路网“拉丁熊猫在中国”西班牙语专题上线",
-      },
-      {
-        content: "中国一带一路网（阿语版）推介会在沙特举行",
-      },
-      {
-        content:
-          "中国一带一路网（阿语版）推介会在沙特举行中国一带一路网（阿语版）推介会在沙特举行中国一带一路网（阿语版）推介会在沙特举行中国一带一路网（阿语版）推介会在沙特举行",
-      },
-    ]);
+    const activities = reactive([]);
     //官网动态数据
     const activities1 = reactive([
       {
@@ -371,10 +215,10 @@ export default {
 
     //通知公告点击置灰
     const isClickedArr = ref([]);
-    function elTimelineClick(index) {
-      if (!isClickedArr.value.includes(index)) {
-        isClickedArr.value.push(index);
-      }
+    function elTimelineClick(index) {index
+      // if (!isClickedArr.value.includes(index)) {
+      //   isClickedArr.value.push(index);
+      // }
     }
     //官网动态点击置灰
     const isClickedArr1 = ref([]);
@@ -384,264 +228,7 @@ export default {
       }
     }
 
-    const searchInput1 = ref("");
-    const searchSelectValue1 = ref(0);
-    const searchOptions1 = [
-      {
-        value: 0,
-        label: "标题",
-      },
-      {
-        value: 1,
-        label: "正文",
-      },
-    ];
-    //来源select数据
-    const originSelectValue = ref("");
-    const originOptions = [
-      {
-        value: 0,
-        label: "我的投稿",
-      },
-      {
-        value: 1,
-        label: "新华社",
-      },
-    ];
 
-    const langSelectValue1 = ref("");
-    const langOptions1 = [
-    {
-        value: 1,
-        label: "中文",
-      },
-      {
-        value: 2,
-        label: "英文",
-      },
-      {
-        value: 3,
-        label: "阿语",
-      },
-      {
-        value: 4,
-        label: "俄语",
-      },
-      {
-        value: 5,
-        label: "西语",
-      },
-      {
-        value: 6,
-        label: "法语",
-      },
-    ];
-
-
-    //日期选择 数据
-    const dateDefaultTime1 = ref([]);
-
-    //表格数据
-    const tableData1 = [
-      {
-        title:
-          "شي يقول إنه مستعد لتعزيز العلاقات بين الصين ونيكاراغوا لتحقيق إنجازات جديدة مع اتخاذ الشراكة الاستراتيجية نقطة انطلاق جديدةشي يقول إنه مستعد لتعزيز العلاقات بين الصين ونيكاراغوا لتحقيق إنجازات جديدة مع اتخاذ الشراكة الاستراتيجية نقطة انطلاق جديدةشي يقول إنه مستعد لتعزيز العلاقات بين الصين ونيكاراغوا لتحقيق إنجازات جديدة مع اتخاذ الشراكة الاستراتيجية نقطة انطلاق جديدة",
-        date: "2016-05-03",
-        origin: "新华社",
-        lang: "中文",
-        status: "已发布",
-      },
-      {
-        title:
-          "(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title:
-          "(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title:
-          "(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title:
-          "(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title:
-          "(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-    ];
-
-    //分页器
-    let limit1 = ref(15);
-    function handleSizeChange1(val) {
-      limit1.value = val;
-    }
-    let page1 = ref(1);
-    function handleCurrentChange1(val) {
-      page1.value = val;
-    }
-
-
-    /**
-     * 已发稿件 接口请求
-     * 以下注释摘抄至接口文档（20240409.0912）
-     * language 必填 中文1、英文2、阿语3、俄语4、西语5、法语6 
-     * articleUseStatus 非必填 稿件发布状态（0：待处理 1：审核中 2：已发布 3：未采用 ）
-     * articleTitle 非必填 关键字搜索
-     * crtime 非必填 创建时间搜索
-     * currPage 非必填 开始页数
-     * pageSize 非必填 页面条数
-     * 
-     * 接口返回数据字段，线上文档有写，很详细
-     */
-
-     function getBrokeListAjaxFn(){
-      const languageNameArr = ['中文','英文','阿语','俄语','西语','法语'];languageNameArr
-      const articleUseStatusNameArr = ['待处理','审核中','已发布','未采用'];articleUseStatusNameArr
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-
-      httpAxiosO({
-        method: 'get',
-        url: '/api/web/article/brokeList.do',
-        params:{
-          language:0,//0 可能代表 所有语种，文档里有提示 写 0
-
-        }
-      })
-      .then((D)=>{
-        console.log('已发稿件 D',D);
-        const { data,success } = D.data;data
-        if(!success){
-          ElMessage({
-            message: '已发稿件数据请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '已发稿件数据请求成功',
-          type: 'success',
-          plain: true,
-        })
-        
-        // tableData.value = [];//清空tableData
-        // data.ldata.forEach((o,i)=>{
-        //   let _o = o;
-        //   _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-        //   _o.articleUseStatusName = articleUseStatusNameArr[o.articleUseStatus]//状态名字，接口只提供了状态对应的 编号
-        //   _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
-        //   tableData.push(_o);
-        // });
-
-      })
-      .catch((error)=>{
-        console.log('已发稿件 接口请求 error',error);
-        ElMessage({
-          message: '已发稿件接口请求失败',
-          type: 'error',
-          plain: true,
-        })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
-      return;
-    }
-    // end of getArticleListAjaxFn    
 
 
     //首页公告接口
@@ -668,8 +255,8 @@ export default {
           type: 'success',
           plain: true,
         })
-        data 
-        activities
+
+        activities.push(...data);
       })
       .catch((error)=>{
         console.log('首页公告 接口请求 error',error);
@@ -740,7 +327,7 @@ export default {
     onMounted(() => {
       getArticleCountAjaxFn();//稿件统计
       getSYNoticeListAjaxFn();//首页通知公告
-      getBrokeListAjaxFn();//已发稿件
+
     });
 
     return {
@@ -756,24 +343,6 @@ export default {
       elTimelineClick,
       isClickedArr1,
       elTimelineClick1,
-      
-      searchInput1,
-      searchSelectValue1,
-      searchOptions1,
-      originSelectValue,
-      originOptions,
-
-      langSelectValue1,
-      langOptions1,
-
-
-      dateDefaultTime1,
-      locale: zhCn, //date-range 语言设置
-      tableData1,
-      limit1,
-      page1,
-      handleSizeChange1,
-      handleCurrentChange1,
 
     };
   },

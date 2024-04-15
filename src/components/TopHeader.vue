@@ -29,17 +29,24 @@
         <!-- <el-avatar shape="square" src="../assets/avatar.png" key="0"/> -->
         <img src="../assets/avatar.png" alt="" srcset="" />
         <span>陕西发改委 张某某</span>
-        <a href="">退出</a>
+        <a href="javascript:;">退出</a>
         <i class="iconfont icon-goit" />
       </div>
     </div>
   </div>
 </template>
-
 <script>
+import { useStore } from "vuex";
+
 export default {
   name: "TopHeader",
-  setup() {},
+  setup() {
+    const store = useStore();store
+
+    return {
+
+    };
+  },
 };
 </script>
 

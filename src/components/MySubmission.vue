@@ -4,7 +4,7 @@
       <div>
         <el-button
           class="btn-tougao"
-          @click="toPage('/MyContribute/CreateContribute')"
+          @click="router.push('/MyContribute/CreateContribute')"
         >
           <el-icon><Plus /></el-icon>
           &nbsp;&nbsp;&nbsp;投稿
@@ -66,7 +66,6 @@
             type="daterange"
             start-placeholder="创建起始日期"
             end-placeholder="创建结束日期"
-            :locale="locale"
             style="margin-left: 10px; width: 270px"
           />
         </el-config-provider>
@@ -74,6 +73,7 @@
           type="primary"
           class="marl10"
           style="width: 78px"
+          @click="getArticleListAjaxFn"
         >
           <el-icon style="margin-right: 5px"><Search /></el-icon>
           搜索
@@ -144,7 +144,7 @@
             <div
               class="mid-content-statistics-table-tabledata-operate"
             >
-              <div @click="getFindByIdAjaxFn(scope.row.id)">查看</div>
+              <div @click="getFindByIdAjaxFn(scope)">查看</div>
               <span></span>
               <div v-if="scope.row.articleUseStatus === 3" data-desc="已发布">链接</div>
               <span v-if="scope.row.articleUseStatus === 3" data-desc="已发布"></span>
@@ -159,7 +159,7 @@
       <div class="flexcenter el-pagination-style">
         <el-pagination
           layout="slot"
-          :total="tableData.length"
+          :total="pageTotal"
           class="el-pagination-style-leftpagination"
         >
           <span class="el-pagination-style-leftpagination-total">
@@ -176,7 +176,7 @@
             background
             layout="prev, next, sizes, jumper"
             :total="pageTotal"
-            :page-sizes="[1, 15, 20, 30, 40, 50]"
+            :page-sizes="[15, 20, 30, 40, 50]"
             :page-size="limit"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
@@ -192,12 +192,18 @@
 
 <script>
 import { ref, reactive, onMounted } from "vue";
+import { useStore } from "vuex"
+import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage,ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
+    //路由实例
+    const router = useRouter();
+    //vuex实例
+    const store = useStore();
 
     //关键词
     const searchInput = ref("");
@@ -213,34 +219,16 @@ export default {
       },
     ];
 
-    //语法select数据
+    //语种select数据
     const langSelectValue = ref("");
-    const langOptions = [
-      {
-        value: 1,
-        label: "中文",
-      },
-      {
-        value: 2,
-        label: "英文",
-      },
-      {
-        value: 3,
-        label: "阿语",
-      },
-      {
-        value: 4,
-        label: "俄语",
-      },
-      {
-        value: 5,
-        label: "西语",
-      },
-      {
-        value: 6,
-        label: "法语",
-      },
-    ];
+    const langOptions = reactive([]);
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+      langOptions.push({
+        value: o.id,
+        label: o.desc,
+      })
+    });
+
 
     //状态select数据
     const statusSelectValue = ref("");
@@ -264,12 +252,12 @@ export default {
     ];
 
     //日期选择 数据
-    const dateDefaultTime = ref([]);
+    const dateDefaultTime = ref('');
     //表格数据
     const tableData = reactive([]);
 
     //分页器
-    let limit = ref(1);
+    let limit = ref(15);
     function handleSizeChange(val) {
       limit.value = val;
     }
@@ -277,6 +265,7 @@ export default {
     let pageTotal = ref(0);
     function handleCurrentChange(val) {
       page.value = val;
+      getArticleListAjaxFn();
     }
 
 
@@ -291,21 +280,46 @@ export default {
      * pageSize 非必填 页面条数
      * 
      * 接口返回数据字段，线上文档有写，很详细
-     */
-
+    */
     function getArticleListAjaxFn(){
-      const languageNameArr = ['中文','英文','阿语','俄语','西语','法语']
+
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
+        return o.desc
+      });
+      languageNameArr.unshift('全部');
+
       const articleUseStatusNameArr = ['待处理','审核中','已发布','未采用'];
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const paramsO = {
+        language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
+        currPage:page.value,//当前页
+        pageSize:limit.value,//每页条数
+      }
+
+      statusSelectValue.value&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
+      
+      switch(searchSelectValue.value){
+        case 0:
+        paramsO.articleTitle = searchInput.value;//按标题搜索
+          break;
+        case 1:
+        paramsO.articleContent = searchInput.value;//按正文搜索
+          break;
+      }
+
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      }
+      
 
       httpAxiosO({
         method: 'get',
         url: '/api/web/article/articleList.do',
-        params:{
-          language:0,//0 可能代表 所有语种，文档里有提示 写 0
-          currPage:page.value,//当前页
-          pageSize:1,//每页条数
-        }
+        params:paramsO,
       })
       .then((D)=>{
         console.log('我的投稿 D',D);
@@ -324,7 +338,7 @@ export default {
           plain: true,
         })
         
-        tableData.value = [];//清空tableData
+        tableData.splice(0,tableData.length);   //清空tableData
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
@@ -356,13 +370,13 @@ export default {
      * 我的投稿-查看
      * 
      */
-    function getFindByIdAjaxFn(docIDP){
+    function getFindByIdAjaxFn(scopeP){
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       httpAxiosO({
         method: 'get',
         url: '/api/web/article/findById.do',
         params:{
-          id:docIDP
+          id:scopeP.row.id
         }
       })
       .then((D)=>{
@@ -391,6 +405,15 @@ export default {
         //   tableData.push(_o);
         // });
 
+        const c = router.resolve({
+          path: "/Notice/NoticeDetail",
+          query: {
+            title: scopeP.row.title,
+            time: scopeP.row.date,
+          },
+        });
+        window.open(c.href, "_blank");
+
       })
       .catch((error)=>{
         console.log('我的投稿-查看 接口请求 error',error);
@@ -412,6 +435,8 @@ export default {
     });
 
     return {
+      router,
+
       searchInput,
       searchSelectValue,
       searchOptions,
@@ -430,8 +455,11 @@ export default {
       handleCurrentChange,
       locale: zhCn, //date-range 语言设置
 
+
+
       //接口请求
       getFindByIdAjaxFn,
+      getArticleListAjaxFn,
     }
 
   },
@@ -440,7 +468,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.mid-content-statistics-table {
   .mid-content-statistics-table-content {
     padding: 0 20px;
     .mid-content-statistics-table-btngroup {
@@ -507,5 +534,6 @@ export default {
       }
     }
   }
-}
+
+
 </style>

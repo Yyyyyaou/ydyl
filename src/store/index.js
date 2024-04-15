@@ -8,6 +8,10 @@ const StroeLoginO = {
   appToken:'',
   requestToken:'',
 };
+
+//全局语种列表
+const GLOBAL_LANGUAGE_LIST = [];
+
 /**
  * 用户登录接口函数
  * @param ctx store对象
@@ -36,13 +40,22 @@ async function postUserLoginFn(ctx,params){
 }
 //end of postUserLoginFn()
 
-
+/**
+ * 获取语种列表
+ * @returns 
+ */
+async function getLanguageListFn(){
+  return await httpAxiosO({
+    method: 'get',
+    url: '/api/web/language/list.do',
+  })
+}
 
 
 export default createStore({
   state: {
     StroeLoginO,
-
+    GLOBAL_LANGUAGE_LIST,
     
   },
   getters: {
@@ -66,12 +79,16 @@ export default createStore({
       state.StroeLoginO.loginUser = loginUserStrP;
     },
 
-
+    //记录全局语种列表
+    MGlobalLanguageList(state,languageListP){
+      state.GLOBAL_LANGUAGE_LIST = languageListP;
+    },
 
 
   },
   actions: {
     postUserLoginFn,
+    getLanguageListFn,
   },
   modules: {
 

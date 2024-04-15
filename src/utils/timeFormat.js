@@ -15,8 +15,12 @@ function timeFormatFn(timeP){
   //未使用变量，省得eslint老报错
   hours,minutes,seconds
 
+  const 
+    MM = month<10?'0'+month:month,
+    DD = day<10?'0'+day:day
+  ;
   return {
-    'YYYY-MM-DD':`${year}-${month}-${day}`
+    'YYYY-MM-DD':`${year}-${MM}-${DD}`
   };
 }
 
