@@ -22,12 +22,17 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import "@/assets/iconfont/iconfont.css";
 import "@/assets/style.less";
 
+//引入富文本编辑器Quill
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
 const app = createApp(App)
 
 //注册element-plus icon
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
   }
+app.component('QuillEditor', QuillEditor)
 app.use(store).use(router).use(ElementPlus).mount('#app')
 
 /* 解决tabs切换table重绘报错问题 ResizeObserver loop completed with undelivered notifications */

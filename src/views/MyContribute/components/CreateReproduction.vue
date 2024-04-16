@@ -264,6 +264,7 @@ export default {
     height: 45px;
     width: 160px;
     border-radius: 5px;
+    font-size: 20px;
   }
   .createreproduction-btngroup-save{
     color: #2c90ff;
