@@ -29,6 +29,14 @@ const routes = [
     }],
   },
   {
+    path: '/MyUpload',
+    name: 'MyUpload',
+    component: function () {
+      return import('../views/MyUpload.vue')
+    },
+    meta: { title: '我的数据上传' }
+  },
+  {
     path: '/Notice',
     name: 'Notice',
     component: RouterReplaceComp(()=>import('../views/Notice/Notice.vue')),
@@ -41,6 +49,22 @@ const routes = [
       },
       meta: { title: '通知公告详情' },
     }],
+  },
+  {
+    path: '/ManuscriptAuditing',
+    name: 'ManuscriptAuditing',
+    component: function () {
+      return import('../views/ManuscriptAuditing.vue')
+    },
+    meta: { title: '审核稿件' }
+  },
+  {
+    path: '/PaperAuditing',
+    name: 'PaperAuditing',
+    component: function () {
+      return import('../views/PaperAuditing.vue')
+    },
+    meta: { title: '审核报题' }
   },
   {
     path: '/Message',

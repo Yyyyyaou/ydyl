@@ -178,7 +178,7 @@ export default {
   }
   .createorigin-content-upload {
     .el-input {
-      width: 80%;
+      width: 90%;
     }
     .el-button{
       width: 43px;
