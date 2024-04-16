@@ -1,6 +1,6 @@
 <template>
   <!-- 如果登录了，它才显示开始 -->
-  <template v-if="!computedStroeLoginIsLoginO">
+  <template v-if="computedStroeLoginIsLoginO">
 
   <el-container>
     <el-header>
@@ -23,7 +23,7 @@
   <!-- 如果登录了，它才显示结束 -->
   
   <!-- 显示登录页 -->
-  <Login v-if="computedStroeLoginIsLoginO" />
+  <Login v-if="!computedStroeLoginIsLoginO" />
 </template>
 
 <script>
