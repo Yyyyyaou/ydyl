@@ -6,16 +6,26 @@
           <div class="mid-content-mycontribute-header-i">
             <img src="../assets/mycontribute.png" alt="" />
           </div>
-          <span>系统消息</span>
+          <span>审核稿件</span>
         </div>
       </div>
       <div class="mid-divider"></div>
       <div class="mid-content-mycontribute-table-content">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
-          <div></div>
+          <div>
+            <el-radio-group
+              v-model="statusRadio"
+              class="mid-content-mycontribute-table-btngroup-radio"
+            >
+              <el-radio :value="1">待审核</el-radio>
+              <el-radio :value="2">已处理</el-radio>
+            </el-radio-group>
+          </div>
           <div
             class="mid-content-mycontribute-table-btngroup-search flexcenter"
           >
+            <el-button class="mid-content-mycontribute-table-btngroup-search-btn">批量审核</el-button>
+            <div class="mid-content-mycontribute-table-btngroup-search-divide"></div>
             <div class="mid-content-mycontribute-table-btngroup-search-keyword">
               <el-select
                 v-model="searchSelectValue"
@@ -33,8 +43,32 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                clearable
               />
             </div>
+            <div class="marl10">
+              <el-autocomplete
+                v-model="originInput"
+                style="width: 190px"
+                :fetch-suggestions="querySearch"
+                clearable
+                placeholder="稿件来源"
+              />
+            </div>
+
+            <el-select
+              v-model="langSelectValue"
+              placeholder="语种"
+              style="width: 140px"
+              class="marl10"
+            >
+              <el-option
+                v-for="item in langOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
             <el-config-provider :locale="locale">
               <el-date-picker
                 v-model="dateDefaultTime"
@@ -67,6 +101,7 @@
               'font-size': '16px',
             }"
           >
+            <el-table-column type="selection" width="55" />
             <el-table-column label="序号" width="100">
               <template #default="scope">
                 {{ scope.$index + 1 }}
@@ -129,7 +164,16 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="date" label="时间" width="140" />
+            <el-table-column prop="origin" label="稿件来源" width="125" />
+            <el-table-column prop="lang" label="语种" width="120" />
+            <el-table-column prop="date" label="创建时间" width="200" />
+            <el-table-column prop="operate" label="操作" width="80">
+              <template #default="scope">
+                <div class="mid-content-mycontribute-table-tabledata-operate">
+                  <div v-if="scope.row.title != ''">审核</div>
+                </div>
+              </template>
+            </el-table-column>
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination
@@ -166,7 +210,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 export default {
   setup() {
@@ -183,6 +227,9 @@ export default {
         label: "正文",
       },
     ];
+    //语种select数据
+    const langSelectValue = ref("");
+    const langOptions = reactive([{ value: 0, label: "中文" }]);
     //日期选择 数据
     const dateDefaultTime = ref([]);
     //表格数据
@@ -308,10 +355,47 @@ export default {
         isClickedArr.value.push(scope.$index);
       }
     }
+
+    //联想输入框
+    const originInput = ref("");
+    const restaurants = ref([]);
+    const querySearch = (queryString, cb) => {
+      const results = queryString
+        ? restaurants.value.filter(createFilter(queryString))
+        : restaurants.value;
+      // call callback function to return suggestions
+      cb(results);
+    };
+    const loadAll = () => {
+      return [
+        { value: "vue", link: "https://github.com/vuejs/vue" },
+        { value: "element", link: "https://github.com/ElemeFE/element" },
+        { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
+        { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
+        { value: "vuex", link: "https://github.com/vuejs/vuex" },
+        { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
+        { value: "babel", link: "https://github.com/babel/babel" },
+      ];
+    };
+    const createFilter = (queryString) => {
+      return (restaurant) => {
+        return (
+          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    };
+    onMounted(() => {
+      restaurants.value = loadAll();
+    });
+
+    const statusRadio = ref(1);
     return {
       searchInput,
       searchSelectValue,
       searchOptions,
+      langSelectValue,
+      langOptions,
       dateDefaultTime,
       locale: zhCn, //date-range 语言设置
       tableData,
@@ -322,6 +406,9 @@ export default {
       isClickedArr,
       rowTitleClick,
       popoverShowFlag,
+      originInput,
+      querySearch,
+      statusRadio,
     };
   },
 };
@@ -364,6 +451,16 @@ export default {
         background: #1890ff;
         color: #fff;
       }
+      .mid-content-mycontribute-table-btngroup-search-btn{
+        background: #1890ff;
+        color: #fff;
+      }
+      .mid-content-mycontribute-table-btngroup-search-divide{
+        width: 2px;
+        height: 25px;
+        background-color: #dfdee4;
+        margin:0 15px
+      }
       .mid-content-mycontribute-table-btngroup-search-keyword {
         :deep(.el-select__wrapper) {
           border-top-right-radius: 0;
@@ -383,6 +480,11 @@ export default {
       .marl10 {
         margin-left: 10px;
       }
+      .mid-content-mycontribute-table-btngroup-radio {
+        :deep(.el-radio__label) {
+          font-size: 16px;
+        }
+      }
     }
     .mid-content-mycontribute-table-tabledata {
       margin-top: 15px;
@@ -399,10 +501,7 @@ export default {
         color: #fba010;
       }
       .mid-content-mycontribute-table-tabledata-operate {
-        display: flex;
-        align-items: center;
         color: #3652d2;
-        justify-content: left;
         div {
           cursor: pointer;
           padding: 0 8px;
