@@ -88,6 +88,7 @@ export default {
         border-radius: 8px;
         margin-right: 10px;
         border: 1px solid #d1e9ff;
+        font-size: 16px;
       }
       .create-btngroup-btn:nth-last-child(1) {
         margin: 0;
