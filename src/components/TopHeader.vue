@@ -28,8 +28,8 @@
       <div class="flexcenter">
         <!-- <el-avatar shape="square" src="../assets/avatar.png" key="0"/> -->
         <img src="../assets/avatar.png" alt="" srcset="" />
-        <span>陕西发改委 张某某</span>
-        <a href="javascript:;">退出</a>
+        <span>{{ loginUser.bankName }}</span>
+        <a href="javascript:;" @click="logoutFn">退出</a>
         <i class="iconfont icon-goit" />
       </div>
     </div>
@@ -41,10 +41,21 @@ import { useStore } from "vuex";
 export default {
   name: "TopHeader",
   setup() {
-    const store = useStore();store
+    const store = useStore();
+    const { loginUser } = store.state.StroeLoginO;
+
+    // 退出登录
+    function logoutFn(){
+      store.dispatch('getUserLogoutFn')
+      .then((D)=>{
+        console.log('D',D);
+        store.commit('MStroeLoginOIsLogin',false);//改变登录状态为“登出”
+      })
+    }
 
     return {
-
+      loginUser,
+      logoutFn,
     };
   },
 };

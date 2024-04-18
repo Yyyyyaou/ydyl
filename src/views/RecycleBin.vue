@@ -13,7 +13,7 @@
       <div class="mid-content-mycontribute-table-content">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
-            <el-button class="clear-recyclebin" @click="clearRecyclebin()">
+            <el-button class="clear-recyclebin" @click="clearRecyclebinFn()">
               清除回收站
             </el-button>
           </div>
@@ -95,7 +95,7 @@
             <el-table-column prop="articleUseStatus" label="操作" width="200">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div :title="scope.row.articleTitle">继续采用</div>
+                  <div :title="scope.row.articleTitle" @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">继续采用</div>
                   <span></span>
                   <div>删除</div>
                   <span></span>
@@ -147,10 +147,6 @@ import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
-    //清除回收站
-    const clearRecyclebin = () => {
-      console.log("清除回收站");
-    };
 
     //路由实例
     const router = useRouter();
@@ -262,7 +258,7 @@ export default {
         tableData.splice(0,tableData.length);   //清空tableData
         data.ldata.forEach((o)=>{
           let _o = o;
-
+          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
           _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
           tableData.push(_o);
         });
@@ -285,6 +281,64 @@ export default {
     }
     // end of getArticleDraftListAjaxFn
 
+    //清除回收站
+    const clearRecyclebinFn = () => {
+      store.dispatch('deleteDelAllFn').then(()=>{
+        ElMessage({
+          message: '清空回收站成功',
+          type: 'success',
+          plain: true,
+        })
+      })
+      .catch(()=>{
+        ElMessage({
+          message: '清空回收站失败',
+          type: 'error',
+          plain: true,
+        })
+      });
+    };
+
+    /**
+     * 继续采用 ，实际上是“查看稿件”即跳转到 “创建稿件/原创稿件”界面
+     * @param {*} scopeP 
+     */
+    const continueUsingFn = (scopeP) => {
+      scopeP
+      // const {
+      //   id,articleTitle,articleHtmlCon,articleContent,language,remark,articleStatus,aritleSource
+      // } = scopeP.row;
+      // store.dispatch('',{
+      //   params:{
+      //     // id,articleTitle,articleHtmlCon,articleContent,language,remark,
+      //     // articleStatus:1,aritleSource
+      //   },
+      // }).then((D)=>{
+      //   if(
+      //     D.data.success === false
+      //   ){
+      //     ElMessage({
+      //       message: '接口请求成功 但采用失败',
+      //       type: 'error',
+      //       plain: true,
+      //     })
+      //     return;
+      //   }
+      //   ElMessage({
+      //     message: '采用成功',
+      //     type: 'success',
+      //     plain: true,
+      //   })
+      // })
+      // .catch(()=>{
+      //   ElMessage({
+      //     message: '采用失败',
+      //     type: 'error',
+      //     plain: true,
+      //   })
+      // });
+    };
+
     onMounted(() => {
       getArticleDraftListAjaxFn();
     });
@@ -295,7 +349,6 @@ export default {
     return {
       router,
 
-      clearRecyclebin,
       searchInput,
       searchSelectValue,
       searchOptions,
@@ -310,6 +363,8 @@ export default {
       tableSelectionChange,
 
       getArticleDraftListAjaxFn,
+      clearRecyclebinFn,
+      continueUsingFn,
     };
   },
 };

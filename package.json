@@ -12,6 +12,7 @@
     "@vueup/vue-quill": "^1.0.0-alpha.40",
     "axios": "^1.6.8",
     "element-plus": "^2.6.0",
+    "quill": "^2.0.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"

@@ -39,7 +39,7 @@
               placeholder="输入短信验证码"
               :prefix-icon="Lock"
             />
-            <div class="yzm_btn">获取验证码</div>
+            <div class="yzm_btn" @click="getSmsFn">获取验证码</div>
           </li>  
 
           <li class="warning"><el-icon><WarningFilled /></el-icon>&nbsp;用户名或密码不正确</li>
@@ -68,7 +68,7 @@ import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import { HomeFilled,Lock,Iphone } from "@element-plus/icons-vue";
 import { initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
-
+import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 
 
 export default {
@@ -128,12 +128,30 @@ export default {
         loadingInstance1.close();
       })
       ;
-    }
+    };
+
+    /**
+     * 获取短信验证码
+     */
+    const getSmsFn = ()=>{
+      httpAxiosO({
+        method: 'get',
+        url: '/api/web/code/tg/sms.do',
+      })
+      .then((D)=>{
+        console.log('登录短信发送 D',D);
+      })
+      .catch((error)=>{
+        console.log('登录短信发送 error',error);
+      })
+    };
+
 
 
     return {
       inputValueO,
       postUserLoginConstFn,
+      getSmsFn,
 
       HomeFilled,Lock,Iphone,
 

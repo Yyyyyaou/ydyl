@@ -1,5 +1,19 @@
 import { createStore } from 'vuex'
-import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
+// import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
+import {
+  getLanguageListFn,
+  postUserLoginFn,
+  getUserLogoutFn,
+} from './actionFunctions.js';
+
+import { 
+  deleteLogicDeleteFn,
+  deletePhysicsDeleteFn,
+  deleteDelAllFn,
+  getUpdateFn,
+  getFindByIdFn,
+} from './actionSubmission.js';
+
 
 //用户登录信息
 const StroeLoginO = {
@@ -12,44 +26,6 @@ const StroeLoginO = {
 //全局语种列表
 const GLOBAL_LANGUAGE_LIST = [];
 
-/**
- * 用户登录接口函数
- * @param ctx store对象
- * @param params 接口所需要的各种字段
- * @returns 
- */
-async function postUserLoginFn(ctx,params){
-  ctx
-  const { loginName,password,loginCaptcha } = params;
-  console.log('params',params);
-  const formData = new FormData();
-  formData.append('loginName', loginName);
-  formData.append('password', password);
-  formData.append('isCode', false);
-  formData.append('loginCaptcha', loginCaptcha);
-
-  return await httpAxiosO({
-    method: 'post',
-    url: '/api/web/user/tg/login.do',
-    headers:{
-      'methodName': 'postUserLoginFn',
-    },
-    data:formData,
-  })
-
-}
-//end of postUserLoginFn()
-
-/**
- * 获取语种列表
- * @returns 
- */
-async function getLanguageListFn(){
-  return await httpAxiosO({
-    method: 'get',
-    url: '/api/web/language/list.do',
-  })
-}
 
 
 export default createStore({
@@ -89,6 +65,13 @@ export default createStore({
   actions: {
     postUserLoginFn,
     getLanguageListFn,
+    getUserLogoutFn,
+    
+    deleteLogicDeleteFn,
+    deletePhysicsDeleteFn,
+    deleteDelAllFn,
+    getUpdateFn,
+    getFindByIdFn,
   },
   modules: {
 

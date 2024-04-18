@@ -148,9 +148,11 @@
               <span></span>
               <div v-if="scope.row.articleUseStatus === 3" data-desc="已发布">链接</div>
               <span v-if="scope.row.articleUseStatus === 3" data-desc="已发布"></span>
-              <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理">编辑</div>
+              <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理"
+                @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)"
+              >编辑</div>
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
-              <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理">删除</div>
+              <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFn(scope)">删除</div>
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
             </div>
           </template>
@@ -367,67 +369,53 @@ export default {
 
 
     /**
-     * 我的投稿-查看
-     * 
+     * 跳转到细览页，需要传递 稿件id
      */
     function getFindByIdAjaxFn(scopeP){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      httpAxiosO({
-        method: 'get',
-        url: '/api/web/article/findById.do',
-        params:{
-          id:scopeP.row.id
-        }
+      const c = router.resolve({
+        path: "/Notice/NoticeDetail",
+        query: {
+          id: scopeP.row.id,
+        },
+      });
+
+      window.open(c.href, "_blank");
+      return;
+    }
+
+    /**
+     *删除稿件到回收站 
+     */
+    function triggerDeleteLogicDeleteFn(scopeP){
+      const { id } = scopeP.row;
+      store.dispatch('deleteLogicDeleteFn',{
+        ids:String(id),
       })
       .then((D)=>{
-        console.log('我的投稿-查看 D',D);
-        const { data,success } = D.data;data
-        if(!success){
+        if(
+          D === undefined
+        ){
           ElMessage({
-            message: '我的投稿-查看数据请求失败',
+            message: '接口请求成功 但删除失败',
             type: 'error',
             plain: true,
           })
           return;
         }
         ElMessage({
-          message: '我的投稿-查看数据请求成功',
+          message: '删除到回收站',
           type: 'success',
           plain: true,
         })
-        
-        // tableData.value = [];//清空tableData
-        // data.ldata.forEach((o,i)=>{
-        //   let _o = o;
-        //   _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-        //   _o.articleUseStatusName = articleUseStatusNameArr[o.articleUseStatus]//状态名字，接口只提供了状态对应的 编号
-        //   _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
-        //   tableData.push(_o);
-        // });
-
-        const c = router.resolve({
-          path: "/Notice/NoticeDetail",
-          query: {
-            title: scopeP.row.title,
-            time: scopeP.row.date,
-          },
-        });
-        window.open(c.href, "_blank");
-
       })
-      .catch((error)=>{
-        console.log('我的投稿-查看 接口请求 error',error);
+      .catch(()=>{
         ElMessage({
-          message: '我的投稿-查看接口请求失败',
+          message: '删除失败',
           type: 'error',
           plain: true,
         })
       })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
       ;
-      return;
     }
 
     onMounted(()=>{
@@ -455,11 +443,11 @@ export default {
       handleCurrentChange,
       locale: zhCn, //date-range 语言设置
 
-
-
       //接口请求
       getFindByIdAjaxFn,
       getArticleListAjaxFn,
+      triggerDeleteLogicDeleteFn,
+
     }
 
   },

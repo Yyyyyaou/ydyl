@@ -282,6 +282,9 @@ export default {
       httpAxiosO({
         method: 'get',
         url: '/api/web/article/articleCount',
+        params:{
+          searchUser:0,//	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+        },
       })
       .then((D)=>{
         console.log('稿件统计 D',D);

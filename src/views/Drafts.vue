@@ -89,10 +89,10 @@
             <el-table-column prop="articleSource" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
-            <el-table-column prop="operate" label="操作" width="200">
+            <el-table-column prop="articleUseStatus" label="操作" width="200">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div :title="scope.row.articleTitle">编辑</div>
+                  <div :title="scope.row.articleTitle"  @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">编辑</div>
                   <span></span>
                   <div>删除</div>
                   <span></span>
@@ -239,7 +239,6 @@ export default {
       .then((D)=>{
         console.log('草稿箱 D',D);
         const { data,success } = D?.data
-        data
         if(!success){
           ElMessage({
             message: '草稿箱数据请求失败',
@@ -252,8 +251,8 @@ export default {
           message: '草稿箱数据请求成功',
           type: 'success',
           plain: true,
-        })
-        
+        });
+
         tableData.splice(0,tableData.length);   //清空tableData
         data.ldata.forEach((o)=>{
           let _o = o;
