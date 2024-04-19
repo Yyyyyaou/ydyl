@@ -20,20 +20,126 @@
             </div>
             <div class="mid-divider"></div>
             <div class="mid-content-statistics-left-content flexcenter">
-              <div
-                v-for="item in statisticsData"
-                :key="item.name"
-                class="flexcenter mid-content-statistics-left-content-div"
-              >
-                <div class="flexcenter">
-                  <img
-                    :src="require('../assets/' + item.src + '.png')"
-                    alt=""
-                  />
+              <template v-if="userAuthority == '外部用户'">
+                <div
+                  v-for="item in statisticsData"
+                  :key="item.name"
+                  class="flexcenter mid-content-statistics-left-content-div"
+                >
+                  <div
+                    class="flexcenter mid-content-statistics-left-content-img"
+                  >
+                    <img
+                      :src="require('../assets/' + item.src + '.png')"
+                      alt=""
+                    />
+                  </div>
+                  <p>{{ item.num }}</p>
+                  <p>{{ item.name }}</p>
                 </div>
-                <p>{{ item.num }}</p>
-                <p>{{ item.name }}</p>
-              </div>
+              </template>
+              <template v-else-if="userAuthority == '外部用户_信息中心'">
+                <div
+                  class="flexcenter mid-content-statistics-left-content-div mid-content-statistics-left-content-infocenter"
+                >
+                  <div
+                    class="flexcenter mid-content-statistics-left-content-img"
+                  >
+                    <img src="../assets/papernum.png" alt="" />
+                  </div>
+                  <p>60</p>
+                  <p>待审稿件</p>
+                  <p></p>
+                  <p>248</p>
+                  <p>已审稿件</p>
+                </div>
+                <div
+                  class="flexcenter mid-content-statistics-left-content-div mid-content-statistics-left-content-infocenter"
+                >
+                  <div
+                    class="flexcenter mid-content-statistics-left-content-img"
+                  >
+                    <img src="../assets/papertitlenum.png" alt="" />
+                  </div>
+                  <p>60</p>
+                  <p>待审报题</p>
+                  <p></p>
+                  <p>248</p>
+                  <p>已审报题</p>
+                </div>
+              </template>
+              <template v-else-if="userAuthority == '外部用户_发改委'">
+                <div
+                  class="flexcenter mid-content-statistics-left-content-divfgw"
+                >
+                  <div
+                    class="flexcenter mid-content-statistics-left-content-img"
+                  >
+                    <img src="../assets/releasenum.png" alt="" />
+                  </div>
+                  <div>
+                    <div
+                      class="flexcenter mid-content-statistics-left-content-divfgw-num"
+                    >
+                      <p>247</p>
+                      <p>联络员投稿总数</p>
+                    </div>
+                    <div
+                      class="flexcenter mid-content-statistics-left-content-divfgw-divide"
+                    >
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div
+                      class="flexcenter mid-content-statistics-left-content-divfgw-num"
+                    >
+                      <p>204</p>
+                      <p>联络员发布总数</p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="flexcenter mid-content-statistics-left-content-divfgw"
+                >
+                  <div
+                    class="flexcenter mid-content-statistics-left-content-img"
+                  >
+                    <img src="../assets/fgwnum2.png" alt="" />
+                  </div>
+                  <div>
+                    <div
+                      class="flexcenter mid-content-statistics-left-content-divfgw-num"
+                    >
+                      <p>154</p>
+                      <p>联络员原创稿件</p>
+                    </div>
+                    <div
+                      class="flexcenter mid-content-statistics-left-content-divfgw-divide"
+                    >
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div
+                      class="flexcenter mid-content-statistics-left-content-divfgw-num"
+                    >
+                      <p>50</p>
+                      <p>联络员转载稿件</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flexcenter mid-content-statistics-left-content-div">
+                  <div
+                    class="flexcenter mid-content-statistics-left-content-img"
+                  >
+                    <img src="../assets/fgwnum3.png" alt="" />
+                  </div>
+                  <p>82.6%</p>
+                  <p>采用率</p>
+                  <el-icon><InfoFilled /></el-icon>
+                </div>
+              </template>
             </div>
           </div>
           <div class="mid-content-statistics-right">
@@ -107,9 +213,12 @@
             <el-tabs
               type="border-card"
               @tab-click="tableTabClick"
-              v-if="userAuthority == '外部用户'"
+              v-if="
+                userAuthority == '外部用户' ||
+                userAuthority == '外部用户_发改委'
+              "
             >
-              <el-tab-pane>
+              <el-tab-pane v-if="userAuthority == '外部用户'">
                 <template #label>
                   <span class="custom-tabs-label flexcenter">
                     <img src="../assets/mycontribute.png" alt="" />
@@ -183,12 +292,12 @@ export default {
   components: {
     MySubmission, //我的投稿组件
     PublishedManuscript, //已发表稿件组件
-    ManuscriptAuditing,//审核稿件
-    PaperAuditing//审核报题
+    ManuscriptAuditing, //审核稿件
+    PaperAuditing, //审核报题
   },
   setup() {
     //用户权限
-    const userAuthority = "外部用户_信息中心"; //外部用户  外部用户_信息中心  外部用户_发改委
+    const userAuthority = "外部用户_发改委"; //外部用户  外部用户_信息中心  外部用户_发改委
     //稿件统计数据
     const statisticsData = reactive([
       {
@@ -435,12 +544,12 @@ export default {
         }
         .mid-content-statistics-left-content {
           padding: 20px 18px;
-          .mid-content-statistics-left-content-div {
+          .mid-content-statistics-left-content-divfgw {
             height: 108px;
             min-width: 330px;
             width: 32%;
             background: #f6f6f7;
-            > div {
+            .mid-content-statistics-left-content-img {
               width: 75px;
               height: 75px;
               background-color: #fff;
@@ -448,16 +557,73 @@ export default {
               margin-left: 30px;
               justify-content: center;
             }
-            p:nth-child(2) {
+            .mid-content-statistics-left-content-divfgw-num {
+              justify-content: center;
+              p:nth-child(1) {
+                margin-left: 20px;
+                font-size: 30px;
+                color: #555b73;
+              }
+              p:nth-child(2) {
+                margin-left: 10px;
+                font-size: 16px;
+                color: #555b73;
+              }
+            }
+            .mid-content-statistics-left-content-divfgw-divide {
+              margin-left: 10px;
+              div:nth-child(odd) {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background-color: #e2e3e5;
+              }
+              div:nth-child(even) {
+                width: 193px;
+                height: 1px;
+                border-bottom: 1px dashed #e2e3e5;
+              }
+            }
+          }
+          .mid-content-statistics-left-content-div {
+            height: 108px;
+            min-width: 330px;
+            width: 32%;
+            background: #f6f6f7;
+            .el-icon {
+              color: #ef9712;
+              font-size: 20px;
+              margin-left: 20px;
+            }
+            .mid-content-statistics-left-content-img {
+              width: 75px;
+              height: 75px;
+              background-color: #fff;
+              border-radius: 50%;
+              margin-left: 30px;
+              justify-content: center;
+            }
+            p:nth-child(2),
+            p:nth-child(5) {
               margin-left: 20px;
               font-size: 30px;
               color: #555b73;
             }
-            p:nth-child(3) {
+            p:nth-child(4) {
+              width: 1px;
+              height: 40px;
+              background-color: #dfddec;
+              margin: 0 35px;
+            }
+            p:nth-child(3),
+            p:nth-child(6) {
               margin-left: 10px;
               font-size: 16px;
               color: #555b73;
             }
+          }
+          .mid-content-statistics-left-content-infocenter {
+            min-width: 506px;
           }
           div:nth-child(2) {
             margin: 0 2%;
