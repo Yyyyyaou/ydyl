@@ -373,6 +373,7 @@ export default {
     font-size: 16px;
     color: #555b73;
     margin-left: 10px;
+    margin-top: 25px;
     span:nth-last-child(1) {
       color: #a7a9b2;
     }
@@ -384,4 +385,12 @@ export default {
     justify-content: center;
   }
 }
+</style>
+<style lang="less">
+.elpopover-style {
+  position: fixed !important;
+  top: 50% !important;
+  left: 63% !important;
+  transform: translate(-50%, -50%);
+  }
 </style>
