@@ -109,32 +109,39 @@
 
 <script>
 import { reactive, ref } from "vue";
+import { useStore } from "vuex";
+import { ElMessage,ElLoading } from "element-plus";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+
 export default {
   setup() {
-    const dataList = ref([{ title: "11", fold: false }]);
+    //vuex实例
+    const store = useStore();
+
+    const dataList = ref([]);
     const rules = reactive({
-      title: [
+      title: [//稿件标题
         {
           required: true,
           message: "必填项",
           trigger: "change",
         },
       ],
-      origin: [
+      origin: [//稿件来源
         {
           required: true,
           message: "必填项",
           trigger: "change",
         },
       ],
-      lang: [
+      lang: [//语种
         {
           required: true,
           message: "必填项",
           trigger: "change",
         },
       ],
-      url: [
+      url: [//稿件原地址
         {
           required: true,
           message: "必填项",
@@ -142,16 +149,16 @@ export default {
         },
       ],
     });
-    const langOptions = [
-      {
-        value: 0,
-        label: "中文",
-      },
-      {
-        value: 1,
-        label: "英文",
-      },
-    ];
+
+    const langOptions = reactive([]);
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+      langOptions.push({
+        value: o.id,
+        label: o.desc,
+      })
+    });
+
+
     function foldClick(formData) {
       formData.fold = !formData.fold;
     }
@@ -168,6 +175,9 @@ export default {
       });
       dataList.value[dataList.value.length - 1].fold = false;
     }
+
+
+
     return {
       dataList,
       rules,
@@ -175,6 +185,8 @@ export default {
       foldClick,
       addData,
       deleteData,
+
+
     };
   },
 };

@@ -81,8 +81,8 @@
     </el-form>
   </div>
   <div class="createorigin-btngroup flexcenter">
-    <el-button class="createorigin-btngroup-save">保存到草稿箱</el-button>
-    <el-button class="createorigin-btngroup-submit" @click="postAddEditFn">提 交</el-button>
+    <el-button class="createorigin-btngroup-save" @click="postAddEditAjaxFn(0)">保存到草稿箱</el-button>
+    <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
     <el-button class="createorigin-btngroup-reset">重 置</el-button>
   </div>
 </template>
@@ -106,6 +106,7 @@ export default {
     
     //vuex实例
     const store = useStore();
+
     const formData = reactive({});//表单数据
     const rules = reactive({
       articleTitle: [//文章标题
@@ -216,7 +217,7 @@ export default {
      */
     function checkFieldValueFn(datasOP){
       const { articleTitle,articleSource,language,articleContent } = datasOP;
-      console.log('articleContent',articleContent);
+
       let checkResult = true;
       if(
         !articleTitle
@@ -262,14 +263,20 @@ export default {
       return checkResult
     }
 
-    function postAddEditFn(){
+    /**
+     * articleStatus:0 时
+     * 提交稿件到 “草稿箱”列表里
+     * articleStatus:1 时
+     * 提交稿件到 “我的投稿”列表里     * 
+     */
+    function postAddEditAjaxFn(articleStatusP){
       const datasO = {
         articleTitle:formData.articleTitle,//稿件标题
         articleSource:formData.articleSource,//稿件来源
         language:formData.language,//语种
         remark:formData.remark,//备注
 
-        articleStatus:1,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
+        articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
       };
       
       datasO.articleHtmlCon = QuillEditorInitFn.getSemanticHTML()//文章HTML内容
@@ -279,7 +286,6 @@ export default {
       const _regExp1 = /\n$/;
       datasO.articleContent = datasO.articleContent.replace(_regExp1, '');
 
-      console.log(datasO);
       if(!checkFieldValueFn(datasO)){//验证各个字段
         return;
       }
@@ -361,7 +367,6 @@ export default {
 
     onMounted(()=>{
       QuillEditorInitFn();
-
     })
 
     return {
@@ -371,7 +376,7 @@ export default {
       rules,
       langOptions,
 
-      postAddEditFn,
+      postAddEditAjaxFn,
       QuillEditorInitFn,
 
     };

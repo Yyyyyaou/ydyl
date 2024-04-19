@@ -45,7 +45,7 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px" @click="getArticleRecordListAjaxFn">
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
@@ -58,12 +58,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
           >
@@ -72,45 +72,8 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="稿件标题">
+            <el-table-column prop="title" label="标题">
               <template #default="scope">
-                <el-popover
-                  :visible="scope.row.visible ? true : false"
-                  placement="bottom"
-                  :width="600"
-                  popper-class="elpopover-style"
-                >
-                  <div class="elpopover-header">
-                    <span>发送人：{{ scope.row.name }}</span>
-                    <span style="margin-left: 18px"
-                      >发送时间：{{ scope.row.date }}</span
-                    >
-                  </div>
-                  <p>
-                    <span>标题：</span><span>{{ scope.row.title }}</span>
-                  </p>
-                  <p>
-                    <span>正文：</span><span>{{ scope.row.title }}</span>
-                  </p>
-                  <div class="elpopover-button">
-                    <el-button
-                      type="primary"
-                      @click="
-                        scope.row.visible = false;
-                        popoverShowFlag = false;
-                      "
-                      >确定
-                    </el-button>
-                    <el-button
-                      type="info"
-                      @click="
-                        scope.row.visible = false;
-                        popoverShowFlag = false;
-                      "
-                      >取消
-                    </el-button>
-                  </div>
-                  <template #reference>
                     <span
                       style="
                         display: flex;
@@ -126,31 +89,29 @@
                       {{ scope.row.title }}
                     </span>
                   </template>
-                </el-popover>
-              </template>
             </el-table-column>
-            <el-table-column prop="date" label="时间" width="140" />
+            <el-table-column prop="crtimeFormat" label="时间" width="240" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination
               layout="slot"
-              :total="tableData.length"
+              :total="pageTotal"
               class="el-pagination-style-leftpagination"
             >
               <span class="el-pagination-style-leftpagination-total">
-                共{{ tableData.length }}条
+                共{{ pageTotal }}条
               </span>
               <span
                 class="el-pagination-style-leftpagination-percent flexcenter"
               >
-                {{ page }}/{{ Math.ceil(tableData.length / limit) }}
+                {{ page }}/{{ Math.ceil(pageTotal / limit) }}
               </span>
             </el-pagination>
             <el-config-provider :locale="locale">
               <el-pagination
                 background
                 layout="prev, next, sizes, jumper"
-                :total="tableData.length"
+                :total="pageTotal"
                 :page-sizes="[15, 20, 30, 40, 50]"
                 :page-size="limit"
                 @size-change="handleSizeChange"
@@ -166,8 +127,11 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import { ElMessage,ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
     //关键词
@@ -184,113 +148,16 @@ export default {
       },
     ];
     //日期选择 数据
-    const dateDefaultTime = ref([]);
+    const dateDefaultTime = ref('');
     //表格数据
-    const tableData = [
-      {
-        title:
-          "您题为《外交部：中国发展对外关系对各国一视同仁》的投稿正在审核中",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "您题为《便利外籍人员来华5项措施详解》的投稿未采用",
-        date: "2016-05-03",
-        origin: "新华社1",
-        lang: "中文",
-        status: "已发布",
-      },
-      {
-        title:
-          "(Musiècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title:
-          "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-    ];
+    const tableData = reactive([]);
     //分页器
     let limit = ref(15);
     function handleSizeChange(val) {
       limit.value = val;
     }
     let page = ref(1);
+    let pageTotal = ref(0);
     function handleCurrentChange(val) {
       page.value = val;
     }
@@ -308,6 +175,71 @@ export default {
         isClickedArr.value.push(scope.$index);
       }
     }
+
+    /**
+     * 获取系统消息列表数据
+     */
+    function getArticleRecordListAjaxFn(){
+
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const paramsO = {
+        displayNode:0,// 0 我的投稿  1 国家信息信息中心  2 国家发改委
+        pageIndex:page.value,//页码
+        pageSize:limit.value,//每页显示条数
+      }
+
+      switch(searchSelectValue.value){
+        case 0:
+        paramsO.title = searchInput.value;//检索关键词，模糊检索标题
+          break;
+        case 1:
+        paramsO.content = searchInput.value;//检索关键词，模糊检索正文
+          break;
+      }
+
+
+      httpAxiosO({
+        method:'get',
+        url:'/api/web/articleRecord/getArticleRecordList.do',
+        params:paramsO
+      })
+      .then((D)=>{
+        console.log('获取系统消息列表数据 D',D);
+        const { data,success } = D.data;
+        if(!success){
+          ElMessage({
+            message: '获取系统消息列表数据失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '获取系统消息列表数据成功',
+          type: 'success',
+          plain: true,
+        })
+        data.ldata.forEach((o)=>{
+          let _o = o;
+          _o.crtimeFormat = timeFormatFn(o.cRtime)['YYYY-MM-DD hh:mm:ss']//时间格式化
+          tableData.push(_o);  
+        });
+        pageTotal.value = data.totalResults;
+      })
+      .catch((error)=>{
+        console.log('获取系统消息列表数据 error',error)
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+    }
+
+
+    onMounted(()=>{
+      getArticleRecordListAjaxFn();
+    });
+
     return {
       searchInput,
       searchSelectValue,
@@ -317,11 +249,14 @@ export default {
       tableData,
       limit,
       page,
+      pageTotal,
       handleSizeChange,
       handleCurrentChange,
       isClickedArr,
       rowTitleClick,
       popoverShowFlag,
+
+      getArticleRecordListAjaxFn,
     };
   },
 };
