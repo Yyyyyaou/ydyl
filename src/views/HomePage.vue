@@ -104,7 +104,11 @@
             >
               <el-icon><DArrowRight /></el-icon>
             </div>
-            <el-tabs type="border-card" @tab-click="tableTabClick">
+            <el-tabs
+              type="border-card"
+              @tab-click="tableTabClick"
+              v-if="userAuthority == '外部用户'"
+            >
               <el-tab-pane>
                 <template #label>
                   <span class="custom-tabs-label flexcenter">
@@ -116,7 +120,6 @@
 
                 <!-- 我的投稿组件 -->
                 <MySubmission />
-
               </el-tab-pane>
               <el-tab-pane>
                 <template #label>
@@ -128,7 +131,35 @@
                 <div class="mid-divider" style="margin-top: 1px"></div>
 
                 <PublishedManuscript />
+              </el-tab-pane>
+            </el-tabs>
+            <el-tabs
+              type="border-card"
+              @tab-click="tableTabClick"
+              v-else-if="userAuthority == '外部用户_信息中心'"
+            >
+              <el-tab-pane>
+                <template #label>
+                  <span class="custom-tabs-label flexcenter">
+                    <img src="../assets/paper.png" alt="" />
+                    <span>审核稿件</span>
+                  </span>
+                </template>
+                <div class="mid-divider" style="margin-top: 1px"></div>
 
+                <!-- 审核稿件组件 -->
+                <ManuscriptAuditing />
+              </el-tab-pane>
+              <el-tab-pane>
+                <template #label>
+                  <span class="custom-tabs-label flexcenter">
+                    <img src="../assets/papertitle.png" alt="" />
+                    <span>审核报题</span>
+                  </span>
+                </template>
+                <div class="mid-divider" style="margin-top: 1px"></div>
+
+                <PaperAuditing />
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -141,34 +172,39 @@
 <script>
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import MySubmission from "@/components/MySubmission.vue";
 import PublishedManuscript from "@/components/PublishedManuscript.vue";
+import ManuscriptAuditing from "@/components/ManuscriptAuditing.vue";
+import PaperAuditing from "@/components/PaperAuditing.vue";
 export default {
-  components:{
-    MySubmission,//我的投稿组件
-    PublishedManuscript,//已发表稿件组件
+  components: {
+    MySubmission, //我的投稿组件
+    PublishedManuscript, //已发表稿件组件
+    ManuscriptAuditing,//审核稿件
+    PaperAuditing//审核报题
   },
   setup() {
-
+    //用户权限
+    const userAuthority = "外部用户_信息中心"; //外部用户  外部用户_信息中心  外部用户_发改委
     //稿件统计数据
     const statisticsData = reactive([
       {
         name: "投稿总数",
         num: 0,
-        src:'contributenum',
+        src: "contributenum",
       },
       {
         name: "发布总数",
         num: 0,
-        src:'releasenum'
+        src: "releasenum",
       },
       {
         name: "待处理稿件",
         num: 0,
-        src:'pendingnum'
+        src: "pendingnum",
       },
     ]);
 
@@ -215,7 +251,8 @@ export default {
 
     //通知公告点击置灰
     const isClickedArr = ref([]);
-    function elTimelineClick(index) {index
+    function elTimelineClick(index) {
+      index;
       // if (!isClickedArr.value.includes(index)) {
       //   isClickedArr.value.push(index);
       // }
@@ -228,112 +265,105 @@ export default {
       }
     }
 
-
-
-
     //首页公告接口
-    function getSYNoticeListAjaxFn(){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+    function getSYNoticeListAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
-        method: 'get',
-        url: '/api/web/notice/list.do',
+        method: "get",
+        url: "/api/web/notice/list.do",
       })
-      .then((D)=>{
-        console.log('首页公告 D',D);
-        const { data,success } = D.data
-        if(!success){
+        .then((D) => {
+          console.log("首页公告 D", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "首页公告数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
           ElMessage({
-            message: '首页公告数据请求失败',
-            type: 'error',
+            message: "首页公告数据请求成功",
+            type: "success",
             plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '首页公告数据请求成功',
-          type: 'success',
-          plain: true,
-        })
+          });
 
-        activities.push(...data);
-      })
-      .catch((error)=>{
-        console.log('首页公告 接口请求 error',error);
-        ElMessage({
-          message: '首页公告接口请求失败',
-          type: 'error',
-          plain: true,
+          activities.push(...data);
         })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+        .catch((error) => {
+          console.log("首页公告 接口请求 error", error);
+          ElMessage({
+            message: "首页公告接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
     }
     // end of getArticleListAjaxFn
 
     /**
      * 稿件统计 接口请求
      */
-    function getArticleCountAjaxFn(){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+    function getArticleCountAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
-        method: 'get',
-        url: '/api/web/article/articleCount',
-        params:{
-          searchUser:0,//	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+        method: "get",
+        url: "/api/web/article/articleCount",
+        params: {
+          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
         },
       })
-      .then((D)=>{
-        console.log('稿件统计 D',D);
-        const { data,success } = D.data
-        if(!success){
+        .then((D) => {
+          console.log("稿件统计 D", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "稿件统计数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
           ElMessage({
-            message: '稿件统计数据请求失败',
-            type: 'error',
+            message: "稿件统计数据请求成功",
+            type: "success",
             plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '稿件统计数据请求成功',
-          type: 'success',
-          plain: true,
-        })
-        
-        //投稿总数
-        statisticsData[0].num = data.articleCount;
-        //发布总数
-        statisticsData[1].num = data.pubCount;
-        //待处理稿件
-        statisticsData[2].num = data.waitArticle;
+          });
 
-      })
-      .catch((error)=>{
-        console.log('稿件统计 接口请求 error',error);
-        ElMessage({
-          message: '稿件统计接口请求失败',
-          type: 'error',
-          plain: true,
+          //投稿总数
+          statisticsData[0].num = data.articleCount;
+          //发布总数
+          statisticsData[1].num = data.pubCount;
+          //待处理稿件
+          statisticsData[2].num = data.waitArticle;
         })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+        .catch((error) => {
+          console.log("稿件统计 接口请求 error", error);
+          ElMessage({
+            message: "稿件统计接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
     }
     // end of getArticleCountAjaxFn
 
-
     onMounted(() => {
-      getArticleCountAjaxFn();//稿件统计
-      getSYNoticeListAjaxFn();//首页通知公告
-
+      getArticleCountAjaxFn(); //稿件统计
+      getSYNoticeListAjaxFn(); //首页通知公告
     });
 
     return {
+      userAuthority,
       statisticsData,
       activities,
       activities1,
@@ -346,10 +376,8 @@ export default {
       elTimelineClick,
       isClickedArr1,
       elTimelineClick1,
-
     };
   },
-
 };
 </script>
 <style lang="less" scoped>
