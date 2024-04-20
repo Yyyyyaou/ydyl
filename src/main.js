@@ -27,8 +27,13 @@ import "@/assets/style.less";
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
+//引入echarts
+import * as echarts from 'echarts'
+
 const app = createApp(App)
 
+// 全局挂载echarts
+app.config.globalProperties.$echarts = echarts
 //注册element-plus icon
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)

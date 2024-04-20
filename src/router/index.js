@@ -37,6 +37,14 @@ const routes = [
     meta: { title: '我的数据上传' }
   },
   {
+    path: '/StatisticsManuscript',
+    name: 'StatisticsManuscript',
+    component: function () {
+      return import('../views/StatisticsManuscript.vue')
+    },
+    meta: { title: '稿件统计' }
+  },
+  {
     path: '/Notice',
     name: 'Notice',
     component: RouterReplaceComp(()=>import('../views/Notice/Notice.vue')),

@@ -8,18 +8,6 @@
       >
         <div class="mid-content-statistics-table-btngroup-search-keyword">
           <el-select
-            v-model="originSelectValue"
-            placeholder="来源"
-            style="width: 140px"
-          >
-            <el-option
-              v-for="item in originOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          <el-select
             v-model="searchSelectValue1"
             placeholder=""
             style="width: 80px"
@@ -36,6 +24,15 @@
             v-model="searchInput1"
             style="width: 190px"
             placeholder="请输入关键词"
+          />
+        </div>
+        <div class="marl10">
+          <el-autocomplete
+            v-model="originInput"
+            style="width: 190px"
+            :fetch-suggestions="querySearch"
+            clearable
+            placeholder="稿件来源"
           />
         </div>
         <el-select
@@ -96,7 +93,11 @@
             {{ scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="稿件标题" v-if="userAuthority == '外部用户_发改委'">
+        <el-table-column
+          prop="title"
+          label="稿件标题"
+          v-if="userAuthority == '外部用户_发改委'"
+        >
           <template #default="scope">
             <span
               style="
@@ -292,6 +293,7 @@ export default {
 
     onMounted(() => {
       getBrokeListAjaxFn(); //已发稿件
+      restaurants.value = loadAll(); //联想输入框赋值
     });
     const router = useRouter();
     function rowTitleClick(scope) {
@@ -304,6 +306,36 @@ export default {
       });
       window.open(c.href, "_blank");
     }
+
+    //联想输入框
+    const originInput = ref("");
+    const restaurants = ref([]);
+    const querySearch = (queryString, cb) => {
+      const results = queryString
+        ? restaurants.value.filter(createFilter(queryString))
+        : restaurants.value;
+      // call callback function to return suggestions
+      cb(results);
+    };
+    const loadAll = () => {
+      return [
+        { value: "vue", link: "https://github.com/vuejs/vue" },
+        { value: "element", link: "https://github.com/ElemeFE/element" },
+        { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
+        { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
+        { value: "vuex", link: "https://github.com/vuejs/vuex" },
+        { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
+        { value: "babel", link: "https://github.com/babel/babel" },
+      ];
+    };
+    const createFilter = (queryString) => {
+      return (restaurant) => {
+        return (
+          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    };
     return {
       userAuthority,
       searchInput1,
@@ -325,7 +357,10 @@ export default {
       handleCurrentChange1,
 
       getBrokeListAjaxFn,
-      rowTitleClick
+
+      rowTitleClick,
+      originInput,
+      querySearch,
     };
   },
 };
