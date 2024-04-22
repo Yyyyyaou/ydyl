@@ -16,7 +16,7 @@
       <el-icon><i class="iconfont icon-yunshangchuan" /></el-icon>
       <span>我的数据</span>
     </el-menu-item>
-    <el-menu-item index="3">
+    <el-menu-item index="/StatisticsManuscript">
       <el-icon
         ><i class="iconfont icon-tongjifenxi-xiangmubiaogetongji"
       /></el-icon>
