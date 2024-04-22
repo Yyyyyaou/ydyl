@@ -52,7 +52,7 @@ export default createStore({
     },
     //记录 loginUser
     MStroeLoginOLoginUser(state,loginUserStrP){
-      state.StroeLoginO.loginUser = loginUserStrP;
+      state.StroeLoginO.loginUser = JSON.parse(loginUserStrP);
     },
 
     //记录全局语种列表

@@ -188,7 +188,7 @@ export default {
   },
   setup() {
     //用户权限
-    const userAuthority = "外部用户_信息中心"; //外部用户  外部用户_信息中心  外部用户_发改委
+    const userAuthority = "外部用户"; //外部用户  外部用户_信息中心  外部用户_发改委
     //稿件统计数据
     const statisticsData = reactive([
       {

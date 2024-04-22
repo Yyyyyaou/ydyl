@@ -120,21 +120,21 @@ export default {
 
     const dataList = ref([]);
     const rules = reactive({
-      title: [//稿件标题
+      articleTitle: [//稿件标题
         {
           required: true,
           message: "必填项",
           trigger: "change",
         },
       ],
-      origin: [//稿件来源
+      articleSource: [//稿件来源
         {
           required: true,
           message: "必填项",
           trigger: "change",
         },
       ],
-      lang: [//语种
+      language: [//语种
         {
           required: true,
           message: "必填项",
@@ -158,7 +158,7 @@ export default {
       })
     });
 
-
+    //控制折叠的
     function foldClick(formData) {
       formData.fold = !formData.fold;
     }
@@ -177,6 +177,121 @@ export default {
     }
 
 
+    /**
+     * 校验 转载稿件 用户所填表单 各个字段 合法性
+     * @param {*} datasOP 
+     */
+     function checkFieldValueFn(datasOP){
+      const { articleTitle,articleSource,language,articleContent } = datasOP;
+
+      let checkResult = true;
+      if(
+        !articleTitle
+      ){
+        ElMessage({
+          message: '请重新填写稿件标题',
+          type: 'warning',
+          plain: true,
+        })
+        checkResult = false;
+      }
+      if(
+        !articleSource
+      ){
+        ElMessage({
+          message: '请重新填写稿件来源',
+          type: 'warning',
+          plain: true,
+        })
+        checkResult = false;
+      }
+      if(
+        !language
+      ){
+        ElMessage({
+          message: '请选择语种',
+          type: 'warning',
+          plain: true,
+        })
+        checkResult = false;
+      }
+      if(
+        !articleContent
+        ||articleContent==='\n'
+      ){
+        ElMessage({
+          message: '请编辑正文内容',
+          type: 'warning',
+          plain: true,
+        })
+        checkResult = false;
+      }
+      return checkResult
+    }
+
+    /**
+     * articleStatus:0 时
+     * 提交稿件到 “草稿箱”列表里
+     * articleStatus:1 时
+     * 提交稿件到 “我的投稿”列表里
+     * 
+     */
+    function postAddEditReprintAjaxFn(articleStatusP){
+      const datasO = {
+        // articleTitle:formData.articleTitle,//稿件标题
+        // articleSource:formData.articleSource,//稿件来源
+        // language:formData.language,//语种
+        // remark:formData.remark,//备注
+
+        articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
+      };
+      
+      // datasO.articleHtmlCon = QuillEditorInitFn.getSemanticHTML()//文章HTML内容
+      // datasO.articleContent = QuillEditorInitFn.getText();//文章文本内容
+
+      //接口传参需要去掉datasO.articleContent 结尾的 \n
+      const _regExp1 = /\n$/;
+      datasO.articleContent = datasO.articleContent.replace(_regExp1, '');
+
+      if(!checkFieldValueFn(datasO)){//验证各个字段
+        return;
+      }
+
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      return;
+      httpAxiosO({
+        url:'/api/web/article/addEditReprint.do',
+        method:'post',
+        data:datasO
+      })
+      .then((D)=>{
+        console.log('原创稿件提交 D',D);
+        const { data,success } = D.data;data
+        if(!success){
+          ElMessage({
+            message: '原创稿件提交 接口传参可能有误',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '原创稿件提交成功',
+          type: 'success',
+          plain: true,
+        });
+
+      })
+      .catch((error)=>{
+        console.log('原创稿件提交 error',error);
+        
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+    }
+    // end of postAddEditReprintAjaxFn
+
 
     return {
       dataList,
@@ -186,6 +301,7 @@ export default {
       addData,
       deleteData,
 
+      postAddEditReprintAjaxFn,
 
     };
   },

@@ -614,9 +614,19 @@
 
 <script>
 import { onMounted, reactive, ref } from "vue";
+import { useStore } from "vuex"
+import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import { ElMessage,ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
+    //路由实例
+    const router = useRouter();router
+    //vuex实例
+    const store = useStore();
+
     //关键词
     const searchInput = ref("");
     const searchSelectValue = ref(0);
@@ -630,120 +640,76 @@ export default {
         label: "正文",
       },
     ];
+
     //语种select数据
     const langSelectValue = ref("");
-    const langOptions = [{ value: 0, label: "中文" }];
+    const langOptions = reactive([]);
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+      langOptions.push({
+        value: o.id,
+        label: o.desc,
+      })
+    });
+
     //日期选择 数据
-    const dateDefaultTime = ref([]);
+    const dateDefaultTime = ref('');
     //表格数据
-    const tableData = [
-      {
-        title:
-          "您题为《外交部：中国发展对外关系对各国一视同仁》的投稿正在审核中",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "您题为《便利外籍人员来华5项措施详解》的投稿未采用",
-        date: "2016-05-03",
-        origin: "新华社1",
-        lang: "中文",
-        status: "已发布",
-      },
-      {
-        title:
-          "(Musiècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title:
-          "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-    ];
+    const tableData = reactive([]);
+
     //分页器
     let limit = ref(15);
     function handleSizeChange(val) {
       limit.value = val;
     }
     let page = ref(1);
+    let pageTotal = ref(0);
     function handleCurrentChange(val) {
       page.value = val;
     }
+
+
+    /**
+     * 查询未审核稿件
+     */
+    function getNeedAuditCountAjaxFn(){
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+
+      httpAxiosO({
+        method:'get',
+        url:'/api/web/articleRecord/getNeedAuditCount.do',
+        params:{
+          displayNode: 1, //	1国家信息中心 2 国家发改委
+        }
+      })
+      .then((D)=>{
+        console.log('D 查询未审核稿件',D);
+        const { data,success } = D.data
+        if(!success){
+          ElMessage({
+            message: '查询未审核稿件请求失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '查询未审核稿件请求成功',
+          type: 'success',
+          plain: true,
+        });
+        data
+        timeFormatFn
+      })
+      .catch((error)=>{
+        console.log('error 查询未审核稿件',error);
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+    }
+    // end of getNeedAuditCountAjaxFn
+
     //稿件标题点击置灰
     const isClickedArr = ref([]);
     const popoverShowFlag = ref(false);
@@ -790,6 +756,7 @@ export default {
     };
     onMounted(() => {
       restaurants.value = loadAll();
+      getNeedAuditCountAjaxFn();
     });
 
     const statusRadio = ref(1);
@@ -971,6 +938,7 @@ export default {
       tableData,
       limit,
       page,
+      pageTotal,
       handleSizeChange,
       handleCurrentChange,
       isClickedArr,
@@ -1008,6 +976,9 @@ export default {
       commentTextarea,
       commentRadio,
       commentRadioData,
+
+      getNeedAuditCountAjaxFn,
+
     };
   },
 };

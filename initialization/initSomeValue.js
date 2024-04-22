@@ -18,7 +18,7 @@ export function getUserInfoFn(){
     }
     const { success,loginUser } = D.data;
     if(success){
-      store.commit('MStroeLoginOLoginUser',loginUser);//记录语种列表
+      store.commit('MStroeLoginOLoginUser',JSON.stringify(loginUser));//记录语种列表
       store.commit('MStroeLoginOIsLogin',true);//改变登录状态为“登录”
     }
 

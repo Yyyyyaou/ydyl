@@ -34,7 +34,7 @@ const routes = [
     component: function () {
       return import('../views/MyUpload.vue')
     },
-    meta: { title: '我的数据上传' }
+    meta: { title: '我的数据' }
   },
   {
     path: '/Notice',

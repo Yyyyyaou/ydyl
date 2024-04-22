@@ -106,6 +106,7 @@ export default {
         store.commit('MStroeLoginOAppToken',appToken);//记录 appToken
         store.commit('MStroeLoginOLoginUser',JSON.stringify(loginUser));//记录 loginUser
 
+
         /* 截止到20240408 这两个sessionStorage 先存上，还不知道用来做什么 */
         sessionStorage.setItem('requestToken',requestToken);
         sessionStorage.setItem('loginUser',JSON.stringify(loginUser));

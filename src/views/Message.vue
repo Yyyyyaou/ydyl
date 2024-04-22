@@ -74,6 +74,45 @@
             </el-table-column>
             <el-table-column prop="title" label="标题">
               <template #default="scope">
+                <el-popover
+                  :visible="scope.row.visible ? true : false"
+                  placement="bottom"
+                  :width="600"
+                  popper-class="elpopover-style"
+                >
+                  <div class="elpopover-header">
+                    <!-- 
+                      注释于 20240419.1717 与程雪飞沟通后，说“发送人”字段暂时没有
+                      <span>发送人：{{ scope.row.name }}</span> -->
+                    <span style="margin-left: 18px"
+                      >发送时间：{{ scope.row.crtimeFormat }}</span
+                    >
+                  </div>
+                  <p>
+                    <span>标题：</span><span>{{ scope.row.title }}</span>
+                  </p>
+                  <p>
+                    <span>正文：</span><span>{{ scope.row.content }}</span>
+                  </p>
+                  <div class="elpopover-button">
+                    <el-button
+                      type="primary"
+                      @click="
+                        scope.row.visible = false;
+                        popoverShowFlag = false;
+                      "
+                      >确定
+                    </el-button>
+                    <el-button
+                      type="info"
+                      @click="
+                        scope.row.visible = false;
+                        popoverShowFlag = false;
+                      "
+                      >取消
+                    </el-button>
+                  </div>
+                  <template #reference>
                     <span
                       style="
                         display: flex;
@@ -89,6 +128,8 @@
                       {{ scope.row.title }}
                     </span>
                   </template>
+                </el-popover>
+              </template>
             </el-table-column>
             <el-table-column prop="crtimeFormat" label="时间" width="240" />
           </el-table>

@@ -139,7 +139,7 @@
           label="创建日期"
           width="140"
         />
-        <el-table-column prop="articleUseStatus" label="操作" width="200">
+        <el-table-column prop="articleUseStatus" label="操作" width="130" >
           <template #default="scope">
             <div
               class="mid-content-statistics-table-tabledata-operate"
@@ -148,10 +148,12 @@
               <span></span>
               <div v-if="scope.row.articleUseStatus === 3" data-desc="已发布">链接</div>
               <span v-if="scope.row.articleUseStatus === 3" data-desc="已发布"></span>
-              <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理"
+              <!-- 
+                注释于20240419.1657 许慧敏姐说这块不要编辑
+                <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理"
                 @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)"
               >编辑</div>
-              <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
+              <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span> -->
               <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFn(scope)">删除</div>
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
             </div>

@@ -14,7 +14,7 @@
     </el-menu-item>
     <el-menu-item index="/MyUpload">
       <el-icon><i class="iconfont icon-yunshangchuan" /></el-icon>
-      <span>我的数据上传</span>
+      <span>我的数据</span>
     </el-menu-item>
     <el-menu-item index="3">
       <el-icon
