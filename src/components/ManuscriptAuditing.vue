@@ -614,16 +614,17 @@
 
 <script>
 import { onMounted, reactive, ref } from "vue";
-import { useStore } from "vuex"
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
     //路由实例
-    const router = useRouter();router
+    const router = useRouter();
+    router;
     //vuex实例
     const store = useStore();
 
@@ -644,15 +645,15 @@ export default {
     //语种select数据
     const langSelectValue = ref("");
     const langOptions = reactive([]);
-    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o) => {
       langOptions.push({
         value: o.id,
         label: o.desc,
-      })
+      });
     });
 
     //日期选择 数据
-    const dateDefaultTime = ref('');
+    const dateDefaultTime = ref("");
     //表格数据
     const tableData = reactive([]);
 
@@ -667,46 +668,44 @@ export default {
       page.value = val;
     }
 
-
     /**
      * 查询未审核稿件
      */
-    function getNeedAuditCountAjaxFn(){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+    function getNeedAuditCountAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
-        method:'get',
-        url:'/api/web/articleRecord/getNeedAuditCount.do',
-        params:{
+        method: "get",
+        url: "/api/web/articleRecord/getNeedAuditCount.do",
+        params: {
           displayNode: 1, //	1国家信息中心 2 国家发改委
-        }
+        },
       })
-      .then((D)=>{
-        console.log('D 查询未审核稿件',D);
-        const { data,success } = D.data
-        if(!success){
+        .then((D) => {
+          console.log("D 查询未审核稿件", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "查询未审核稿件请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
           ElMessage({
-            message: '查询未审核稿件请求失败',
-            type: 'error',
+            message: "查询未审核稿件请求成功",
+            type: "success",
             plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '查询未审核稿件请求成功',
-          type: 'success',
-          plain: true,
+          });
+          data;
+          timeFormatFn;
+        })
+        .catch((error) => {
+          console.log("error 查询未审核稿件", error);
+        })
+        .finally(() => {
+          loadingInstance1.close();
         });
-        data
-        timeFormatFn
-      })
-      .catch((error)=>{
-        console.log('error 查询未审核稿件',error);
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
     }
     // end of getNeedAuditCountAjaxFn
 
@@ -978,7 +977,6 @@ export default {
       commentRadioData,
 
       getNeedAuditCountAjaxFn,
-
     };
   },
 };
@@ -1243,6 +1241,21 @@ export default {
   .elpopover-content-right1 {
     max-height: 710px !important;
   }
+}
+///* 滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #1890ff;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: transparent;
 }
 </style>
 <style lang="less">
