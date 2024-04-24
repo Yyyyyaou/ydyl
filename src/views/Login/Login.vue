@@ -95,12 +95,14 @@ export default {
         loginCaptcha:inputValueO.value.loginCaptcha||'004241',
       })
       .then((D)=>{
+        
         console.log('用户登录 D',D);
         ElMessage({
           message: '登录成功',
           type: 'success',
           plain: true,
         })
+        
         const { loginUser,appToken,requestToken } = D.data;
         store.commit('MStroeLoginORequestToken',requestToken);//记录 requestToken
         store.commit('MStroeLoginOAppToken',appToken);//记录 appToken
@@ -111,10 +113,15 @@ export default {
         sessionStorage.setItem('requestToken',requestToken);
         sessionStorage.setItem('loginUser',JSON.stringify(loginUser));
 
-        store.commit('MStroeLoginOIsLogin',true);//改变登录状态
+        Promise.all(
+          [
+            initLanguageListFn(),//初始化语言列表
+          ]
+        ).then(()=>{
+          store.commit('MStroeLoginOIsLogin',true);//改变登录状态 为 登录
+        });
 
-        //初始化语种列表
-        initLanguageListFn();
+        
         
       })
       .catch((error)=>{

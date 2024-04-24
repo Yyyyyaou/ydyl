@@ -202,7 +202,6 @@ export default {
       const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
         return o.desc
       });
-      languageNameArr.unshift('全部');
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       const paramsO = {

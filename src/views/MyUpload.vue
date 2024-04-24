@@ -1,13 +1,467 @@
 <template>
-  <div>MyUpload</div>
+  <div class="mid-content">
+    <div class="mid-content-mycontribute">
+      <div class="mid-content-mycontribute-header flexcenter">
+        <div class="flexcenter">
+          <div class="mid-content-mycontribute-header-i">
+            <img src="@/assets/mycontribute.png" alt="" />
+          </div>
+          <span>我的数据</span>
+        </div>
+      </div>
+      <div class="mid-divider"></div>
+      <div class="mid-content-mycontribute-table-content">
+        <div class="mid-content-mycontribute-table-btngroup flexcenter">
+          <div>
+            <el-button class="clear-recyclebin" @click="dataUpdataFn()">
+              数据上传
+            </el-button>
+          </div>
+          <div
+            class="mid-content-mycontribute-table-btngroup-search flexcenter"
+          >
+            <div class="mid-content-mycontribute-table-btngroup-search-keyword ">
+
+              <el-input
+                v-model="searchInput"
+                style="width: 190px"
+                placeholder="请输入关键词"
+              />
+            </div>
+
+            <div class="mid-content-mycontribute-table-btngroup-search-keyword marl10">
+
+              <el-select
+                v-model="searchExcelTyepValue"
+                placeholder=""
+                style="width: 200px"
+              >
+                <el-option
+                  v-for="item in searchExcelTyepOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+
+            </div>
+
+            <el-config-provider :locale="locale">
+              <el-date-picker
+                v-model="dateDefaultTime"
+                type="daterange"
+                start-placeholder="创建起始日期"
+                end-placeholder="创建结束日期"
+                :locale="locale"
+                style="margin-left: 10px; width: 270px"
+              />
+            </el-config-provider>
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getExcelListAjaxFn"
+            >
+              <el-icon style="margin-right: 5px"><Search /></el-icon>
+              搜索
+            </el-button>
+          </div>
+        </div>
+        <div class="mid-content-mycontribute-table-tabledata">
+          <el-table
+            :data="tableData.slice((page - 1) * limit, page * limit)"
+            border
+            style="width: 100%"
+            :header-cell-style="{
+              'text-align': 'center',
+              'color': '#6a6d74',
+              'font-size': '16px',
+            }"
+            :cell-style="{
+              'text-align': 'center',
+              'color': '#727789',
+              'font-size': '16px',
+            }"
+            @selection-change="tableSelectionChange"
+          >
+            <el-table-column type="selection" width="55" />
+            <el-table-column label="序号" width="100">
+              <template #default="scope">
+                {{ scope.$index + 1 }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="excelTitle" label="稿件标题">
+              <template #default="scope">
+                <span
+                  style="display: flex; justify-content: left; text-align: left"
+                >
+                  {{ scope.row.excelTitle }}
+                </span>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
+            <el-table-column prop="articleUseStatus" label="操作" width="180">
+              <template #default="scope">
+                <div class="mid-content-mycontribute-table-tabledata-operate">
+                  <div :title="scope.row.excelTitle" @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">审核</div>
+                  <span></span>
+                  <div>下载</div>
+                  <span></span>
+                  <div>删除</div>
+                  <span></span>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="flexcenter el-pagination-style">
+            <el-pagination
+              layout="slot"
+              :total="pageTotal"
+              class="el-pagination-style-leftpagination"
+            >
+              <span class="el-pagination-style-leftpagination-total">
+                共{{ pageTotal }}条
+              </span>
+              <span
+                class="el-pagination-style-leftpagination-percent flexcenter"
+              >
+                {{ page }}/{{ Math.ceil(pageTotal / limit) }}
+              </span>
+            </el-pagination>
+            <el-config-provider :locale="locale">
+              <el-pagination
+                background
+                layout="prev, next, sizes, jumper"
+                :total="pageTotal"
+                :page-sizes="[15, 20, 30, 40, 50]"
+                :page-size="limit"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                class="el-pagination-style-rightpagination"
+              />
+            </el-config-provider>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
+import { ref, reactive, onMounted } from "vue";
+import { useStore } from "vuex"
+import { useRouter } from "vue-router";
+import zhCn from "element-plus/es/locale/lang/zh-cn";
+import { ElMessage,ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
-    return {}
+
+    //路由实例
+    const router = useRouter();
+    //vuex实例
+    const store = useStore();
+
+    //关键词
+    const searchInput = ref("");
+
+    //搜索条件 数据指数 选项
+    const searchExcelTyepValue = ref(0);
+    const searchExcelTyepOptions = [
+      {
+        value: 0,
+        label: "数据指数全部",//贸易指数
+      },
+      {
+        value: 1,
+        label: "航贸指数",
+      },
+      {
+        value: 2,
+        label: "其他指数",
+      },
+    ];
+    //日期选择 数据
+    const dateDefaultTime = ref('');
+    //表格数据
+    const tableData = reactive([]);
+
+    //分页器
+    let limit = ref(15);
+    function handleSizeChange(val) {
+      limit.value = val;
+    }
+    let page = ref(1);
+    let pageTotal = ref(0);
+    function handleCurrentChange(val) {
+      page.value = val;
+      getExcelListAjaxFn();
+    }
+
+
+    /**
+     * 我的数据  接口
+     * excelTyep 非必填  0贸易指数、1航贸指数、2其他指数
+     * excelTitle 非必填 关键字搜索
+     * crtime 非必填 起始时间
+     * endtime 非必填 结束时间
+     * currPage 非必填 开始页数
+     * pageSize 非必填 页面条数
+     * 
+     * 接口返回数据字段，线上文档有写，很详细
+    */
+    function getExcelListAjaxFn(){
+
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const paramsO = {
+        excelTitle:searchInput.value,//标题
+        exceType:searchExcelTyepValue.value,//0贸易指数、1航贸指数、2其他指数
+        currPage:page.value,//当前页
+        pageSize:limit.value,//每页条数
+      }
+
+
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      }
+
+
+      httpAxiosO({
+        method: 'get',
+        url: '/api/web/excel/getExcelList',
+        params:paramsO,
+      })
+      .then((D)=>{
+        console.log('我的数据 D',D);
+        const { data,success } = D?.data
+        data
+        if(!success){
+          ElMessage({
+            message: '我的数据数据请求失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '我的数据数据请求成功',
+          type: 'success',
+          plain: true,
+        })
+        
+        tableData.splice(0,tableData.length);   //清空tableData
+        data.ldata.forEach((o)=>{
+          let _o = o;
+          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
+          tableData.push(_o);
+        });
+        pageTotal.value = data.totalResults;
+
+      })
+      .catch((error)=>{
+        console.log('我的数据 接口请求 error',error);
+        ElMessage({
+          message: '我的数据接口请求失败',
+          type: 'error',
+          plain: true,
+        })
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+      return;
+    }
+    // end of getExcelListAjaxFn
+
+    //由“数据上传” 按钮触发
+    const dataUpdataFn = () => {
+      store
+      console.log('dataUpdataFn');
+      // store.dispatch('deleteDelAllFn')
+      // .then(()=>{
+      //   ElMessage({
+      //     message: '清空回收站成功',
+      //     type: 'success',
+      //     plain: true,
+      //   })
+      // })
+      // .catch(()=>{
+      //   ElMessage({
+      //     message: '清空回收站失败',
+      //     type: 'error',
+      //     plain: true,
+      //   })
+      // });
+    };
+
+    /**
+     * 继续采用 ，实际上是“查看稿件”即跳转到 “创建稿件/原创稿件”界面
+     * @param {*} scopeP 
+     */
+    const continueUsingFn = (scopeP) => {
+      scopeP
+      // const {
+      //   id,excelTitle,articleHtmlCon,articleContent,language,remark,articleStatus,aritleSource
+      // } = scopeP.row;
+      // store.dispatch('',{
+      //   params:{
+      //     // id,excelTitle,articleHtmlCon,articleContent,language,remark,
+      //     // articleStatus:1,aritleSource
+      //   },
+      // }).then((D)=>{
+      //   if(
+      //     D.data.success === false
+      //   ){
+      //     ElMessage({
+      //       message: '接口请求成功 但采用失败',
+      //       type: 'error',
+      //       plain: true,
+      //     })
+      //     return;
+      //   }
+      //   ElMessage({
+      //     message: '采用成功',
+      //     type: 'success',
+      //     plain: true,
+      //   })
+      // })
+      // .catch(()=>{
+      //   ElMessage({
+      //     message: '采用失败',
+      //     type: 'error',
+      //     plain: true,
+      //   })
+      // });
+    };
+
+    onMounted(() => {
+      getExcelListAjaxFn();
+    });
+
+    function tableSelectionChange(val){
+        console.log(val)
+    }
+    return {
+      router,
+
+      searchInput,
+
+      searchExcelTyepValue,
+      searchExcelTyepOptions,
+
+      dateDefaultTime,
+      locale: zhCn, //date-range 语言设置
+      tableData,
+      limit,
+      page,
+      pageTotal,
+      handleSizeChange,
+      handleCurrentChange,
+      tableSelectionChange,
+
+      getExcelListAjaxFn,
+      dataUpdataFn,
+      continueUsingFn,
+    };
+  },
+};
+</script>
+
+<style scoped lang='less'>
+.mid-content {
+  padding: 15px 34px;
+  .mid-content-mycontribute {
+    background-color: #fff;
+    .mid-content-mycontribute-header {
+      height: 50px;
+      padding: 0 18px;
+      div {
+        .mid-content-mycontribute-header-i {
+          display: inline-block;
+          height: 36px;
+          width: 36px;
+          line-height: 44px;
+          text-align: center;
+          border-radius: 50%;
+          font-size: 19px;
+          color: #086dbd;
+          background-image: linear-gradient(130deg, #eaf0ff, #ffffff);
+        }
+      }
+      span {
+        margin-left: 10px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #424f63;
+      }
+    }
+  }
+  .mid-content-mycontribute-table-content {
+    padding: 0 20px;
+    .mid-content-mycontribute-table-btngroup {
+      margin-top: 15px;
+      justify-content: space-between;
+      .clear-recyclebin {
+        background: #1890ff;
+        color: #fff;
+      }
+      .mid-content-mycontribute-table-btngroup-search-keyword {
+        :deep(.el-select__wrapper) {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+        :deep(.el-input__wrapper) {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
+      :deep(.el-range__icon) {
+        position: absolute;
+        right: 10px;
+        color: #0b77cd;
+        font-size: 16px;
+      }
+      .marl10 {
+        margin-left: 10px;
+      }
+    }
+    .mid-content-mycontribute-table-tabledata {
+      margin-top: 15px;
+      .isyfb {
+        color: #3a8b38;
+      }
+      .isdcl {
+        color: #f47373;
+      }
+      .isshz {
+        color: #4481f8;
+      }
+      .iswcy {
+        color: #fba010;
+      }
+      .mid-content-mycontribute-table-tabledata-operate {
+        display: flex;
+        align-items: center;
+        color: #3652d2;
+        justify-content: left;
+        div {
+          cursor: pointer;
+          padding: 0 8px;
+        }
+        span:nth-last-child(1) {
+          display: none;
+        }
+        span {
+          width: 1px;
+          height: 17px;
+          background: #3652d2;
+        }
+      }
+    }
   }
 }
-</script>
-<style scoped lang='less'>
 </style>

@@ -5,7 +5,7 @@
       <div class="mid-content-mycontribute-header flexcenter">
         <div class="flexcenter">
           <div class="mid-content-mycontribute-header-i">
-            <img src="../../assets/mycontribute.png" alt="" />
+            <img src="@/assets/mycontribute.png" alt="" />
           </div>
           <span>通知公告</span>
         </div>

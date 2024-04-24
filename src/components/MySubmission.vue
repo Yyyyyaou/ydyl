@@ -290,7 +290,6 @@ export default {
       const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
         return o.desc
       });
-      languageNameArr.unshift('全部');
 
       const articleUseStatusNameArr = ['待处理','审核中','已发布','未采用'];
       const loadingInstance1 = ElLoading.service({ fullscreen: true })

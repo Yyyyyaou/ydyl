@@ -1,9 +1,15 @@
 import { createStore } from 'vuex'
 // import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
+
+import {
+  ROLESETO,
+} from './stateRoleManagement.js';
+
 import {
   getLanguageListFn,
   postUserLoginFn,
   getUserLogoutFn,
+  postExternalAuditArticleFn,
 } from './actionFunctions.js';
 
 import { 
@@ -13,6 +19,11 @@ import {
   getUpdateFn,
   getFindByIdFn,
 } from './actionSubmission.js';
+
+import {
+  externalAuditArticleFindByIdFn
+} from './actionExternal.js';
+
 
 
 //用户登录信息
@@ -30,6 +41,7 @@ const GLOBAL_LANGUAGE_LIST = [];
 
 export default createStore({
   state: {
+    ROLESETO,
     StroeLoginO,
     GLOBAL_LANGUAGE_LIST,
     
@@ -66,12 +78,18 @@ export default createStore({
     postUserLoginFn,
     getLanguageListFn,
     getUserLogoutFn,
+    postExternalAuditArticleFn,
     
     deleteLogicDeleteFn,
     deletePhysicsDeleteFn,
     deleteDelAllFn,
     getUpdateFn,
     getFindByIdFn,
+
+    externalAuditArticleFindByIdFn,
+
+
+    
   },
   modules: {
 

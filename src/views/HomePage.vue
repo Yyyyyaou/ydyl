@@ -38,19 +38,20 @@
                   <p>{{ item.name }}</p>
                 </div>
               </template>
-              <template v-else-if="userAuthority == '外部用户_信息中心'">
+              <template v-else-if="userAuthority == '外部用户_国家信息中心'">
                 <div
                   class="flexcenter mid-content-statistics-left-content-div mid-content-statistics-left-content-infocenter"
+                  data-desc="外部用户_国家发改委 稿件统计"
                 >
                   <div
                     class="flexcenter mid-content-statistics-left-content-img"
                   >
                     <img src="../assets/papernum.png" alt="" />
                   </div>
-                  <p>60</p>
+                  <p>{{ statisticsGJXXZXData[0].num }}</p>
                   <p>待审稿件</p>
                   <p></p>
-                  <p>248</p>
+                  <p>{{ statisticsGJXXZXData[2].num }}</p>
                   <p>已审稿件</p>
                 </div>
                 <div
@@ -61,16 +62,18 @@
                   >
                     <img src="../assets/papertitlenum.png" alt="" />
                   </div>
-                  <p>60</p>
+                  <p>{{ statisticsGJXXZXData[1].num }}</p>
                   <p>待审报题</p>
                   <p></p>
-                  <p>248</p>
+                  <p>{{ statisticsGJXXZXData[3].num }}</p>
                   <p>已审报题</p>
                 </div>
               </template>
-              <template v-else-if="userAuthority == '外部用户_发改委'">
+              <!-- end of 外部用户_国家信息中心 -->
+              <template v-else-if="userAuthority == '外部用户_国家发改委'">
                 <div
                   class="flexcenter mid-content-statistics-left-content-divfgw"
+                  data-desc="外部用户_国家发改委 稿件统计"
                 >
                   <div
                     class="flexcenter mid-content-statistics-left-content-img"
@@ -140,6 +143,9 @@
                   <el-icon><InfoFilled /></el-icon>
                 </div>
               </template>
+              <!-- end of 外部用户_国家发改委 -->
+
+
             </div>
           </div>
           <div class="mid-content-statistics-right">
@@ -215,7 +221,7 @@
               @tab-click="tableTabClick"
               v-if="
                 userAuthority == '外部用户' ||
-                userAuthority == '外部用户_发改委'
+                userAuthority == '外部用户_国家发改委'
               "
             >
               <el-tab-pane v-if="userAuthority == '外部用户'">
@@ -242,10 +248,12 @@
                 <PublishedManuscript />
               </el-tab-pane>
             </el-tabs>
+            <!-- end of 外部用户_国家发改委 -->
+
             <el-tabs
               type="border-card"
               @tab-click="tableTabClick"
-              v-else-if="userAuthority == '外部用户_信息中心'"
+              v-else-if="userAuthority == '外部用户_国家信息中心'"
             >
               <el-tab-pane>
                 <template #label>
@@ -271,6 +279,8 @@
                 <PaperAuditing />
               </el-tab-pane>
             </el-tabs>
+            <!-- end of 外部用户_国家信息中心 -->
+
           </div>
         </div>
       </div>
@@ -279,7 +289,8 @@
   </div>
 </template>
 <script>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage, ElLoading } from "element-plus";
 
@@ -296,9 +307,14 @@ export default {
     PaperAuditing, //审核报题
   },
   setup() {
-    //用户权限
-    const userAuthority = "外部用户"; //外部用户  外部用户_信息中心  外部用户_发改委
-    //稿件统计数据
+    const store = useStore();
+
+    //用户角色名字
+    const userAuthority = computed(() => {
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
+    });
+
+    //外部用户 稿件统计数据
     const statisticsData = reactive([
       {
         name: "投稿总数",
@@ -316,6 +332,36 @@ export default {
         src: "pendingnum",
       },
     ]);
+
+    //外部用户_国家发改委 稿件统计数据
+    const statisticsGJFGWData = reactive([
+
+    ]);statisticsGJFGWData
+
+    //外部用户_国家信息中心 稿件统计数据
+    const statisticsGJXXZXData = reactive([
+      {
+        name: "待审稿件",
+        num: 0,
+        src: "unprocessedManuscripts",
+      },
+      {
+        name: "待审报题",
+        num: 0,
+        src: "unprocessedTopics",
+      },
+      {
+        name: "已审稿件",
+        num: 0,
+        src: "processedManuscripts",
+      },
+      {
+        name: "已审报题",
+        num: 0,
+        src: "processedTopics",
+      },
+    ]);
+
 
     //通知公告数据
     const activities = reactive([]);
@@ -416,9 +462,58 @@ export default {
     // end of getArticleListAjaxFn
 
     /**
-     * 稿件统计 接口请求
+     * 外部用户_国家信息中心 稿件统计 接口请求
      */
-    function getArticleCountAjaxFn() {
+    function getNicCountAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+
+      httpAxiosO({
+        method: "get",
+        url: "/api/web/externalAuditCount/getNicCount",
+        params: {
+          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+        },
+      })
+        .then((D) => {
+          console.log("稿件统计 D", D);
+          const { data, success } = D.data;data
+          if (!success) {
+            ElMessage({
+              message: "稿件统计数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+
+          //待审稿件
+          statisticsGJXXZXData[0].num = data[0].unprocessedManuscripts;
+          //待审报题
+          statisticsGJXXZXData[1].num = data[0].unprocessedTopics;
+          //已审稿件
+          statisticsGJXXZXData[2].num = data[0].processedManuscripts;
+          //已审报题
+          statisticsGJXXZXData[3].num = data[0].processedTopics;
+        })
+        .catch((error) => {
+          console.log("稿件统计 接口请求 error", error);
+          ElMessage({
+            message: "稿件统计接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
+    }
+    // end of getNicCountAjaxFn
+
+
+    /**
+     * 外部用户 稿件统计 接口请求
+     */
+     function getArticleCountAjaxFn() {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
@@ -439,11 +534,6 @@ export default {
             });
             return;
           }
-          ElMessage({
-            message: "稿件统计数据请求成功",
-            type: "success",
-            plain: true,
-          });
 
           //投稿总数
           statisticsData[0].num = data.articleCount;
@@ -466,14 +556,20 @@ export default {
     }
     // end of getArticleCountAjaxFn
 
+
+
     onMounted(() => {
-      getArticleCountAjaxFn(); //稿件统计
+      getArticleCountAjaxFn(); //外部用户 稿件统计
+      getNicCountAjaxFn();//外部用户_国家信息中心 稿件统计
       getSYNoticeListAjaxFn(); //首页通知公告
     });
 
     return {
       userAuthority,
+      
       statisticsData,
+      statisticsGJXXZXData,
+
       activities,
       activities1,
       statisticsTabClick,

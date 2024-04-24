@@ -17,6 +17,10 @@ export function getUserInfoFn(){
       return;
     }
     const { success,loginUser } = D.data;
+
+    //临时加入 当前角色
+    loginUser.CURRENT_ROLE = '外部用户_国家信息中心';//外部用户  外部用户_国家信息中心  外部用户_国家发改委
+
     if(success){
       store.commit('MStroeLoginOLoginUser',JSON.stringify(loginUser));//记录语种列表
       store.commit('MStroeLoginOIsLogin',true);//改变登录状态为“登录”
@@ -36,7 +40,7 @@ export function getUserInfoFn(){
  * @returns 
  */
 export function initLanguageListFn(){
-  store.dispatch('getLanguageListFn').then((D)=>{
+  return store.dispatch('getLanguageListFn').then((D)=>{
 
     if(!D){
       return;
@@ -44,7 +48,11 @@ export function initLanguageListFn(){
     
     const { success,message } = D.data;
     if(success){
-      const _message = eval(message);
+      const _message = eval(message);//_message 应为数组
+      _message.unshift({
+        id:0,
+        desc:'全部',
+      });
       store.commit('MGlobalLanguageList',_message);//记录语种列表
     
     }
@@ -53,5 +61,4 @@ export function initLanguageListFn(){
   .catch((error)=>{
     console.log('error',error);
   });
-  return ;
 }

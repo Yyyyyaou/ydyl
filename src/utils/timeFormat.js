@@ -24,6 +24,7 @@ function timeFormatFn(timeP){
   ;
   return {
     'YYYY-MM-DD':`${year}-${MM}-${DD}`,
+    'YYYY-MM-DD hh:mm':`${year}-${MM}-${DD} ${hh}:${mm}`,
     'YYYY-MM-DD hh:mm:ss':`${year}-${MM}-${DD} ${hh}:${mm}:${ss}`,
   };
 }
