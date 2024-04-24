@@ -613,13 +613,14 @@ import { onMounted, reactive, ref, watch,computed } from "vue";
 import { useStore } from "vuex"
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
     //路由实例
-    const router = useRouter();router
+    const router = useRouter();
+    router;
     //vuex实例
     const store = useStore();
 
@@ -646,15 +647,15 @@ export default {
     //语种select数据
     const langSelectValue = ref("");
     const langOptions = reactive([]);
-    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o) => {
       langOptions.push({
         value: o.id,
         label: o.desc,
-      })
+      });
     });
 
     //日期选择 数据
-    const dateDefaultTime = ref('');
+    const dateDefaultTime = ref("");
     //表格数据
     const tableData = reactive([]);
 
@@ -668,7 +669,6 @@ export default {
     function handleCurrentChange(val) {
       page.value = val;
     }
-
 
 
     //稿件标题点击置灰
@@ -1470,6 +1470,21 @@ export default {
   .elpopover-content-right1 {
     max-height: 710px !important;
   }
+}
+///* 滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #1890ff;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: transparent;
 }
 </style>
 <style lang="less">

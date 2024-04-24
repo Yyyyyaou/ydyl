@@ -1273,6 +1273,21 @@ export default {
     max-height: 710px !important;
   }
 }
+///* 滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #1890ff;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: transparent;
+}
 </style>
 <style lang="less">
 .elpopover-style {
