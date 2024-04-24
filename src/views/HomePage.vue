@@ -297,7 +297,7 @@ import { ElMessage, ElLoading } from "element-plus";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import MySubmission from "@/components/MySubmission.vue";
 import PublishedManuscript from "@/components/PublishedManuscript.vue";
-import ManuscriptAuditing from "@/components/ManuscriptAuditing.vue";
+import ManuscriptAuditing from "@/components/ManuscriptAuditingComponents/ManuscriptAuditing.vue";
 import PaperAuditing from "@/components/PaperAuditing.vue";
 export default {
   components: {
@@ -313,6 +313,8 @@ export default {
     const userAuthority = computed(() => {
       return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
     });
+
+    console.log('HomePage userAuthority',userAuthority);
 
     //外部用户 稿件统计数据
     const statisticsData = reactive([

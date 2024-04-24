@@ -19,7 +19,7 @@
 <script>
 // import { onMounted, reactive, ref } from "vue";
 // import zhCn from "element-plus/es/locale/lang/zh-cn";
-import ManuscriptAuditing from "@/components/ManuscriptAuditing.vue";
+import ManuscriptAuditing from "@/components/ManuscriptAuditingComponents/ManuscriptAuditing.vue";
 export default {
   components: {
     ManuscriptAuditing, //审核稿件

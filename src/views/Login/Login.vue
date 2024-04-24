@@ -67,7 +67,7 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import { HomeFilled,Lock,Iphone } from "@element-plus/icons-vue";
-import { initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
+import { getUserInfoFn,initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
 import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 
 
@@ -115,6 +115,7 @@ export default {
 
         Promise.all(
           [
+            getUserInfoFn(),//初始化用户信息
             initLanguageListFn(),//初始化语言列表
           ]
         ).then(()=>{

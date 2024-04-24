@@ -79,7 +79,9 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getNeedAuditCountAjaxFn"
+            >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
@@ -179,7 +181,7 @@
                     </div>
                     <div class="elpopover-content-right">
                       <div class="elpopover-content-title flexcenter">
-                        <img src="../assets/manuscriptauditing.png" alt="" />
+                        <img src="@/assets/manuscriptauditing.png" alt="" />
                         <span>审核流程记录</span>
                       </div>
                       <el-timeline class="elpopover-content-timeline">
@@ -198,7 +200,7 @@
                             </div>
                             <div class="elpopover-content-timeline-details-thi">
                               <span>审核人：</span
-                              ><span>审核人字段有些变化，先空着</span>
+                              ><span>{{ activity.cRuser }}</span>
                             </div>
                           </div>
                         </el-timeline-item>
@@ -207,7 +209,8 @@
                     <!-- end of elpopover-content-right -->
                     
                   </div>
-                  <div class="elpopover-comment">
+                  
+                  <div class="elpopover-comment" data-desc="审核意见以及提交按钮板块">
                     <div class="elpopover-comment-header flexcenter">
                       <div class="elpopover-comment-header-divide"></div>
                       <span>审核意见</span>
@@ -234,6 +237,8 @@
                       <el-button @click="postExternalAuditArticleAjaxFn">提交</el-button>
                     </div>
                   </div>
+                  <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
+
                   <template #reference>
                     <span
                       :title="scope.row.articleTitle"
@@ -395,7 +400,9 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getNeedAuditCountAjaxFn1"
+            >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
@@ -441,7 +448,7 @@
                     /></el-icon>
                   </div>
                   <div class="elpopover-passpic">
-                    <img src="../assets/pass.png" alt="" />
+                    <img src="@/assets/pass.png" alt="" />
                   </div>
                   <div class="elpopover-content flexcenter">
                     <div class="elpopover-content-left">
@@ -499,7 +506,7 @@
                       class="elpopover-content-right elpopover-content-right1"
                     >
                       <div class="elpopover-content-title flexcenter">
-                        <img src="../assets/manuscriptauditing.png" alt="" />
+                        <img src="@/assets/manuscriptauditing.png" alt="" />
                         <span>审核流程记录</span>
                       </div>
                       <el-timeline class="elpopover-content-timeline">
@@ -1119,9 +1126,30 @@ export default {
       store.dispatch('postExternalAuditArticleFn',paramsO)
       .then((D)=>{
         console.log('D 详情页提交审核',D);
+        // const { data,success } = D.data
+        // if(!success){
+        //   ElMessage({
+        //     message: '详情页提交审核失败',
+        //     type: 'error',
+        //     plain: true,
+        //   })
+        //   return;
+        // }
+        // ElMessage({
+        //   message: '详情页提交审核成功',
+        //   type: 'success',
+        //   plain: true,
+        // });
+
+        // data
+        //更新待审核列表
+        getNeedAuditCountAjaxFn();
+        //更新已处理列表
+        getNeedAuditCountAjaxFn1();
+
       })
       .catch((error)=>{
-        console.log('error 审核文章',error);
+        console.log('error 详情页提交审核',error);
       })
     }
 
@@ -1391,13 +1419,13 @@ export default {
         margin-top: 20px;
       }
       :deep(.el-timeline-item__node--normal) {
-        background: url(../assets/timeline.png) no-repeat;
+        background: url(@/assets/timeline.png) no-repeat;
         width: 19px;
         height: 19px;
         left: -4px;
       }
       :deep(.el-timeline-item__timestamp.is-top) {
-        background: url(../assets/timelinebg.png) no-repeat;
+        background: url(@/assets/timelinebg.png) no-repeat;
         height: 42px;
         line-height: 25px;
         padding-left: 15px;

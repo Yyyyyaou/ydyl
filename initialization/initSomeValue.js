@@ -7,7 +7,8 @@ import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
  * @returns 
  */
 export function getUserInfoFn(){
-  httpAxiosO({
+
+  return httpAxiosO({
     url: '/api/web/user/getLoginUser.do',
     methods:'get',
   })
