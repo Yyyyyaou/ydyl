@@ -82,7 +82,7 @@
   </div>
   <div class="createorigin-btngroup flexcenter">
     <el-button class="createorigin-btngroup-save" @click="postAddEditAjaxFn(0)">保存到草稿箱</el-button>
-    <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
+    <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn">预 览</el-button>
     <el-button class="createorigin-btngroup-reset">重 置</el-button>
   </div>
 </template>
@@ -94,7 +94,7 @@ import "quill/dist/quill.core.css";
 import { onMounted, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
 // import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 
@@ -323,8 +323,31 @@ export default {
       })
     }
 
+    /**
+     * 预览稿件
+     */
+    function previewAddEditFn(){
+      //预览前要先 检测一下 标题语种，非中文要给提示
+      ElMessageBox.confirm(
+        '您输入的“稿件标题”语种不是中文，请修改语种',
+        '提示',
+        {
+          confirmButtonText: '继续预览',
+          cancelButtonText: '取消，去修改',
+          type: 'warning',
+        }
+      )
+      .then(() => {
+alert(2)
+      })
+      .catch(() => {
+        alert(3)
 
-    
+      })
+    }
+    // end of previewAddEditFn
+
+
     /**
      * 富文本编辑器初始化
      */
@@ -377,6 +400,7 @@ export default {
       langOptions,
 
       postAddEditAjaxFn,
+      previewAddEditFn,
       QuillEditorInitFn,
 
     };

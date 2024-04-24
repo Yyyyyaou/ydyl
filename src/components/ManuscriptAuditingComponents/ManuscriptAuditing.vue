@@ -21,8 +21,8 @@
           >
             <el-button
               class="mid-content-mycontribute-table-btngroup-search-btn"
-              >批量审核</el-button
-            >
+              @click="dialogBatchProcessingFn"
+            >批量审核</el-button>
             <div
               class="mid-content-mycontribute-table-btngroup-search-divide"
             ></div>
@@ -90,6 +90,7 @@
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
             :data="tableData.slice((page - 1) * limit, page * limit)"
+            @selection-change="handleSelectionTableDataFn"
             border
             style="width: 100%"
             :header-cell-style="{
@@ -210,33 +211,7 @@
                     
                   </div>
                   
-                  <div class="elpopover-comment" data-desc="审核意见以及提交按钮板块">
-                    <div class="elpopover-comment-header flexcenter">
-                      <div class="elpopover-comment-header-divide"></div>
-                      <span>审核意见</span>
-                    </div>
-                    <div class="elpopover-comment-header-textarea">
-                      <el-input
-                        v-model="commentTextarea"
-                        :rows="4"
-                        type="textarea"
-                        placeholder="审核通过"
-                      />
-                    </div>
-                    <div class="elpopover-comment-header-radio">
-                      <el-radio-group v-model="commentRadio">
-                        <el-radio
-                          :value="item.value"
-                          v-for="item in commentRadioData"
-                          :key="item.value"
-                          >{{ item.label }}
-                        </el-radio>
-                      </el-radio-group>
-                    </div>
-                    <div class="elpopover-comment-header-btn flexcenter">
-                      <el-button @click="postExternalAuditArticleAjaxFn">提交</el-button>
-                    </div>
-                  </div>
+                  <AuditOpinion :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" />
                   <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
 
                   <template #reference>
@@ -612,18 +587,33 @@
         </div>
       </div>
     </div>
+    <!-- end of mid-content-mycontribute -->
+
+    <!-- 用于批量审核的弹窗开始 -->
+    <el-dialog v-model="dialogBatchProcessingVisible" title="批量审核" width="800">
+      <AuditOpinion :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" />
+      <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
+    </el-dialog>
+    <!-- 用于批量审核的弹窗结束 -->
+
   </div>
 </template>
 
 <script>
-import { onMounted, reactive, ref, watch,computed } from "vue";
+import { onMounted, reactive, ref,computed } from "vue";
 import { useStore } from "vuex"
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+
+import AuditOpinion from "./AuditOpinion.vue";
+
 export default {
+  components: { 
+    AuditOpinion,
+  },
   setup() {
     //路由实例
     const router = useRouter();
@@ -665,6 +655,21 @@ export default {
     const dateDefaultTime = ref("");
     //表格数据
     const tableData = reactive([]);
+    const tableSelectedDataArr = reactive([]);//记录选中checkbox的数据
+    /**
+     * 监听 选中table checkbox 变化
+     * @param {*} selectedArrP 选中checkbox的数据
+     */
+    function handleSelectionTableDataFn(
+      selectedArrP,
+    ){
+      tableSelectedDataArr.splice(0,tableSelectedDataArr.length);
+      selectedArrP.forEach((o)=>{
+        tableSelectedDataArr.push(o);
+      });
+    }
+    //end of handleSelectionTableDataFn
+
 
     //分页器
     let limit = ref(15);
@@ -714,7 +719,16 @@ export default {
     };
 
 
-    const statusRadio = ref(1);
+    const statusRadio = ref(1);//切换 待审核 已处理
+
+
+    const dialogBatchProcessingVisible = ref(false);//用于显示批量审核的弹窗
+    /**
+     * 批量审核按钮触发
+     */
+    function dialogBatchProcessingFn(){
+      dialogBatchProcessingVisible.value = true;
+    }
 
     // <!-- 已处理部分 -->
     //关键词
@@ -762,6 +776,7 @@ export default {
 
     //表格数据
     const tableData1 = reactive([]);
+
     //分页器
     let limit1 = ref(15);
     function handleSizeChange1(val) {
@@ -802,28 +817,7 @@ export default {
     const externalAuditArticleFindByIdO = reactive({});
     //时间轴数据
     const timelineData = reactive([]);
-
     
-    //审核意见
-    const commentTextarea = ref('');
-    //审核意见Radio
-    const commentRadio = ref('');
-    const commentRadioData = reactive([]);
-    //根据角色把 相应的 审核意见Radio 选项 赋值到commentRadioData
-    for(let key in store.state.ROLESETO[userAuthority.value]['auditSign']){
-      if(//为审核意见Radio 确定 默认选项
-        store.state.ROLESETO[userAuthority.value]['auditSign'][key] === '审核通过'
-      ){
-        commentRadio.value = key;
-        commentTextarea.value = '审核通过'
-      }
-
-      commentRadioData.push({
-        label:store.state.ROLESETO[userAuthority.value]['auditSign'][key],
-        value:key
-      });
-      
-    }
   
 
     /**
@@ -1109,75 +1103,12 @@ export default {
       ;
     }
     //end of externalAuditArticleRecordListAjaxFn
-    
-    //详情页提交审核
-    function postExternalAuditArticleAjaxFn(){
-
-      console.log('externalAuditArticleFindByIdO',externalAuditArticleFindByIdO);
-      const paramsO = {
-        externalAuditArticleId:externalAuditArticleFindByIdO.externalAuditArticleId,
-        srcArticleId:externalAuditArticleFindByIdO.srcArticleId,
-        externalAuditSign:commentRadio.value,//审核意见 下面的选项 选择了哪个
-        externalAuditTime:timeFormatFn(new Date())['YYYY-MM-DD hh:mm:ss'],
-        view:commentTextarea.value,
-        wcmId:externalAuditArticleFindByIdO.wcmId,
-      }
-
-      store.dispatch('postExternalAuditArticleFn',paramsO)
-      .then((D)=>{
-        console.log('D 详情页提交审核',D);
-        // const { data,success } = D.data
-        // if(!success){
-        //   ElMessage({
-        //     message: '详情页提交审核失败',
-        //     type: 'error',
-        //     plain: true,
-        //   })
-        //   return;
-        // }
-        // ElMessage({
-        //   message: '详情页提交审核成功',
-        //   type: 'success',
-        //   plain: true,
-        // });
-
-        // data
-        //更新待审核列表
-        getNeedAuditCountAjaxFn();
-        //更新已处理列表
-        getNeedAuditCountAjaxFn1();
-
-      })
-      .catch((error)=>{
-        console.log('error 详情页提交审核',error);
-      })
-    }
-
-
-    watch([commentRadio],([commentRadio])=>{
-      switch(commentRadio){
-        case '1_2'://审核通过
-          commentTextarea.value = '审核通过';
-        break;
-        case '2_2'://审核通过
-          commentTextarea.value = '审核通过';
-        break;
-        case '1_1'://审核未通过
-          commentTextarea.value = '审核未通过';
-        break;
-        case '2_1'://审核未通过
-          commentTextarea.value = '审核未通过';
-        break;
-      }
-    })
-
 
     onMounted(() => {
       restaurants.value = loadAll();
       getNeedAuditCountAjaxFn();//待审核
       getNeedAuditCountAjaxFn1();//已处理
     });
-
 
     return {
       searchInput,
@@ -1198,7 +1129,12 @@ export default {
       popoverShowFlag,
       originInput,
       querySearch,
+      
       statusRadio,
+
+      dialogBatchProcessingVisible,
+      dialogBatchProcessingFn,
+      handleSelectionTableDataFn,
 
       //已处理部分
       searchInput1,
@@ -1225,15 +1161,14 @@ export default {
 
       fontSelect,
       timelineData,
-      commentTextarea,
-      commentRadio,
-      commentRadioData,
 
       getNeedAuditCountAjaxFn,
       getNeedAuditCountAjaxFn1,
       externalAuditArticleFindByIdFn,
       externalAuditArticleRecordListAjaxFn,
-      postExternalAuditArticleAjaxFn,
+
+      externalAuditArticleFindByIdO,
+
     };
   },
 };
@@ -1455,43 +1390,7 @@ export default {
       }
     }
   }
-  .elpopover-comment {
-    height: 300px;
-    background-color: #f5f6fa;
-    padding: 0 47px;
-    .elpopover-comment-header {
-      padding-top: 30px;
-      .elpopover-comment-header-divide {
-        width: 5px;
-        height: 20px;
-        border-radius: 5px;
-        background-color: #1890ff;
-      }
-      span {
-        font-size: 20px;
-        font-weight: 700;
-        color: #000;
-        margin-left: 20px;
-      }
-    }
-    .elpopover-comment-header-textarea {
-      margin-top: 15px;
-    }
-    .elpopover-comment-header-radio {
-      margin-top: 15px;
-    }
-    .elpopover-comment-header-btn {
-      margin-top: 15px;
-      justify-content: center;
-      .el-button {
-        width: 240px;
-        height: 45px;
-        border-radius: 5px;
-        background-color: #1890ff;
-        color: #fff;
-      }
-    }
-  }
+
   .elpopover-content-left-text1 {
     max-height: 575px !important;
   }

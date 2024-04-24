@@ -52,7 +52,6 @@
 
         </ul>
 
-
       </div>
       <!-- end of login_container_1 -->
     </div>
