@@ -15,78 +15,99 @@
       <div class="noticedetail-content-word flexcenter">
         <div v-html="articleHtmlCon"></div>
       </div>
+      <!-- 没数据时不显示 -->
+      <div>
+        <!-- v-if -->
+        <div class="mid-dividerdashed"></div>
+        <div class="noticedetail-bottom-content">
+          <div><span>司局审批单：</span><span>xxxxxx.pdf</span></div>
+          <div class="noticedetail-bottom-content-img">
+            <span
+              >附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件：</span
+            >
+            <img src="./../../../assets/filepic.png" alt="" />
+          </div>
+          <div>
+            <span
+              >备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</span
+            ><span>说明信息</span>
+          </div>
+          
+        </div>
+      </div>
+      <!-- 没数据时不显示 -->
+      <div class="mid-divider" style="margin-top:53px;"></div>
     </div>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-import { useStore } from "vuex"
+import { onMounted, ref } from "vue";
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { ElMessage,ElLoading } from "element-plus";
-import { timeFormatFn } from "@/utils/timeFormat.js";timeFormatFn
+import { ElMessage, ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
+timeFormatFn;
 
 export default {
   setup() {
     const router = useRouter();
-    const { id } = router.currentRoute.value.query;//稿件ID，用来请求稿件详情接口
+    const { id } = router.currentRoute.value.query; //稿件ID，用来请求稿件详情接口
 
     const store = useStore();
 
-    const articleTitle = ref('');//稿件标题
-    const articleSource = ref('');//稿件来源
-    const articleHtmlCon = ref('');//稿件HTML正文
-    const postUser = ref('');//投稿人
-    const pubTime = ref('');//发布时间
+    const articleTitle = ref(""); //稿件标题
+    const articleSource = ref(""); //稿件来源
+    const articleHtmlCon = ref(""); //稿件HTML正文
+    const postUser = ref(""); //投稿人
+    const pubTime = ref(""); //发布时间
 
     /**
      * 获取稿件详情
      */
-    function getFindByIdAjaxFn(){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      store.dispatch('getFindByIdFn',id)
-      .then((D)=>{
-        console.log('我的投稿-查看 D',D);
-        const { data,success } = D.data;
-        if(!success){
+    function getFindByIdAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+      store
+        .dispatch("getFindByIdFn", id)
+        .then((D) => {
+          console.log("我的投稿-查看 D", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "我的投稿-查看数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
           ElMessage({
-            message: '我的投稿-查看数据请求失败',
-            type: 'error',
+            message: "我的投稿-查看数据请求成功",
+            type: "success",
             plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '我的投稿-查看数据请求成功',
-          type: 'success',
-          plain: true,
-        })
+          });
 
-        articleTitle.value = data.articleTitle;
-        articleSource.value = data.articleSource;
-        articleHtmlCon.value = data.articleHtmlCon;
-        postUser.value = data.postUser;
-        pubTime.value = data.pubTime;
-
-      })
-      .catch((error)=>{
-        console.log('我的投稿-查看 接口请求 error',error);
-        ElMessage({
-          message: '我的投稿-查看接口请求失败',
-          type: 'error',
-          plain: true,
+          articleTitle.value = data.articleTitle;
+          articleSource.value = data.articleSource;
+          articleHtmlCon.value = data.articleHtmlCon;
+          postUser.value = data.postUser;
+          pubTime.value = data.pubTime;
         })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+        .catch((error) => {
+          console.log("我的投稿-查看 接口请求 error", error);
+          ElMessage({
+            message: "我的投稿-查看接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
     }
-  
 
-    onMounted(()=>{
+    onMounted(() => {
       getFindByIdAjaxFn();
-    })
+    });
 
     return {
       articleTitle,
@@ -123,12 +144,29 @@ export default {
         margin: 0 24px;
       }
     }
-    .mid-divider{
+    .mid-divider {
       color: #757575 !important;
       height: 2px;
       margin-top: 13px;
     }
-    .noticedetail-content-word{
+    .mid-dividerdashed {
+      border-bottom: 1px #757575 dashed;
+      margin: 0 1%;
+      margin-top: 53px;
+    }
+    .noticedetail-bottom-content {
+      padding: 0 110px;
+      margin-top: 53px;
+      font-size: 18px;
+      color: #000;
+      >div{
+        margin-top: 10px;
+      }
+      .noticedetail-bottom-content-img {
+        display: flex;
+      }
+    }
+    .noticedetail-content-word {
       padding: 0 110px;
       margin-top: 53px;
       color: #000;
