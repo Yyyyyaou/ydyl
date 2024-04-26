@@ -28,7 +28,22 @@
         prop="articleHtmlCon"
         class="createorigin-content-editor"
       >
-        <section id="QuillEditorEleID"></section>
+        <!-- <section id="QuillEditorEleID"></section> -->
+        <!-- <textarea id="tinymceEditorEleID" placeholder="编辑正文"></textarea> -->
+        <Editor 
+          :init="{
+            language:'zh_CN',
+            plugins: 'lists link image code media',
+            directionality: 'ltr rtl',
+            toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | link image media | code language',
+            // branding:false,
+            menubar:false,
+          }" 
+          v-model="editorHTMLContent"
+          model-events="change keydown blur focus paste"
+          @change="editorChangeFn"
+        />
+
       </el-form-item>
       <el-row style="justify-content: space-between">
         <el-col :span="11">
@@ -43,7 +58,11 @@
               placeholder="司局级审核单格式doc、pdf、jpg、png"
             ></el-input>
             <el-upload
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+              id="auditingUploadID"
+              :auto-upload="false"
+              multiple
+              show-file-list
+              :on-change="handleAuditingUploadChangeFn"
             >
               <el-button type="primary" class="createorigin-content-upload-auditing">上传</el-button>
             </el-upload>
@@ -88,17 +107,22 @@
 </template>
 
 <script>
-import Quill from 'quill';
-import "quill/dist/quill.core.css";
+// import Quill from 'quill';
+// import "quill/dist/quill.core.css";
+import Editor from '@tinymce/tinymce-vue';
 
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive,ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
+
 // import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 
 export default {
+  components:{
+    Editor,
+  },
   setup() {
     //路由实例
     const router = useRouter();
@@ -162,12 +186,44 @@ export default {
       })
     });
 
+    //上传字段保存
+    const auditingUploadFilesArray = ref([]);
+    //审核资质附件
+    const postAddEditAjaxFormData = new FormData();
+    function handleAuditingUploadChangeFn(file,files){file
+      auditingUploadFilesArray.value = files.map((o)=>{
+        return o
+      });
+    }
+    // end of handleAuditingUploadChange
+
+    //富文本编辑器 html正文内容
+    const editorHTMLContent = ref('');
+    //富文本编辑器 文本正文内容
+    const editorTEXTContent = ref('');
+    /**
+     * 监听编辑器输入
+     * a、b 两个参数暂时不知道属于什么对象
+     */
+    function editorChangeFn(a,b){
+      a
+      editorTEXTContent.value = b.getContent({
+        format: 'text'
+      });
+
+    }
+    // end of editorChangeFn
 
     /**
      * 获取稿件详情
      */
      function getFindByIdAjaxFn(){
       
+      //没有id就退出
+      if(!id){
+        return;
+      }
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       store.dispatch('getFindByIdFn',id)
       .then((D)=>{
@@ -189,9 +245,13 @@ export default {
 
         formData.articleTitle = data.articleTitle;//稿件标题
         formData.articleSource = data.articleSource||'';//稿件来源
+        
         formData.articleHtmlCon = data.articleHtmlCon||'';//稿件HTML内容
+        editorHTMLContent.value = data.articleHtmlCon||'';//稿件HTML内容
+
         formData.articleContent = data.articleContent||'';//稿件文本内容
-        QuillEditorInitFn.setText(formData.articleContent);
+        editorTEXTContent.value = data.articleContent||'';//稿件文本内容
+        
         formData.language = data.language||'';//语种
         formData.remark = data.remark||'';//备注
 
@@ -209,7 +269,7 @@ export default {
       })
       ;
     }
-  
+    //end of getFindByIdAjaxFn
 
     /**
      * 校验 原创稿件 用户所填表单 各个字段 合法性
@@ -267,7 +327,8 @@ export default {
      * articleStatus:0 时
      * 提交稿件到 “草稿箱”列表里
      * articleStatus:1 时
-     * 提交稿件到 “我的投稿”列表里     * 
+     * 提交稿件到 “我的投稿”列表里
+     *  
      */
     function postAddEditAjaxFn(articleStatusP){
       const datasO = {
@@ -279,8 +340,8 @@ export default {
         articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
       };
       
-      datasO.articleHtmlCon = QuillEditorInitFn.getSemanticHTML()//文章HTML内容
-      datasO.articleContent = QuillEditorInitFn.getText();//文章文本内容
+      // datasO.articleHtmlCon = QuillEditorInitFn.getSemanticHTML()//文章HTML内容
+      // datasO.articleContent = QuillEditorInitFn.getText();//文章文本内容
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       const _regExp1 = /\n$/;
@@ -290,11 +351,30 @@ export default {
         return;
       }
 
+
+      //验证完普通字段，把它们都塞进formData 里
+      postAddEditAjaxFormData.append('articleTitle',datasO.articleTitle);//稿件标题
+      postAddEditAjaxFormData.append('articleSource',datasO.articleSource);//稿件来源
+      postAddEditAjaxFormData.append('language',datasO.language);//语种
+      postAddEditAjaxFormData.append('remark',datasO.remark);//备注
+      postAddEditAjaxFormData.append('articleStatus',articleStatusP);//稿件状态 （-1：已删除，0：草稿，1：已投稿）
+
+      postAddEditAjaxFormData.append('articleHtmlCon', datasO.articleHtmlCon);//文章HTML内容
+
+      //接口传参需要去掉datasO.articleContent 结尾的 \n
+      postAddEditAjaxFormData.append('articleContent', datasO.articleContent);//文章文本内容
+      
+
+      auditingUploadFilesArray.value.length&&auditingUploadFilesArray.value.forEach((o)=>{
+        postAddEditAjaxFormData.append(o.name,o);
+      });
+
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       httpAxiosO({
         url:'/api/web/article/addEdit.do',
         method:'post',
-        data:datasO
+        data:postAddEditAjaxFormData
       })
       .then((D)=>{
         console.log('原创稿件提交 D',D);
@@ -338,10 +418,9 @@ export default {
         }
       )
       .then(() => {
-alert(2)
+
       })
       .catch(() => {
-        alert(3)
 
       })
     }
@@ -351,45 +430,61 @@ alert(2)
     /**
      * 富文本编辑器初始化
      */
-    let quillO = null;//富文本编辑器实例
-    function QuillEditorInitFn(){
+    // let quillO = null;//富文本编辑器实例
+    // function QuillEditorInitFn(){
 
-      id&&getFindByIdAjaxFn();//获取稿件详情，以便在当前表单里回显 各个字段值
+    //   id&&getFindByIdAjaxFn();//获取稿件详情，以便在当前表单里回显 各个字段值
 
-      const options = {
-        debug: 'info',
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            ['link', 'image'],
-            [{ 'align': [] }],
-            [{ 'size': ['small', 'large', 'huge'] }],
-          ],
-          history: {
-            delay: 2000,
-            maxStack: 500,
-            userOnly: true
-          },
-        },
-        placeholder: '编辑正文内容',
-        theme: 'snow'
-      };
-      quillO = new Quill('#QuillEditorEleID', options);
-    }
-    QuillEditorInitFn.getText = function(){
-      return quillO.getText();
-    }
-    QuillEditorInitFn.getSemanticHTML = function(){
-      return quillO.getSemanticHTML();
-    }
-    QuillEditorInitFn.setText = function(textP){
-      return quillO.setText(textP);
-    }
+    //   const options = {
+    //     debug: 'info',
+    //     modules: {
+    //       toolbar: [
+    //         ['bold', 'italic', 'underline', 'strike'],
+    //         [{ 'color': [] }, { 'background': [] }],
+    //         ['link', 'image','video'],
+    //         [{ 'align': [] }],
+    //         [{ 'size': ['10px', '12px', '14px','16px','18px','20px','22px','24px','26px','28px',false] }],
+    //       ],
+    //       history: {
+    //         delay: 2000,
+    //         maxStack: 500,
+    //         userOnly: true
+    //       },
+    //       handlers:{
+    //         video:(val)=>{//插入视频
+    //           console.log('video',val);
+    //           return document.querySelector('body').click=function(){
+    //             console.log('body');
+    //           }
+    //         },
+    //         'video1':function(val){//插入视频
+    //           console.log('videovideovideovideo',val);
+    //         },
+            
+    //       }
+    //     },
+    //     placeholder: '编辑正文内容',
+    //     theme: 'snow'
+    //   };
+    //   quillO = new Quill('#QuillEditorEleID', options);
+    // }
+    // QuillEditorInitFn.getText = function(){
+    //   return quillO.getText();
+    // }
+    // QuillEditorInitFn.getSemanticHTML = function(){
+    //   return quillO.getSemanticHTML();
+    // }
+    // QuillEditorInitFn.setText = function(textP){
+    //   return quillO.setText(textP);
+    // }
     
 
     onMounted(()=>{
-      QuillEditorInitFn();
+      getFindByIdAjaxFn();//根据稿件id获取稿件内容，用于回显稿件内容
+
+      // QuillEditorInitFn();
+      // console.log('auditingUploadFilesArray.value',auditingUploadFilesArray.value);//获取上传组件实例
+
     })
 
     return {
@@ -399,9 +494,16 @@ alert(2)
       rules,
       langOptions,
 
+      editorHTMLContent,
+      editorChangeFn,
+
+      auditingUploadFilesArray,
+      handleAuditingUploadChangeFn,
+
       postAddEditAjaxFn,
       previewAddEditFn,
-      QuillEditorInitFn,
+      // QuillEditorInitFn,
+
 
     };
   },
