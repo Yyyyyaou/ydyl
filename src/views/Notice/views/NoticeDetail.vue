@@ -25,7 +25,7 @@
             <span
               >附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件：</span
             >
-            <img src="./../../../assets/filepic.png" alt="" />
+            <img src="@/assets/filepic.png" alt="" />
           </div>
           <div>
             <span

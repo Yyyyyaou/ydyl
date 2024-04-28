@@ -34,10 +34,19 @@
           :init="{
             language:'zh_CN',
             plugins: 'lists link image code media',
+            file_picker_types: 'image media',
+            images_file_types: 'jpg,png,svg,webp',
+            video_file_types: 'mp4',
+            images_upload_handler:editorImagesUploadHandlerFn,
+            video_template_callback: editorVideoTemplateCallbackFn,
+            file_picker_callback:editorFilePickerCallbackFn,
+
             directionality: 'ltr rtl',
             toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | link image media | code language',
-            // branding:false,
-            menubar:false,
+            branding:false,//底部logo
+            menubar:false,//顶部菜单栏
+            resize:false,
+            placeholder:'请编辑正文',
           }" 
           v-model="editorHTMLContent"
           model-events="change keydown blur focus paste"
@@ -213,6 +222,69 @@ export default {
 
     }
     // end of editorChangeFn
+
+    /**
+     * 图片上传
+     */
+    function editorImagesUploadHandlerFn(a,b){
+      console.log('a',a)
+      console.log('b',b)
+      return new Promise((resolved)=>{
+        setTimeout(()=>{
+          resolved('https://www.trs.com.cn/gjlm_zqnr/sygg/202309/W020230908654837080566.jpg')
+        },2000)
+      });
+    }
+    // end of editorImagesUploadHandlerFn
+
+    /**
+     * 文件上传拦截
+     */
+    function editorFilePickerCallbackFn(callbackP,valueP,metaP){
+      if(metaP.filetype==='media'){
+        console.log('callbackP',callbackP)
+        console.log('valueP',valueP)
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.onchange = async function(){
+          const file = this.files[0];
+          console.log('file',file);
+          if(
+            !file.name.match(/.mp4$/)
+          ){
+            ElMessage({
+              message: "请上传MP4文件",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          callbackP(
+            'https://www.trs.com.cn/virtual-video/xybsjb_2022.11.23shijiebeibobao.mp4',
+            {
+              title:file.name,
+            }
+          )
+      
+        };
+        input.click();
+      }
+    }
+    //end of editorFilePickerCallbackFn
+
+    /**
+     * 视频上传返回格式
+     */
+    function editorVideoTemplateCallbackFn(data,b){
+      console.log('data',data)
+      console.log('b',b)
+      return `<video width="${data.width}" height="${data.height}"${data.poster ? ` poster="${data.poster}"` : ''} controls="controls">
+        <source src="${data.source}"${data.sourcemime ? ` type="${data.sourcemime}"` : ''} />
+      </video>
+      `
+    }
+    // end of editorVideoTemplateCallbackFn
+
 
     /**
      * 获取稿件详情
@@ -426,64 +498,12 @@ export default {
     }
     // end of previewAddEditFn
 
-
-    /**
-     * 富文本编辑器初始化
-     */
-    // let quillO = null;//富文本编辑器实例
-    // function QuillEditorInitFn(){
-
-    //   id&&getFindByIdAjaxFn();//获取稿件详情，以便在当前表单里回显 各个字段值
-
-    //   const options = {
-    //     debug: 'info',
-    //     modules: {
-    //       toolbar: [
-    //         ['bold', 'italic', 'underline', 'strike'],
-    //         [{ 'color': [] }, { 'background': [] }],
-    //         ['link', 'image','video'],
-    //         [{ 'align': [] }],
-    //         [{ 'size': ['10px', '12px', '14px','16px','18px','20px','22px','24px','26px','28px',false] }],
-    //       ],
-    //       history: {
-    //         delay: 2000,
-    //         maxStack: 500,
-    //         userOnly: true
-    //       },
-    //       handlers:{
-    //         video:(val)=>{//插入视频
-    //           console.log('video',val);
-    //           return document.querySelector('body').click=function(){
-    //             console.log('body');
-    //           }
-    //         },
-    //         'video1':function(val){//插入视频
-    //           console.log('videovideovideovideo',val);
-    //         },
-            
-    //       }
-    //     },
-    //     placeholder: '编辑正文内容',
-    //     theme: 'snow'
-    //   };
-    //   quillO = new Quill('#QuillEditorEleID', options);
-    // }
-    // QuillEditorInitFn.getText = function(){
-    //   return quillO.getText();
-    // }
-    // QuillEditorInitFn.getSemanticHTML = function(){
-    //   return quillO.getSemanticHTML();
-    // }
-    // QuillEditorInitFn.setText = function(textP){
-    //   return quillO.setText(textP);
-    // }
     
+
 
     onMounted(()=>{
       getFindByIdAjaxFn();//根据稿件id获取稿件内容，用于回显稿件内容
 
-      // QuillEditorInitFn();
-      // console.log('auditingUploadFilesArray.value',auditingUploadFilesArray.value);//获取上传组件实例
 
     })
 
@@ -496,6 +516,9 @@ export default {
 
       editorHTMLContent,
       editorChangeFn,
+      editorImagesUploadHandlerFn,
+      editorVideoTemplateCallbackFn,
+      editorFilePickerCallbackFn,
 
       auditingUploadFilesArray,
       handleAuditingUploadChangeFn,

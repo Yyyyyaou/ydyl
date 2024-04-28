@@ -369,6 +369,7 @@ export default {
   },
 };
 </script>
+
 <style scoped lang='less'>
 .mid-content {
   padding: 15px 34px;
