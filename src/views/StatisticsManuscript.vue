@@ -6,6 +6,7 @@
           v-model="companySelectValue"
           placeholder="投稿单位"
           style="width: 140px"
+          v-if="userAuthority == '外部用户_国家发改委'"
         >
           <el-option
             v-for="item in companyOptions"
@@ -38,7 +39,12 @@
           />
         </el-config-provider>
       </div>
-      <div class="flexcenter mid-content-statistics-left-content-div">
+
+      <!-- 外部用户_国家发改委 -->
+      <div
+        class="flexcenter mid-content-statistics-left-content-div"
+        v-if="userAuthority == '外部用户_国家发改委'"
+      >
         <div class="flexcenter mid-content-statistics-left-content-img">
           <img src="../assets/contributenum.png" alt="" />
         </div>
@@ -50,6 +56,7 @@
       <div
         class="flexcenter mid-content-statistics-left-content-divmid"
         style="margin-left: 10px"
+        v-if="userAuthority == '外部用户_国家发改委'"
       >
         <div class="divmid-bg flexcenter">
           <div class="flexcenter mid-content-statistics-left-content-div">
@@ -86,12 +93,103 @@
       <div
         class="flexcenter mid-content-statistics-left-content-div"
         style="margin-left: 10px"
+        v-if="userAuthority == '外部用户_国家发改委'"
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
           <img src="../assets/fgwnum3.png" alt="" />
         </div>
         <div class="mid-content-statistics-left-content-num">
           <p>82.6%</p>
+          <p>采用率</p>
+        </div>
+        <el-icon><InfoFilled /></el-icon>
+      </div>
+
+      <!-- 外部用户_国家信息中心 -->
+      <div
+        class="flexcenter mid-content-statistics-left-content-div1"
+        v-if="
+          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '外部用户'
+        "
+      >
+        <div class="flexcenter mid-content-statistics-left-content-img">
+          <img src="../assets/contributenum.png" alt="" />
+        </div>
+        <div class="mid-content-statistics-left-content-num">
+          <p>{{num1}}</p>
+          <p>投稿总数</p>
+        </div>
+      </div>
+      <div
+        class="flexcenter mid-content-statistics-left-content-divmid1"
+        style="margin-left: 10px"
+        v-if="
+          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '外部用户'
+        "
+      >
+        <div class="divmid-bg flexcenter">
+          <div class="flexcenter mid-content-statistics-left-content-div">
+            <div class="flexcenter mid-content-statistics-left-content-img">
+              <img src="../assets/contributenum.png" alt="" />
+            </div>
+            <div class="mid-content-statistics-left-content-num">
+              <p>{{num2}}</p>
+              <p>发布总数</p>
+            </div>
+          </div>
+          <div class="divmid-divide"></div>
+          <div class="flexcenter mid-content-statistics-left-content-div">
+            <div class="flexcenter mid-content-statistics-left-content-img">
+              <img src="../assets/papernum.png" alt="" />
+            </div>
+            <div class="mid-content-statistics-left-content-num">
+              <p>{{num3}}</p>
+              <p>原创稿件</p>
+            </div>
+          </div>
+          <div class="divmid-divide"></div>
+          <div class="flexcenter mid-content-statistics-left-content-div">
+            <div class="flexcenter mid-content-statistics-left-content-img">
+              <img src="../assets/statisticsnum3.png" alt="" />
+            </div>
+            <div class="mid-content-statistics-left-content-num">
+              <p>{{num4}}</p>
+              <p>转载稿件</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="flexcenter mid-content-statistics-left-content-div1"
+        style="margin-left: 10px"
+        v-if="
+          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '外部用户'
+        "
+      >
+        <div class="flexcenter mid-content-statistics-left-content-img">
+          <img src="../assets/contributenum.png" alt="" />
+        </div>
+        <div class="mid-content-statistics-left-content-num">
+          <p>{{num5}}</p>
+          <p>待处理稿件</p>
+        </div>
+      </div>
+      <div
+        class="flexcenter mid-content-statistics-left-content-div1"
+        style="margin-left: 10px"
+        v-if="
+          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '外部用户'
+        "
+      >
+        <div class="flexcenter mid-content-statistics-left-content-img">
+          <img src="../assets/fgwnum3.png" alt="" />
+        </div>
+        <div class="mid-content-statistics-left-content-num">
+          <p>{{num6}}</p>
           <p>采用率</p>
         </div>
         <el-icon><InfoFilled /></el-icon>
@@ -129,16 +227,27 @@
 </template>
 
 <script>
-import { reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useStore } from "vuex";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import PublishedManuscript from "@/components/PublishedManuscript.vue";
 import TrendEcharts from "@/components/TrendEcharts.vue";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import { ElMessage, ElLoading } from "element-plus";
 export default {
   components: {
     PublishedManuscript, //审核稿件
     TrendEcharts, //投稿趋势图
   },
   setup() {
+    const store = useStore();
+    //用户角色名字
+    const userAuthority = computed(() => {
+      console.log(store.state.StroeLoginO.loginUser.CURRENT_ROLE);
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
+    });
+
+    // console.log("HomePage userAuthority", userAuthority);
     const companySelectValue = ref("");
     const companyOptions = reactive([{ label: "中经社", value: 0 }]);
     const timeSelectValue = ref("");
@@ -148,13 +257,73 @@ export default {
     ]);
     //日期选择 数据
     const dateDefaultTime = ref([]);
+    /**
+     * 外部用户 稿件统计 接口请求
+     */
+    const num1 = ref(0);//投稿总数
+    const num2 = ref(0);//发布总数
+    const num3 = ref(0);//原创稿件
+    const num4 = ref(0);//转载稿件
+    const num5 = ref(0);//待处理稿件
+    const num6 = ref(0);//采用率
+    function getArticleCountAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+
+      httpAxiosO({
+        method: "get",
+        url: "/api/web/article/articleCount",
+        params: {
+          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+        },
+      })
+        .then((D) => {
+          console.log("稿件统计 D", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "稿件统计数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          num1.value = data.articleCount;
+          num2.value = data.pubCount;
+          num3.value = data.normalArticle;
+          num4.value = data.reprArticle;
+          num5.value = data.waitArticle;
+          num6.value = data.useRate;
+        })
+        .catch((error) => {
+          console.log("稿件统计 接口请求 error", error);
+          ElMessage({
+            message: "稿件统计接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
+    }
+    // end of getArticleCountAjaxFn
+    onMounted(() => {
+      getArticleCountAjaxFn(); //外部用户 稿件统计
+    });
     return {
+      userAuthority,
       companySelectValue,
       companyOptions,
       timeSelectValue,
       timeOptions,
       dateDefaultTime,
       locale: zhCn, //date-range 语言设置
+      num1,
+      num2,
+      num3,
+      num4,
+      num5,
+      num6,
     };
   },
 };
@@ -245,6 +414,63 @@ export default {
       margin-right: 25px;
     }
   }
+  .mid-content-statistics-left-content-div1 {
+    height: 110px;
+    width: 250px;
+    background: #fff;
+    .mid-content-statistics-left-content-img {
+      width: 75px;
+      height: 75px;
+      background-color: #f6f6f7;
+      border-radius: 50%;
+      margin-left: 25px;
+      justify-content: center;
+    }
+    .mid-content-statistics-left-content-num {
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+    }
+    p:nth-child(1) {
+      margin-left: 20px;
+      font-size: 30px;
+      color: #555b73;
+    }
+    p:nth-child(2) {
+      margin-left: 10px;
+      font-size: 16px;
+      color: #555b73;
+    }
+    .el-icon {
+      color: #ef9712;
+      font-size: 20px;
+      margin-left: 10px;
+    }
+  }
+  .mid-content-statistics-left-content-divmid1 {
+    width: 804px;
+    height: 106px;
+    background-color: #fff;
+    padding: 2px;
+    .divmid-bg {
+      width: 804px;
+      height: 106px;
+      background-color: #ebf6f6;
+    }
+    .mid-content-statistics-left-content-div {
+      background-color: unset;
+      .mid-content-statistics-left-content-img {
+        background-color: #fff;
+        margin-left: 25px;
+      }
+    }
+    .divmid-divide {
+      width: 2px;
+      height: 70px;
+      background-color: #fff;
+      margin-right: 15px;
+    }
+  }
 }
 .mid-content-divs {
   position: relative;
@@ -263,7 +489,8 @@ export default {
     :deep(.el-select__placeholder),
     :deep(.el-select__caret),
     :deep(.el-date-editor .el-range__icon),
-    :deep(.el-range-input) {
+    :deep(.el-range-input),
+    :deep(.el-range-separator) {
       color: #fff;
       &::placeholder {
         color: #fff;

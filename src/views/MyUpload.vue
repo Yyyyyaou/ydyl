@@ -20,8 +20,7 @@
           <div
             class="mid-content-mycontribute-table-btngroup-search flexcenter"
           >
-            <div class="mid-content-mycontribute-table-btngroup-search-keyword ">
-
+            <div class="mid-content-mycontribute-table-btngroup-search-keyword">
               <el-input
                 v-model="searchInput"
                 style="width: 190px"
@@ -29,8 +28,9 @@
               />
             </div>
 
-            <div class="mid-content-mycontribute-table-btngroup-search-keyword marl10">
-
+            <div
+              class="mid-content-mycontribute-table-btngroup-search-keyword marl10"
+            >
               <el-select
                 v-model="searchExcelTyepValue"
                 placeholder=""
@@ -43,7 +43,6 @@
                   :value="item.value"
                 />
               </el-select>
-
             </div>
 
             <el-config-provider :locale="locale">
@@ -56,7 +55,10 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px"
+            <el-button
+              type="primary"
+              class="marl10"
+              style="width: 78px"
               @click="getExcelListAjaxFn"
             >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
@@ -71,12 +73,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              'color': '#6a6d74',
+              color: '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              'color': '#727789',
+              color: '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
@@ -101,7 +103,16 @@
             <el-table-column prop="articleUseStatus" label="操作" width="180">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div :title="scope.row.excelTitle" @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">审核</div>
+                  <div
+                    :title="scope.row.excelTitle"
+                    @click="
+                      router.push(
+                        '/MyContribute/CreateContribute?id=' + scope.row.id
+                      )
+                    "
+                  >
+                    审核
+                  </div>
                   <span></span>
                   <div>下载</div>
                   <span></span>
@@ -143,23 +154,34 @@
       </div>
     </div>
   </div>
+
+  <el-dialog
+    v-model="dialogVisible"
+    title="数据上传"
+    width="1450"
+  >
+  <CreateUpdate />
+  </el-dialog>
 </template>
 
 <script>
 import { ref, reactive, onMounted } from "vue";
-import { useStore } from "vuex"
+//import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import CreateUpdate from "@/views/MyContribute/components/CreateUpdate.vue";
 export default {
+  components:{
+    CreateUpdate
+  },
   setup() {
-
     //路由实例
     const router = useRouter();
     //vuex实例
-    const store = useStore();
+    //const store = useStore();
 
     //关键词
     const searchInput = ref("");
@@ -169,7 +191,7 @@ export default {
     const searchExcelTyepOptions = [
       {
         value: 0,
-        label: "数据指数全部",//贸易指数
+        label: "数据指数全部", //贸易指数
       },
       {
         value: 1,
@@ -181,7 +203,7 @@ export default {
       },
     ];
     //日期选择 数据
-    const dateDefaultTime = ref('');
+    const dateDefaultTime = ref("");
     //表格数据
     const tableData = reactive([]);
 
@@ -197,7 +219,6 @@ export default {
       getExcelListAjaxFn();
     }
 
-
     /**
      * 我的数据  接口
      * excelTyep 非必填  0贸易指数、1航贸指数、2其他指数
@@ -206,81 +227,76 @@ export default {
      * endtime 非必填 结束时间
      * currPage 非必填 开始页数
      * pageSize 非必填 页面条数
-     * 
+     *
      * 接口返回数据字段，线上文档有写，很详细
-    */
-    function getExcelListAjaxFn(){
-
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+     */
+    function getExcelListAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
-        excelTitle:searchInput.value,//标题
-        exceType:searchExcelTyepValue.value,//0贸易指数、1航贸指数、2其他指数
-        currPage:page.value,//当前页
-        pageSize:limit.value,//每页条数
-      }
-
+        excelTitle: searchInput.value, //标题
+        exceType: searchExcelTyepValue.value, //0贸易指数、1航贸指数、2其他指数
+        currPage: page.value, //当前页
+        pageSize: limit.value, //每页条数
+      };
 
       //时间段
-      if(
-        dateDefaultTime.value
-      ){
-        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      if (dateDefaultTime.value) {
+        paramsO.crtime = timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"]; //起始时间
+        paramsO.endtime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"]; //结束时间
       }
 
-
       httpAxiosO({
-        method: 'get',
-        url: '/api/web/excel/getExcelList',
-        params:paramsO,
+        method: "get",
+        url: "/api/web/excel/getExcelList",
+        params: paramsO,
       })
-      .then((D)=>{
-        console.log('我的数据 D',D);
-        const { data,success } = D?.data
-        data
-        if(!success){
+        .then((D) => {
+          console.log("我的数据 D", D);
+          const { data, success } = D?.data;
+          data;
+          if (!success) {
+            ElMessage({
+              message: "我的数据数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
           ElMessage({
-            message: '我的数据数据请求失败',
-            type: 'error',
+            message: "我的数据数据请求成功",
+            type: "success",
             plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '我的数据数据请求成功',
-          type: 'success',
-          plain: true,
-        })
-        
-        tableData.splice(0,tableData.length);   //清空tableData
-        data.ldata.forEach((o)=>{
-          let _o = o;
-          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
-          tableData.push(_o);
-        });
-        pageTotal.value = data.totalResults;
+          });
 
-      })
-      .catch((error)=>{
-        console.log('我的数据 接口请求 error',error);
-        ElMessage({
-          message: '我的数据接口请求失败',
-          type: 'error',
-          plain: true,
+          tableData.splice(0, tableData.length); //清空tableData
+          data.ldata.forEach((o) => {
+            let _o = o;
+            _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
+            tableData.push(_o);
+          });
+          pageTotal.value = data.totalResults;
         })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+        .catch((error) => {
+          console.log("我的数据 接口请求 error", error);
+          ElMessage({
+            message: "我的数据接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
       return;
     }
     // end of getExcelListAjaxFn
 
     //由“数据上传” 按钮触发
+    const dialogVisible = ref(false)
     const dataUpdataFn = () => {
-      store
-      console.log('dataUpdataFn');
+      //store
+      console.log("dataUpdataFn");
+      dialogVisible.value = true;
       // store.dispatch('deleteDelAllFn')
       // .then(()=>{
       //   ElMessage({
@@ -300,10 +316,10 @@ export default {
 
     /**
      * 继续采用 ，实际上是“查看稿件”即跳转到 “创建稿件/原创稿件”界面
-     * @param {*} scopeP 
+     * @param {*} scopeP
      */
     const continueUsingFn = (scopeP) => {
-      scopeP
+      scopeP;
       // const {
       //   id,excelTitle,articleHtmlCon,articleContent,language,remark,articleStatus,aritleSource
       // } = scopeP.row;
@@ -342,8 +358,8 @@ export default {
       getExcelListAjaxFn();
     });
 
-    function tableSelectionChange(val){
-        console.log(val)
+    function tableSelectionChange(val) {
+      console.log(val);
     }
     return {
       router,
@@ -366,6 +382,8 @@ export default {
       getExcelListAjaxFn,
       dataUpdataFn,
       continueUsingFn,
+      
+      dialogVisible,
     };
   },
 };
