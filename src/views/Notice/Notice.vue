@@ -54,7 +54,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
-            :data="tableData.slice((page - 1) * limit, page * limit)"
+            :data="tableData"
             border
             style="width: 100%"
             :header-cell-style="{
@@ -159,11 +159,13 @@ export default {
     let limit = ref(15);
     function handleSizeChange(val) {
       limit.value = val;
+      getNoticeListAjaxFn()
     }
     let page = ref(1);
     let pageTotal = ref(0);
     function handleCurrentChange(val) {
       page.value = val;
+      getNoticeListAjaxFn()
     }
     //稿件标题点击置灰
     const isClickedArr = ref([]);
