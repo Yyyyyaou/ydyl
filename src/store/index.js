@@ -10,6 +10,7 @@ import {
   postUserLoginFn,
   getUserLogoutFn,
   postExternalAuditArticleFn,
+  getNeedAuditCountFn,
 } from './actionFunctions.js';
 
 import { 
@@ -38,12 +39,22 @@ const StroeLoginO = {
 const GLOBAL_LANGUAGE_LIST = [];
 
 
+//左侧导航小红点
+const LeftMenuMessageCount = {};
+//系统右下角提示未审核稿件弹窗列表
+const SystemUntreatedMessageList = [];
+//是否显示提示未审核稿件弹窗
+const IsShowSystemUntreatedMessagePopup = false;
 
 export default createStore({
   state: {
     ROLESETO,
     StroeLoginO,
     GLOBAL_LANGUAGE_LIST,
+
+    LeftMenuMessageCount,
+    SystemUntreatedMessageList,
+    IsShowSystemUntreatedMessagePopup,
     
   },
   getters: {
@@ -72,6 +83,17 @@ export default createStore({
       state.GLOBAL_LANGUAGE_LIST = languageListP;
     },
 
+    //更新为处理消息列表
+    MSystemUntreatedMessageList(state,listP){
+      state.SystemUntreatedMessageList = listP;
+    },
+    //更新左侧导航小红点
+    MLeftMenuMessageCount(state,paramsP){
+      state.LeftMenuMessageCount = paramsP;
+    },
+    MIsShowSystemUntreatedMessagePopup(state,paramsP){
+      state.IsShowSystemUntreatedMessagePopup = paramsP;
+    },
 
   },
   actions: {
@@ -79,6 +101,7 @@ export default createStore({
     getLanguageListFn,
     getUserLogoutFn,
     postExternalAuditArticleFn,
+    getNeedAuditCountFn,
     
     deleteLogicDeleteFn,
     deletePhysicsDeleteFn,
@@ -88,8 +111,6 @@ export default createStore({
 
     externalAuditArticleFindByIdFn,
 
-
-    
   },
   modules: {
 

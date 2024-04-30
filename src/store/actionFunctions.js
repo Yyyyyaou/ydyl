@@ -80,3 +80,47 @@ export async function postExternalAuditArticleFn(ctx,params){ctx
     data: params
   })
 }
+
+
+/**
+ * 导航栏的小红点 和 右下角的消息弹窗提醒
+ */
+export async function getNeedAuditCountFn(ctx){
+  const { CURRENT_ROLE } = ctx.state.StroeLoginO.loginUser;//获取当前登录用户角色
+
+  let displayNode = null;
+  switch(CURRENT_ROLE){
+    case '外部用户_国家信息中心':
+      displayNode = '1';
+    break;
+    case '外部用户_国家发改委':
+      displayNode = '2';
+    break;
+  }
+
+  return await httpAxiosO({
+    method: 'get',
+    url: '/api/web/articleRecord/getNeedAuditCount.do',
+    params:{
+      displayNode,//1为国家信息中心 2为国家发改委
+    }
+  })
+  .then((D)=>{
+    console.log('导航栏的小红点 和 右下角的消息弹窗提醒 D',D);
+    const { articleCount,proposeTopicCount,needAudit} = D.data.data;    articleCount,proposeTopicCount
+
+    //更新未审核的稿件列表
+    ctx.commit('MSystemUntreatedMessageList',needAudit);
+
+    //显示右下角弹窗
+    ctx.commit('MIsShowSystemUntreatedMessagePopup',true);
+
+    //更新导航栏的小红点 数值
+    ctx.commit('MLeftMenuMessageCount',{
+      articleCount,//审核稿件
+      proposeTopicCount,//审核专题
+    });
+
+  })
+
+}

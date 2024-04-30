@@ -211,7 +211,15 @@
                     
                   </div>
                   
-                  <AuditOpinion :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" />
+                  <AuditOpinion 
+                    :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" 
+                    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
+                    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
+                    @TriggerCloseElpopoverCommentFn = "
+                        scope.row.visible = false;
+                        popoverShowFlag = false;
+                    "
+                  />
                   <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
 
                   <template #reference>
@@ -591,7 +599,11 @@
 
     <!-- 用于批量审核的弹窗开始 -->
     <el-dialog v-model="dialogBatchProcessingVisible" title="批量审核" width="800">
-      <AuditOpinion :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" />
+      <AuditOpinion 
+        :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" 
+        @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
+        @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
+      />
       <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
     </el-dialog>
     <!-- 用于批量审核的弹窗结束 -->

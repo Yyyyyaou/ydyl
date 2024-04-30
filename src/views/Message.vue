@@ -262,6 +262,7 @@ export default {
           type: 'success',
           plain: true,
         })
+        tableData.splice(0,tableData.length);
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.crtimeFormat = timeFormatFn(o.cRtime)['YYYY-MM-DD hh:mm:ss']//时间格式化

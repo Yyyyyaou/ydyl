@@ -66,7 +66,10 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import { HomeFilled,Lock,Iphone } from "@element-plus/icons-vue";
-import { getUserInfoFn,initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
+import { 
+  getUserInfoFn,
+  initLanguageListFn,
+}  from 'ROOT_URL/initialization/initSomeValue.js'
 import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 
 
@@ -120,8 +123,6 @@ export default {
         ).then(()=>{
           store.commit('MStroeLoginOIsLogin',true);//改变登录状态 为 登录
         });
-
-        
         
       })
       .catch((error)=>{

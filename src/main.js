@@ -8,9 +8,12 @@ import store from './store'
 import httpAxiosO from 'ROOT_URL/api/http/httpAxios.js'
 
 //初始化一些值
-import { getUserInfoFn,initLanguageListFn }  from 'ROOT_URL/initialization/initSomeValue.js'
-getUserInfoFn();
-initLanguageListFn();
+import { 
+  getUserInfoFn,
+  initLanguageListFn,
+}  from 'ROOT_URL/initialization/initSomeValue.js'
+getUserInfoFn();//获取用户信息
+initLanguageListFn();//初始化语言列表
 
 
 

@@ -24,6 +24,10 @@
   
   <!-- 显示登录页 -->
   <Login v-if="!computedStroeLoginIsLoginO" />
+
+  <!-- 系统未处理消息提示弹窗 -->
+  <GlobalUntreatedMessage />
+
 </template>
 
 <script>
@@ -32,6 +36,7 @@ import AsideMenu from "@/components/AsideMenu.vue";
 import TopHeader from "@/components/TopHeader.vue";
 import MainContent from "@/components/MainContent.vue";
 import Login from "@/views/Login/Login.vue";
+import GlobalUntreatedMessage from "@/components/GlobalUntreatedMessage.vue";
 import { useRouter } from "vue-router";
 import { ref, watch,computed, } from "vue";
 export default {
@@ -40,6 +45,7 @@ export default {
     TopHeader,
     MainContent,
     Login,
+    GlobalUntreatedMessage,
   },
   setup() {
     //获取store

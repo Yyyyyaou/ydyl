@@ -30,7 +30,7 @@
 
 
 <script>
-import { reactive, ref, computed, watch,toRefs, } from "vue";
+import { reactive, ref, computed, watch,toRefs } from "vue";
 import { useStore } from "vuex"
 import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
@@ -39,7 +39,6 @@ export default {
   props:{
     externalAuditArticleFindByIdOArray:Array,//父组件传过来的对象，储存稿件 各种字段信息，数组的每一项包含一个稿件信息
   },
-  emits: ['getNeedAuditCountAjaxFn', 'getNeedAuditCountAjaxFn1'],
   setup(props,ctx){
 
     const { externalAuditArticleFindByIdOArray } = toRefs(props);
@@ -79,22 +78,25 @@ export default {
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       //接口参数 是个数组，为了批量审核用
       const paramsArr = [];
-      externalAuditArticleFindByIdOArray.forEach((o)=>{
+      
+      externalAuditArticleFindByIdOArray.value.forEach((o)=>{
+
         let _o = {
-          externalAuditArticleId:o.value.externalAuditArticleId,
-          srcArticleId:o.value.srcArticleId,
+          externalAuditArticleId:o.externalAuditArticleId,
+          srcArticleId:o.srcArticleId,
           externalAuditSign:commentRadio.value,//审核意见 下面的选项 选择了哪个
           externalAuditTime:timeFormatFn(new Date())['YYYY-MM-DD hh:mm:ss'],
           view:commentTextarea.value,
-          wcmId:o.value.wcmId,
+          wcmId:o.wcmId,
         }
         paramsArr.push(_o);
       });
 
+
       store.dispatch('postExternalAuditArticleFn',paramsArr)
       .then((D)=>{
         console.log('D 详情页提交审核',D);
-        const { data,success } = D.data
+        const { data,success } = D.data;data;
         if(!success){
           ElMessage({
             message: '详情页提交审核失败',
@@ -109,12 +111,14 @@ export default {
           plain: true,
         });
 
-        data
         //更新待审核列表
-        ctx.emit('getNeedAuditCountAjaxFn');
+        ctx.emit('TriggerGetNeedAuditCountAjaxFn');
         //更新已处理列表
-        ctx.emit('getNeedAuditCountAjaxFn1');
-
+        ctx.emit('TriggerGetNeedAuditCountAjaxFn1');
+        //关闭弹出层
+        ctx.emit('TriggerCloseElpopoverCommentFn');
+        //更新 导航栏的小红点 和 右下角的消息弹窗提醒
+        store.dispatch('getNeedAuditCountFn');
       })
       .catch((error)=>{
         console.log('error 详情页提交审核',error);
