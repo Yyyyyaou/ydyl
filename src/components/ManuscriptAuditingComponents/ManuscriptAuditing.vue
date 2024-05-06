@@ -5,6 +5,7 @@
       <div
         class="mid-content-mycontribute-table-content"
         v-if="statusRadio == 1"
+        key="待审核1"
       >
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
@@ -89,7 +90,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
-            :data="tableData.slice((page - 1) * limit, page * limit)"
+            :data="tableDataComputed"
             @selection-change="handleSelectionTableDataFn"
             border
             style="width: 100%"
@@ -290,7 +291,7 @@
       </div>
 
       <!-- 已处理部分 -->
-      <div class="mid-content-mycontribute-table-content" v-else>
+      <div class="mid-content-mycontribute-table-content" v-else key="已处理0">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
             <el-radio-group
@@ -596,19 +597,22 @@
       </div>
     </div>
     <!-- end of mid-content-mycontribute -->
-
-    <!-- 用于批量审核的弹窗开始 -->
-    <el-dialog v-model="dialogBatchProcessingVisible" title="批量审核" width="800">
-      <AuditOpinion 
-        :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" 
-        @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
-        @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
-      />
-      <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
-    </el-dialog>
-    <!-- 用于批量审核的弹窗结束 -->
-
   </div>
+
+<!-- 用于批量审核的弹窗开始 -->
+<el-dialog v-model="dialogBatchProcessingVisible" title="批量审核" width="800">
+  <AuditOpinion 
+    :externalAuditArticleFindByIdOArray="tableSelectedDataArray" 
+    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
+    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
+    @TriggerCloseElpopoverCommentFn = "
+      dialogBatchProcessingVisible = false;
+    "
+  />
+  <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
+</el-dialog>
+<!-- 用于批量审核的弹窗结束 -->
+
 </template>
 
 <script>
@@ -667,7 +671,9 @@ export default {
     const dateDefaultTime = ref("");
     //表格数据
     const tableData = reactive([]);
-    const tableSelectedDataArr = reactive([]);//记录选中checkbox的数据
+
+    const tableSelectedDataArray = reactive([]);//记录选中checkbox的数据
+    
     /**
      * 监听 选中table checkbox 变化
      * @param {*} selectedArrP 选中checkbox的数据
@@ -675,13 +681,13 @@ export default {
     function handleSelectionTableDataFn(
       selectedArrP,
     ){
-      tableSelectedDataArr.splice(0,tableSelectedDataArr.length);
+      tableSelectedDataArray.splice(0,tableSelectedDataArray.length);
       selectedArrP.forEach((o)=>{
-        tableSelectedDataArr.push(o);
+        tableSelectedDataArray.push(o);
       });
     }
     //end of handleSelectionTableDataFn
-
+    
 
     //分页器
     let limit = ref(15);
@@ -694,6 +700,9 @@ export default {
       page.value = val;
     }
 
+    const tableDataComputed = computed(()=>{
+      return tableData.slice((page.value - 1) * limit.value, page.value * limit.value);
+    });
 
     //稿件标题点击置灰
     const isClickedArr = ref([]);
@@ -730,17 +739,25 @@ export default {
       };
     };
 
-
     const statusRadio = ref(1);//切换 待审核 已处理
-
 
     const dialogBatchProcessingVisible = ref(false);//用于显示批量审核的弹窗
     /**
      * 批量审核按钮触发
      */
     function dialogBatchProcessingFn(){
+      //如果没选中稿件，则退出
+      if(tableSelectedDataArray.length === 0){
+        ElMessage({
+          message: '请先选择稿件',
+          type: 'warning',
+        });
+        return;
+      }
       dialogBatchProcessingVisible.value = true;
     }
+
+    
 
     // <!-- 已处理部分 -->
     //关键词
@@ -827,6 +844,8 @@ export default {
     const fontSelect = ref("中");
     //当前 详情页弹窗 接口返回信息 和 点击 table 某一列信息
     const externalAuditArticleFindByIdO = reactive({});
+
+
     //时间轴数据
     const timelineData = reactive([]);
     
@@ -1131,6 +1150,7 @@ export default {
       dateDefaultTime,
       locale: zhCn, //date-range 语言设置
       tableData,
+      tableDataComputed,
       limit,
       page,
       pageTotal,
@@ -1180,6 +1200,7 @@ export default {
       externalAuditArticleRecordListAjaxFn,
 
       externalAuditArticleFindByIdO,
+      tableSelectedDataArray,
 
     };
   },

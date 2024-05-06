@@ -92,7 +92,6 @@ export default {
         paramsArr.push(_o);
       });
 
-
       store.dispatch('postExternalAuditArticleFn',paramsArr)
       .then((D)=>{
         console.log('D 详情页提交审核',D);
