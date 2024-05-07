@@ -303,6 +303,19 @@ export default {
     }
     //end of handleAuditingUploadBeforeRemoveFn
 
+    /**
+     * 附件下载接口，这里用于图片预览
+     */
+    function handleAuditingGetobjFn(fileNameP){
+      httpAxiosO({
+        url: '/api/web/article/getobj',
+        method: 'get',
+        params: {
+          fileName:fileNameP,
+        }
+      })
+    }handleAuditingGetobjFn
+    // end of handleAuditingGetobjRemoveFn
 
 
     /**

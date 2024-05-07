@@ -20,20 +20,55 @@
         <!-- v-if -->
         <div class="mid-dividerdashed"></div>
         <div class="noticedetail-bottom-content">
-          <div><span>司局审批单：</span><span>xxxxxx.pdf</span></div>
-          <div class="noticedetail-bottom-content-img">
-            <span
-              >附&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;件：</span
-            >
-            <img src="@/assets/filepic.png" alt="" />
-          </div>
-          <div>
-            <span
-              >备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</span
-            ><span>说明信息</span>
-          </div>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="110">司局审批单：</td>
+              <td>
+                <div class="noticedetail-bottom-content-img">
+                  <div 
+                    v-for="(o,i) in fileUnit"
+                    :key="o+i"
+                    :data-url="o.fileUrl"
+                    :data-name="o.fileName"
+                    @click="triggerHandleAuditingGetobjFn(o.fileName)"
+                    title="点击下载"
+                  >
+                    <span v-if="!o.isPicture">{{ o.fileName }}</span>
+                    <div v-if="o.isPicture"><img :src="o.fileUrl" alt="" /></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td width="110">附　　　件：</td>
+              <td>
+                <div class="noticedetail-bottom-content-img">
+                  <div 
+                    v-for="(o,i) in fileAccessory"
+                    :key="o+i"
+                    :data-url="o.fileUrl"
+                    :data-name="o.fileName"
+                    @click="triggerHandleAuditingGetobjFn(o.fileName)"
+                    title="点击下载"
+                  >
+                    <span v-if="!o.isPicture" data-desc="文件">{{ o.fileName }}</span>
+                    <div v-if="o.isPicture" data-desc="图片"><img :src="o.fileUrl" alt="" /></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td width="110">备　　　注：</td>
+              <td>
+                {{ remark }}
+              </td>
+            </tr>
+          </table>
           
         </div>
+        <!-- end of noticedetail-bottom-content -->
+
+
       </div>
       <!-- 没数据时不显示 -->
       <div class="mid-divider" style="margin-top:53px;"></div>
@@ -42,14 +77,23 @@
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage, ElLoading } from "element-plus";
-import { timeFormatFn } from "@/utils/timeFormat.js";
-timeFormatFn;
+// import { timeFormatFn } from "@/utils/timeFormat.js";
+
+
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+
 
 export default {
+  props: {
+    id: {//稿件ID，用来请求稿件详情接口
+      type: String,
+      default: "",
+    },
+  },
   setup() {
     const router = useRouter();
     const { id } = router.currentRoute.value.query; //稿件ID，用来请求稿件详情接口
@@ -61,11 +105,14 @@ export default {
     const articleHtmlCon = ref(""); //稿件HTML正文
     const postUser = ref(""); //投稿人
     const pubTime = ref(""); //发布时间
+    const remark = ref("");//备注
+    const fileUnit = reactive([]);//审核单附件
+    const fileAccessory = reactive([]);//普通附件
 
     /**
      * 获取稿件详情
      */
-    function getFindByIdAjaxFn() {
+    async function getFindByIdAjaxFn() {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       store
         .dispatch("getFindByIdFn", id)
@@ -91,6 +138,55 @@ export default {
           articleHtmlCon.value = data.articleHtmlCon;
           postUser.value = data.postUser;
           pubTime.value = data.pubTime;
+          remark.value = data.remark;
+
+          //为 fileUnit 赋值
+          (() => {
+            if(!data.fileUnit){
+              return;
+            }
+
+            data.fileUnit.split(',').forEach(async (o)=>{
+              const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(o);
+              let fileUrl
+              if(isPicture){//有图片时候
+                fileUrl = await handleAuditingGetobjFn(o);
+              }
+
+              const _o = {
+                isPicture,
+                fileUrl,
+                fileName: o,
+              }
+
+              fileUnit.push(_o);
+            });
+          })();
+
+          //为 fileAccessory 赋值
+          (() => {
+            if(!data.fileAccessory){
+              return;
+            }
+
+            data.fileAccessory.split(',').forEach(async (o)=>{
+              const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(o);
+              let fileUrl
+              if(isPicture){//有图片时候
+                fileUrl = await handleAuditingGetobjFn(o);
+              }
+
+              const _o = {
+                isPicture,
+                fileUrl,
+                fileName: o,
+              }
+
+              fileAccessory.push(_o);
+            });
+          })();
+
+
         })
         .catch((error) => {
           console.log("我的投稿-查看 接口请求 error", error);
@@ -105,6 +201,74 @@ export default {
         });
     }
 
+    /**
+    * 附件下载接口，这里用于图片预览
+    * fileNameP 文件名 xxx.jpg xxx.pdf
+    * downloadP 是否下载
+    */
+    async function handleAuditingGetobjFn(fileNameP,downloadP){
+
+      // if(downloadP){//下载
+      //     httpAxiosO({
+      //       url: '/api/web/article/getobj',
+      //       method: 'get',
+      //       params: {
+      //         fileName:fileNameP,
+      //       }
+      //     })
+      //     .then((D)=>{
+      //       const {data} = D;
+      //       const blob = new Blob([data]); // 根据文件类型调整MIME类型
+      //       const url = URL.createObjectURL(blob);
+      //       // window.open(url);
+      //       navigator.download(url, fileNameP);
+      //     })
+      //     return;
+      // }
+
+
+      let fileUrl = '';
+      await httpAxiosO({
+        url: '/api/web/article/getobj',
+        method: 'get',
+        responseType:'blob',//响应类型
+        params: {
+          fileName:fileNameP,
+        }
+      })
+      .then((D)=>{
+        const {data} = D;
+
+        return new Promise((resolve, reject) => {  
+          const fileReader = new FileReader();  
+          fileReader.onloadend = () => resolve(fileReader.result); // 读取完成，解析结果  
+          fileReader.onerror = reject;  
+          fileReader.readAsDataURL(data); // 将Blob对象转换为Data URL 
+        
+        });  
+
+      })
+      .then((fileReader)=>{
+        fileUrl = fileReader;
+        if(downloadP){//下载
+          const link = document.createElement('a');
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.href = fileReader;
+          link.download = fileNameP;
+          link.click();
+          document.body.removeChild(link);
+          return;
+        }
+      });
+      return fileUrl;
+    }
+    // end of handleAuditingGetobjFn
+
+    async function triggerHandleAuditingGetobjFn(fileNameP){
+      await handleAuditingGetobjFn(fileNameP,'download');
+    }
+
     onMounted(() => {
       getFindByIdAjaxFn();
     });
@@ -115,6 +279,13 @@ export default {
       articleHtmlCon,
       postUser,
       pubTime,
+      remark,
+      fileUnit,
+      fileAccessory,
+
+      handleAuditingGetobjFn,
+      triggerHandleAuditingGetobjFn,
+
     };
   },
 };
@@ -154,24 +325,15 @@ export default {
       margin: 0 1%;
       margin-top: 53px;
     }
-    .noticedetail-bottom-content {
-      padding: 0 110px;
-      margin-top: 53px;
-      font-size: 18px;
-      color: #000;
-      >div{
-        margin-top: 10px;
-      }
-      .noticedetail-bottom-content-img {
-        display: flex;
-      }
-    }
-    .noticedetail-content-word {
-      padding: 0 110px;
-      margin-top: 53px;
-      color: #000;
-      font-size: 18px;
-    }
   }
 }
+
+.noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
+  .noticedetail-bottom-content-img {
+    display: flex;flex-wrap:wrap;
+    &>div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
+    img{width:100%;height:100%;}
+  }
+}
+
 </style>

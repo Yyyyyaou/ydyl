@@ -21,7 +21,7 @@ export function getUserInfoFn(){
     const { success,loginUser } = D.data;
 
     //临时加入 当前角色
-    loginUser.CURRENT_ROLE = '外部用户_国家信息中心';//外部用户  外部用户_国家信息中心  外部用户_国家发改委
+    loginUser.CURRENT_ROLE = '外部用户_国家发改委';//外部用户  外部用户_国家信息中心  外部用户_国家发改委
 
     if(success){
       store.commit('MStroeLoginOLoginUser',JSON.stringify(loginUser));//记录语种列表
