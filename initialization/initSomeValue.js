@@ -2,6 +2,7 @@ import store from '@/store';
 import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 
 
+
 /**
  * 在cookie有效期内，不用账号密码登录，获取用户信息
  * @returns 
@@ -49,7 +50,20 @@ export function initLanguageListFn(){
     
     const { success,message } = D.data;
     if(success){
-      const _message = eval(message);//_message 应为数组
+      const _message = eval(message)||[];//_message 应为数组
+    
+      if(
+        !Array.isArray(_message)
+        ||_message.length===0
+        ){//接口有问题时候，没有语种，先搞点假语种
+        ['中文','俄文','英文','德文','法文'].forEach((o,i)=>{
+          _message.push({
+            id:i+1,
+            desc:o,
+          });
+        });
+        
+      }
       _message.unshift({
         id:0,
         desc:'全部',

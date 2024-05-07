@@ -60,21 +60,36 @@
             label="司局级审核单"
             prop="auditing"
             class="createorigin-content-upload"
+            data-desc="司局级审核单盒子"
           >
+
             <el-input
               v-model="formData.auditing"
               clearable
+              disabled
               placeholder="司局级审核单格式doc、pdf、jpg、png"
             ></el-input>
+            <el-button type="primary" class="createorigin-content-upload-auditing">上传</el-button>
+            <!-- 
+before-remove 在附件列表删除文件钩子
+             -->
             <el-upload
-              id="auditingUploadID"
-              :auto-upload="false"
+              class="auditingUploadC"
+              action="/api/web/article/upload"
+              v-model:file-list="auditingUploadFilesArray"
               multiple
               show-file-list
               :on-change="handleAuditingUploadChangeFn"
+              :on-error="handleAuditingUploadErrorFn"
+              :before-remove="handleAuditingUploadBeforeRemoveFn"
+              :on-success="handleAuditingUploadSuccessFn"
+              name="files"
+              :data="{
+                fileText:0,//	0审核单,1附件,2正文
+              }"
             >
-              <el-button type="primary" class="createorigin-content-upload-auditing">上传</el-button>
             </el-upload>
+
           </el-form-item>
         </el-col>
         <el-col :span="11">
@@ -86,12 +101,26 @@
             <el-input
               v-model="formData.file"
               clearable
+              disabled
               placeholder="附件文件格式doc、pdf、jpg、png"
             ></el-input>
+            <el-button type="primary" class="createorigin-content-upload-auditing1">上传</el-button>
             <el-upload
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            class="auditingUploadC"
+              action="/api/web/article/upload"
+              v-model:file-list="auditingUploadFilesArray1"
+              multiple
+              show-file-list
+              :on-change="handleAuditingUploadChangeFn"
+              :on-error="handleAuditingUploadErrorFn"
+              :before-remove="handleAuditingUploadBeforeRemoveFn"
+              :on-success="handleAuditingUploadSuccessFn"
+              name="files"
+              :data="{
+                fileText:1,//	0审核单,1附件,2正文
+              }"
             >
-              <el-button type="primary">上传</el-button>
+
             </el-upload>
           </el-form-item>
         </el-col>
@@ -127,6 +156,7 @@ import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
 
 // import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+
 
 export default {
   components:{
@@ -196,15 +226,102 @@ export default {
     });
 
     //上传字段保存
-    const auditingUploadFilesArray = ref([]);
+    const auditingUploadFilesArray = ref([]);//fileText=0
+    const auditingUploadFilesArray1 = ref([]);//fileText=1
+    const auditingUploadFilesArray2 = ref([]);//fileText=2
     //审核资质附件
     const postAddEditAjaxFormData = new FormData();
-    function handleAuditingUploadChangeFn(file,files){file
-      auditingUploadFilesArray.value = files.map((o)=>{
-        return o
+    function handleAuditingUploadChangeFn(file,files){file,files
+      
+      files.forEach((o)=>{
+        switch(o.fileText){
+          case 0://审核单附件
+          auditingUploadFilesArray.value.push(o);
+          break;
+          case 1://普通附件
+          auditingUploadFilesArray1.value.push(o);
+          break;
+          case 2://正文附件
+          auditingUploadFilesArray2.value.push(o);
+          break;
+        }
+        // postAddEditAjaxFormData.append('files',o);
       });
     }
     // end of handleAuditingUploadChange
+
+    /**
+     * 附件上传成功
+     */
+    function handleAuditingUploadSuccessFn(response, uploadFile, uploadFiles){uploadFile, uploadFiles
+
+      if(response.success){
+        ElMessage({
+          message: '附件上传成功',
+          type: 'success',
+          plain: true,
+        })
+      }
+
+
+    }
+    // end of handleAuditingUploadSuccessFn
+
+    /**
+     * 上传文件报错
+     * @param {*} error 
+     * @param {*} uploadFile 
+     * @param {*} uploadFiles 
+     */
+    function handleAuditingUploadErrorFn(error, uploadFile, uploadFiles){
+      console.log('handleAuditingUploadErrorFn error',error);
+      console.log('handleAuditingUploadErrorFn uploadFile',uploadFile);
+      console.log('handleAuditingUploadErrorFn uploadFiles',uploadFiles);
+      auditingUploadFilesArray.value.forEach((o)=>{
+        console.log('o',o);
+      });
+
+    }
+
+    /**
+     * 删除附件文件之前
+     */
+    function handleAuditingUploadBeforeRemoveFn(uploadFile, uploadFiles){uploadFiles
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+      const {fileName} = uploadFile.response.data[0];
+
+      return httpAxiosO({
+        url: '/api/web/article/delFileObj',
+        method: 'delete',
+        params: {
+          fileName
+        }
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      });
+    }
+    //end of handleAuditingUploadBeforeRemoveFn
+
+
+
+    /**
+     * 资质附件上传
+     */
+    function articleFilesUploadFn(){
+      httpAxiosO({
+        url: '/api/web/article/upload',
+        method: 'post',
+        data: postAddEditAjaxFormData,
+      }).then((D)=>{
+        console.log('D 资质附件上传',D)
+      }).catch((error)=>{
+        console.log('资质附件上传 error',error)
+      })
+    }
+    articleFilesUploadFn
+    // end of articleFilesUploadFn
+
 
     //富文本编辑器 html正文内容
     const editorHTMLContent = ref('');
@@ -423,7 +540,7 @@ export default {
         return;
       }
 
-
+return;
       //验证完普通字段，把它们都塞进formData 里
       postAddEditAjaxFormData.append('articleTitle',datasO.articleTitle);//稿件标题
       postAddEditAjaxFormData.append('articleSource',datasO.articleSource);//稿件来源
@@ -521,7 +638,12 @@ export default {
       editorFilePickerCallbackFn,
 
       auditingUploadFilesArray,
+      auditingUploadFilesArray1,
+      auditingUploadFilesArray2,
       handleAuditingUploadChangeFn,
+      handleAuditingUploadErrorFn,
+      handleAuditingUploadBeforeRemoveFn,
+      handleAuditingUploadSuccessFn,
 
       postAddEditAjaxFn,
       previewAddEditFn,
@@ -558,25 +680,36 @@ export default {
       min-height: 300px;
     }
   }
-  :deep(.el-upload-list) {
-    display: none;
+  :deep(.auditingUploadC){
+
   }
-  .createorigin-content-upload {
+  :deep(.el-upload--text) {position:absolute;left:0;right:0;top:0;height:46px;z-index:2;
+  }
+  .createorigin-content-upload {position:relative;
     .el-input {
       width: 90%;
     }
-    .el-button{
-      width: 43px;
-      height: 44px;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    .createorigin-content-upload-auditing{
-      background-color: #ff4949;
-      border: none;
-    }
+
   }
 }
+
+.createorigin-content-upload-auditing{
+  background-color: #ff4949;
+  border: none;
+  width: 43px;
+  height: 44px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.createorigin-content-upload-auditing1{
+  background-color: #2c90ff;
+  border: none;
+  width: 43px;
+  height: 44px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .createorigin-btngroup {
   justify-content: center;
   padding-bottom: 45px;
