@@ -142,14 +142,20 @@ before-remove 在附件列表删除文件钩子
     <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn">预 览</el-button>
     <el-button class="createorigin-btngroup-reset">重 置</el-button>
   </div>
+
+  <el-dialog v-model="dialogNoticeDetailVisible" width="80vw" height="80vh">
+    <NoticeDetail ref="NoticeDetailRef" :propsArticleO="formData"  />
+  </el-dialog>
+
 </template>
 
 <script>
 // import Quill from 'quill';
 // import "quill/dist/quill.core.css";
 import Editor from '@tinymce/tinymce-vue';
+import NoticeDetail from '@/views/Notice/views/NoticeDetail.vue';
 
-import { onMounted, reactive,ref } from "vue";
+import { onMounted, reactive,ref,nextTick } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
@@ -161,6 +167,7 @@ import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   components:{
     Editor,
+    NoticeDetail,
   },
   setup() {
     //路由实例
@@ -169,6 +176,7 @@ export default {
     
     //vuex实例
     const store = useStore();
+
 
     const formData = reactive({});//表单数据
     const rules = reactive({
@@ -219,15 +227,21 @@ export default {
 
     const langOptions = reactive([]);
     store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+      //∵ 这个界面不需要全部
+      if(o.desc === '全部'){
+        return;
+      }
       langOptions.push({
         value: o.id,
         label: o.desc,
       })
     });
 
-    //上传字段保存
+    //审核单附件列表
     const auditingUploadFilesArray = ref([]);//fileText=0
+    //普通附件列表
     const auditingUploadFilesArray1 = ref([]);//fileText=1
+    //正文附件列表
     const auditingUploadFilesArray2 = ref([]);//fileText=2
     //审核资质附件
     const postAddEditAjaxFormData = new FormData();
@@ -605,26 +619,75 @@ return;
       })
     }
 
+    //是否显示详情预览弹窗
+    const dialogNoticeDetailVisible = ref(false);
+    //详情组件实例
+    const NoticeDetailRef = ref(null);
+
     /**
      * 预览稿件
      */
     function previewAddEditFn(){
-      //预览前要先 检测一下 标题语种，非中文要给提示
-      ElMessageBox.confirm(
-        '您输入的“稿件标题”语种不是中文，请修改语种',
-        '提示',
-        {
-          confirmButtonText: '继续预览',
-          cancelButtonText: '取消，去修改',
-          type: 'warning',
-        }
-      )
-      .then(() => {
 
-      })
-      .catch(() => {
+      //为 formData 赋值
+      const forFormDataValue = async ()=>{
 
-      })
+        formData.articleHtmlCon = editorHTMLContent.value||'';//稿件HTML内容
+
+        formData.articleContent = editorTEXTContent.value||'';//稿件文本内容
+
+
+        //审核附件列表
+        formData.fileUnit = auditingUploadFilesArray.value.map((o)=>{
+          console.log('o',o);
+          console.log('o.response',o.response);
+          return o.response?.data[0].fileName || ''
+        });
+
+        //普通附件列表
+        formData.fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
+          return o.response?.data[0].fileName || ''
+        });
+
+        await nextTick();
+
+        NoticeDetailRef.value.readPropsArticleOFn();//执行子组件方法，以便为详情页各个字段赋值
+
+      };
+
+      //查看 中文 字段值 是多少，∵语种列表是不断变化的，中文字段值不一定是 1
+      const zhCNValue =  langOptions.filter((o)=>{
+        return o.label == '中文';
+      })[0]['value'];
+
+      //非要判断 稿件标题是否含有中文，如果不含有中文则  字段 language === 1 时提醒....
+      if(
+        /[u4e00-u9fa5]/g.test(formData.articleTitle)
+        &&formData.language === zhCNValue
+      ){
+        //预览前要先 检测一下 标题语种，非中文要给提示
+        ElMessageBox.confirm(
+          '您输入的“稿件标题”语种不是中文，请修改语种',
+          '提示',
+          {
+            confirmButtonText: '继续预览',
+            cancelButtonText: '取消，去修改',
+            type: 'warning',
+          }
+        )
+        .then(() => {
+          dialogNoticeDetailVisible.value = true;
+          forFormDataValue();
+        })
+        .catch(() => {
+
+        })
+        return;
+      }
+
+      dialogNoticeDetailVisible.value = true;
+      forFormDataValue();
+
     }
     // end of previewAddEditFn
 
@@ -634,7 +697,6 @@ return;
     onMounted(()=>{
       getFindByIdAjaxFn();//根据稿件id获取稿件内容，用于回显稿件内容
 
-
     })
 
     return {
@@ -643,6 +705,9 @@ return;
       formData,
       rules,
       langOptions,
+
+      dialogNoticeDetailVisible,
+      NoticeDetailRef,
 
       editorHTMLContent,
       editorChangeFn,

@@ -18,10 +18,10 @@
 <script>
 // import { onMounted, reactive, ref } from "vue";
 // import zhCn from "element-plus/es/locale/lang/zh-cn";
-import PaperAuditing from "@/components/PaperAuditing.vue";
+import PaperAuditing from "@/components/PaperAuditingComponents/PaperAuditing.vue";
 export default {
   components: {
-    PaperAuditing, //审核稿件
+    PaperAuditing, //审核报题
   },
 };
 </script>

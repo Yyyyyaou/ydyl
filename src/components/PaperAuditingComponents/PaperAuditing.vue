@@ -1,18 +1,11 @@
 <template>
   <div>
-    <div class="mid-content-mycontribute">
-      <!-- <div class="mid-content-mycontribute-header flexcenter">
-        <div class="flexcenter">
-          <div class="mid-content-mycontribute-header-i">
-            <img src="../assets/mycontribute.png" alt="" />
-          </div>
-          <span>审核报题</span>
-        </div>
-      </div> -->
-      <!-- <div class="mid-divider mid-divider-display"></div> -->
+    <div class="mid-content-mycontribute" data-desc="审核稿件组件">
+
       <div
         class="mid-content-mycontribute-table-content"
         v-if="statusRadio == 1"
+        key="待审核1"
       >
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
@@ -29,8 +22,8 @@
           >
             <el-button
               class="mid-content-mycontribute-table-btngroup-search-btn"
-              >批量审核</el-button
-            >
+              @click="dialogBatchProcessingFn"
+            >批量审核</el-button>
             <div
               class="mid-content-mycontribute-table-btngroup-search-divide"
             ></div>
@@ -87,7 +80,9 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getNeedAuditCountAjaxFn"
+            >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
@@ -95,17 +90,18 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
-            :data="tableData.slice((page - 1) * limit, page * limit)"
+            :data="tableData"
+            @selection-change="handleSelectionTableDataFn"
             border
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
           >
@@ -115,7 +111,7 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="稿件标题">
+            <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
                 <el-popover
                   :visible="scope.row.visible ? true : false"
@@ -137,12 +133,12 @@
                     <div class="elpopover-content-left">
                       <div
                         class="elpopover-content-left-title"
-                        :title="scope.row.title"
+                        :title="scope.row.articleTitle"
                       >
-                        {{ scope.row.title }}
+                        {{ scope.row.articleTitle }}
                       </div>
                       <div class="elpopover-content-left-info flexcenter">
-                        <span>作者：</span><span>李某某</span>
+                        <span >作者：</span><span>{{ scope.row.trueName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -150,7 +146,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>发布时间：</span><span>{{ scope.row.date }}</span>
+                        <span>发布时间：</span><span>{{ scope.row.crtimeFormat }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -182,67 +178,54 @@
                           fontBig: fontSelect == '大',
                         }"
                       >
-                        <div v-html="articleHtmlCon"></div>
+                        <div v-html="scope.row.articleHtmlCon"></div>
                       </div>
                     </div>
                     <div class="elpopover-content-right">
                       <div class="elpopover-content-title flexcenter">
-                        <img src="../assets/manuscriptauditing.png" alt="" />
+                        <img src="@/assets/manuscriptauditing.png" alt="" />
                         <span>审核流程记录</span>
                       </div>
                       <el-timeline class="elpopover-content-timeline">
                         <el-timeline-item
-                          :timestamp="activity.timestamp"
+                          :timestamp="activity.auditTimeFormat"
                           placement="top"
                           v-for="(activity, index) in timelineData"
                           :key="index"
                         >
                           <div class="elpopover-content-timeline-details">
                             <div class="elpopover-content-timeline-details-fir">
-                              {{ activity.fir }}
+                              {{ activity.auditSignName }}
                             </div>
                             <div class="elpopover-content-timeline-details-sec">
-                              {{ activity.sec }}
+                              {{ activity.auditView }}
                             </div>
                             <div class="elpopover-content-timeline-details-thi">
                               <span>审核人：</span
-                              ><span>{{ activity.thi }}</span>
+                              ><span>{{ activity.cRuser }}</span>
                             </div>
                           </div>
                         </el-timeline-item>
                       </el-timeline>
                     </div>
+                    <!-- end of elpopover-content-right -->
+                    
                   </div>
-                  <div class="elpopover-comment">
-                    <div class="elpopover-comment-header flexcenter">
-                      <div class="elpopover-comment-header-divide"></div>
-                      <span>审核意见</span>
-                    </div>
-                    <div class="elpopover-comment-header-textarea">
-                      <el-input
-                        v-model="commentTextarea"
-                        :rows="4"
-                        type="textarea"
-                        placeholder="审核通过"
-                      />
-                    </div>
-                    <div class="elpopover-comment-header-radio">
-                      <el-radio-group v-model="commentRadio">
-                        <el-radio
-                          :value="item.value"
-                          v-for="item in commentRadioData"
-                          :key="item.value"
-                          >{{ item.label }}</el-radio
-                        >
-                      </el-radio-group>
-                    </div>
-                    <div class="elpopover-comment-header-btn flexcenter">
-                      <el-button>提交</el-button>
-                    </div>
-                  </div>
+                  
+                  <AuditOpinion 
+                    :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" 
+                    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
+                    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
+                    @TriggerCloseElpopoverCommentFn = "
+                        scope.row.visible = false;
+                        popoverShowFlag = false;
+                    "
+                  />
+                  <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
+
                   <template #reference>
                     <span
-                      :title="scope.row.title"
+                      :title="scope.row.articleTitle"
                       style="
                         display: flex;
                         justify-content: left;
@@ -252,23 +235,23 @@
                       :class="{
                         isClicked: isClickedArr.includes(scope.$index),
                       }"
-                      @click="rowTitleClick(scope)"
+                      @click="externalAuditArticleFindByIdFn(scope)"
                     >
-                      {{ scope.row.title }}
+                      {{ scope.row.articleTitle }}
                     </span>
                   </template>
                 </el-popover>
               </template>
             </el-table-column>
             <el-table-column prop="origin" label="稿件来源" width="125" />
-            <el-table-column prop="lang" label="语种" width="120" />
-            <el-table-column prop="date" label="创建时间" width="200" />
+            <el-table-column prop="languageName" label="语种" width="120" />
+            <el-table-column prop="crtimeFormat" label="创建时间" width="200" />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div
                     v-if="scope.row.title != ''"
-                    @click="rowTitleClick(scope)"
+                    @click="externalAuditArticleFindByIdFn(scope)"
                   >
                     审核
                   </div>
@@ -279,23 +262,23 @@
           <div class="flexcenter el-pagination-style">
             <el-pagination
               layout="slot"
-              :total="tableData.length"
+              :total="pageTotal"
               class="el-pagination-style-leftpagination"
             >
               <span class="el-pagination-style-leftpagination-total">
-                共{{ tableData.length }}条
+                共{{ pageTotal }}条
               </span>
               <span
                 class="el-pagination-style-leftpagination-percent flexcenter"
               >
-                {{ page }}/{{ Math.ceil(tableData.length / limit) }}
+                {{ page }}/{{ Math.ceil(pageTotal / limit) }}
               </span>
             </el-pagination>
             <el-config-provider :locale="locale">
               <el-pagination
                 background
                 layout="prev, next, sizes, jumper"
-                :total="tableData.length"
+                :total="pageTotal"
                 :page-sizes="[15, 20, 30, 40, 50]"
                 :page-size="limit"
                 @size-change="handleSizeChange"
@@ -308,7 +291,7 @@
       </div>
 
       <!-- 已处理部分 -->
-      <div class="mid-content-mycontribute-table-content" v-else>
+      <div class="mid-content-mycontribute-table-content" v-else key="已处理0">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
             <el-radio-group
@@ -401,7 +384,9 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getNeedAuditCountAjaxFn1"
+            >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
@@ -409,17 +394,17 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
-            :data="tableData1.slice((page1 - 1) * limit1, page1 * limit1)"
+            :data="tableData1"
             border
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
           >
@@ -447,15 +432,15 @@
                     /></el-icon>
                   </div>
                   <div class="elpopover-passpic">
-                    <img src="../assets/pass.png" alt="" />
+                    <img src="@/assets/pass.png" alt="" />
                   </div>
                   <div class="elpopover-content flexcenter">
                     <div class="elpopover-content-left">
                       <div
                         class="elpopover-content-left-title"
-                        :title="scope.row.title"
+                        :title="scope.row.articleTitle"
                       >
-                        {{ scope.row.title }}
+                        {{ scope.row.articleTitle }}
                       </div>
                       <div class="elpopover-content-left-info flexcenter">
                         <span>作者：</span><span>啊啊啊啊啊某某</span>
@@ -498,14 +483,14 @@
                           fontBig: fontSelect == '大',
                         }"
                       >
-                        <div v-html="articleHtmlCon"></div>
+                        <div v-html="scope.row.articleHtmlCon"></div>
                       </div>
                     </div>
                     <div
                       class="elpopover-content-right elpopover-content-right1"
                     >
                       <div class="elpopover-content-title flexcenter">
-                        <img src="../assets/manuscriptauditing.png" alt="" />
+                        <img src="@/assets/manuscriptauditing.png" alt="" />
                         <span>审核流程记录</span>
                       </div>
                       <el-timeline class="elpopover-content-timeline">
@@ -533,10 +518,12 @@
                         </el-timeline-item>
                       </el-timeline>
                     </div>
+                    <!-- end of elpopover-content-right -->
+
                   </div>
                   <template #reference>
                     <span
-                      :title="scope.row.title"
+                      :title="scope.row.articleTitle"
                       style="
                         display: flex;
                         justify-content: left;
@@ -548,32 +535,32 @@
                       }"
                       @click="rowTitleClick1(scope)"
                     >
-                      {{ scope.row.title }}
+                      {{ scope.row.articleTitle }}
                     </span>
                   </template>
                 </el-popover>
               </template>
             </el-table-column>
             <el-table-column prop="origin" label="稿件来源" width="125" />
-            <el-table-column prop="lang" label="语种" width="120" />
+            <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="articleUseStatus" label="状态" width="110">
               <template #default="scope">
                 <span
                   :class="{
-                    iswtg: scope.row.articleUseStatus === '未通过', //'未通过',
-                    isshz: scope.row.articleUseStatus === '审核中', //'审核中',
-                    isyfb: scope.row.articleUseStatus === '已发布', //'已发布',
+                    isshz: scope.row.articleStatusName === '审核中', //'审核中',
+                    isyfb: scope.row.articleStatusName === '已发布', //'已发布',
+                    iswtg: scope.row.articleStatusName === '未通过', //'未通过',
                   }"
-                  >{{ scope.row.articleUseStatus }}
+                  >{{ scope.row.articleStatusName }}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="node" label="稿件节点" width="120" />
-            <el-table-column prop="date" label="创建时间" width="200" />
+            <el-table-column prop="currentNodeName" label="稿件节点" width="120" />
+            <el-table-column prop="crtimeFormat" label="创建时间" width="200" />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div v-if="scope.row.title != ''">查看</div>
+                  <div :title="scope.row.articleTitle">查看</div>
                 </div>
               </template>
             </el-table-column>
@@ -581,23 +568,23 @@
           <div class="flexcenter el-pagination-style">
             <el-pagination
               layout="slot"
-              :total="tableData1.length"
+              :total="pageTotal1"
               class="el-pagination-style-leftpagination"
             >
               <span class="el-pagination-style-leftpagination-total">
-                共{{ tableData1.length }}条
+                共{{ pageTotal1 }}条
               </span>
               <span
                 class="el-pagination-style-leftpagination-percent flexcenter"
               >
-                {{ page1 }}/{{ Math.ceil(tableData1.length / limit1) }}
+                {{ page1 }}/{{ Math.ceil(pageTotal1 / limit1) }}
               </span>
             </el-pagination>
             <el-config-provider :locale="locale">
               <el-pagination
                 background
                 layout="prev, next, sizes, jumper"
-                :total="tableData1.length"
+                :total="pageTotal1"
                 :page-sizes="[15, 20, 30, 40, 50]"
                 :page-size="limit1"
                 @size-change="handleSizeChange1"
@@ -609,14 +596,53 @@
         </div>
       </div>
     </div>
+    <!-- end of mid-content-mycontribute -->
   </div>
+
+<!-- 用于批量审核的弹窗开始 -->
+<el-dialog v-model="dialogBatchProcessingVisible" title="批量审核" width="800">
+  <AuditOpinion 
+    :externalAuditArticleFindByIdOArray="tableSelectedDataArray" 
+    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
+    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
+    @TriggerCloseElpopoverCommentFn = "
+      dialogBatchProcessingVisible = false;
+    "
+  />
+  <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
+</el-dialog>
+<!-- 用于批量审核的弹窗结束 -->
+
 </template>
 
 <script>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref,computed } from "vue";
+import { useStore } from "vuex"
+import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import { ElMessage, ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+
+import AuditOpinion from "../ManuscriptAuditingComponents/AuditOpinion.vue";
+
 export default {
+  components: { 
+    AuditOpinion,
+  },
   setup() {
+    //路由实例
+    const router = useRouter();
+    router;
+    //vuex实例
+    const store = useStore();
+
+    //用户角色名字
+    const userAuthority = computed(() => {
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
+    });
+
+    // <!-- 待审核部分 -->
     //关键词
     const searchInput = ref("");
     const searchSelectValue = ref(0);
@@ -630,134 +656,56 @@ export default {
         label: "正文",
       },
     ];
+
     //语种select数据
     const langSelectValue = ref("");
-    const langOptions = [{ value: 0, label: "中文" }];
+    const langOptions = reactive([]);
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o) => {
+      langOptions.push({
+        value: o.id,
+        label: o.desc,
+      });
+    });
+
     //日期选择 数据
-    const dateDefaultTime = ref([]);
+    const dateDefaultTime = ref("");
     //表格数据
-    const tableData = [
-      {
-        title:
-          "您题为《外交部：中国发展对外关系对各国一视同仁》的投稿正在审核中",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "您题为《便利外籍人员来华5项措施详解》的投稿未采用",
-        date: "2016-05-03",
-        origin: "新华社1",
-        lang: "中文",
-        status: "已发布",
-      },
-      {
-        title:
-          "(Musiècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        status: "待处理",
-      },
-      {
-        title:
-          "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "审核中",
-      },
-      {
-        title: "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        status: "未采用",
-      },
-    ];
+    const tableData = reactive([]);
+
+    const tableSelectedDataArray = reactive([]);//记录选中checkbox的数据
+    
+    /**
+     * 监听 选中table checkbox 变化
+     * @param {*} selectedArrP 选中checkbox的数据
+     */
+    function handleSelectionTableDataFn(
+      selectedArrP,
+    ){
+      tableSelectedDataArray.splice(0,tableSelectedDataArray.length);
+      selectedArrP.forEach((o)=>{
+        tableSelectedDataArray.push(o);
+      });
+    }
+    //end of handleSelectionTableDataFn
+    
+
     //分页器
     let limit = ref(15);
     function handleSizeChange(val) {
       limit.value = val;
     }
     let page = ref(1);
+    let pageTotal = ref(0);
     function handleCurrentChange(val) {
       page.value = val;
     }
+
+
+
     //稿件标题点击置灰
     const isClickedArr = ref([]);
     const popoverShowFlag = ref(false);
-    function rowTitleClick(scope) {
-      if (popoverShowFlag.value) {
-        //有弹窗打开时 跳出方法
-        return;
-      }
-      popoverShowFlag.value = true;
-      scope.row.visible = true;
-      if (!isClickedArr.value.includes(scope.$index)) {
-        isClickedArr.value.push(scope.$index);
-      }
-    }
+
 
     //联想输入框
     const originInput = ref("");
@@ -788,11 +736,26 @@ export default {
         );
       };
     };
-    onMounted(() => {
-      restaurants.value = loadAll();
-    });
 
-    const statusRadio = ref(1);
+    const statusRadio = ref(1);//切换 待审核 已处理
+
+    const dialogBatchProcessingVisible = ref(false);//用于显示批量审核的弹窗
+    /**
+     * 批量审核按钮触发
+     */
+    function dialogBatchProcessingFn(){
+      //如果没选中稿件，则退出
+      if(tableSelectedDataArray.length === 0){
+        ElMessage({
+          message: '请先选择稿件',
+          type: 'warning',
+        });
+        return;
+      }
+      dialogBatchProcessingVisible.value = true;
+    }
+
+    
 
     // <!-- 已处理部分 -->
     //关键词
@@ -810,67 +773,44 @@ export default {
     ];
     //语种select数据
     const langSelectValue1 = ref("");
-    const langOptions1 = [{ value: 0, label: "中文" }];
+    const langOptions1 = reactive([]);
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+      langOptions1.push({
+        value: o.id,
+        label: o.desc,
+      })
+    });
+
     //日期选择 数据
-    const dateDefaultTime1 = ref([]);
+    const dateDefaultTime1 = ref('');
     //状态select数据
-    const statusSelectValue = ref("");
+    const statusSelectValue = ref('全部状态');
     const statusOptions = [
-      { value: 0, label: "审核中" },
-      { value: 1, label: "未通过" },
+      { value: 0, label: "全部状态" },
+      { value: 1, label: "审核中" },
+      { value: 2, label: "已发布" },
+      { value: 3, label: "未通过" },
     ];
     //稿件节点select数据
-    const nodeSelectValue = ref("");
-    const nodeOptions = [
-      { value: 0, label: "审核中" },
-      { value: 1, label: "未通过" },
+    const nodeSelectValue = ref("全部节点");
+    const nodeOptions = [//0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布 显示为空字符
+      { value: '', label: "全部节点" },
+      { value: 0, label: "编辑" },
+      { value: 1, label: "国家信息中心" },
+      { value: 2, label: "国家发改委" },
+      { value: 4, label: "未通过或已发布" },
     ];
+
     //表格数据
-    const tableData1 = [
-      {
-        title:
-          "您题为《外交部：中国发展对外关系对各国一视同仁》的投稿正在审核中",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社222",
-        lang: "阿文",
-        articleUseStatus: "审核中",
-        node: "编辑部",
-      },
-      {
-        title: "您题为《便利外籍人员来华5项措施详解》的投稿未采用",
-        date: "2016-05-03",
-        origin: "新华社",
-        lang: "中文",
-        articleUseStatus: "已发布",
-        node: "编辑部1",
-      },
-      {
-        title:
-          "(Musiècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)(Multimédia) L'évolution des chemins de fer kenyans sur un siècle : une histoire d'éveil et de développement (REPORTAGE)",
-        date: "2016-05-02",
-        origin: "新华社",
-        lang: "法语",
-        articleUseStatus: "已发布",
-        node: "编辑部",
-      },
-      {
-        title:
-          "李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰李强将出席世界经济论坛2024年年会并访问瑞士、爱尔兰",
-        date: "2016-05-04",
-        name: "张三",
-        origin: "新华社",
-        lang: "阿文",
-        articleUseStatus: "未通过",
-        node: "编辑部",
-      },
-    ];
+    const tableData1 = reactive([]);
+
     //分页器
     let limit1 = ref(15);
     function handleSizeChange1(val) {
       limit1.value = val;
     }
     let page1 = ref(1);
+    let pageTotal1 = ref(0);
     function handleCurrentChange1(val) {
       page1.value = val;
     }
@@ -900,65 +840,304 @@ export default {
 
     //字体选择
     const fontSelect = ref("中");
-    //待审核弹窗html内容
-    const articleHtmlCon = `<p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">“一企一档”模块聚焦政府安商稳商、银行贷后管理等场景，整合全国6100多万家存续企业工商、司法、投融资、舆情等数据，通过标签化处理赋予企业行业、资质、产品、动态等标签，形成企业全景画像。此外，还支持与用户联合建模，引入公共数据、私域数据，进一步完善企业档案。基于电子档案信息和企业行为动态，为用户推送展示目标企业动态信息，利用数字化手段助力企业服务精准化、规范化和高效化，助力“稳存量”。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">行业洞察系统以产业链图谱为核心，结合中国经济信息社传统的数据平台优势、新华社国家高端智库优势，为政府推动产业高质量发展提供一套从“产业规划-政策供给-运行监测-持续优化”的闭环管理体系和运行指挥体系，助力区域产业数字化转型，提升政府数字化治理能力。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">行业洞察系统以产业链图谱为核心，结合中国经济信息社传统的数据平台优势、新华社国家高端智库优势，为政府推动产业高质量发展提供一套从“产业规划-政策供给-运行监测-持续优化”的闭环管理体系和运行指挥体系，助力区域产业数字化转型，提升政府数字化治理能力。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">行业洞察系统以产业链图谱为核心，结合中国经济信息社传统的数据平台优势、新华社国家高端智库优势，为政府推动产业高质量发展提供一套从“产业规划-政策供给-运行监测-持续优化”的闭环管理体系和运行指挥体系，助力区域产业数字化转型，提升政府数字化治理能力。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">行业洞察系统以产业链图谱为核心，结合中国经济信息社传统的数据平台优势、新华社国家高端智库优势，为政府推动产业高质量发展提供一套从“产业规划-政策供给-运行监测-持续优化”的闭环管理体系和运行指挥体系，助力区域产业数字化转型，提升政府数字化治理能力。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">行业洞察系统以产业链图谱为核心，结合中国经济信息社传统的数据平台优势、新华社国家高端智库优势，为政府推动产业高质量发展提供一套从“产业规划-政策供给-运行监测-持续优化”的闭环管理体系和运行指挥体系，助力区域产业数字化转型，提升政府数字化治理能力。</p><p style="text-align: justify; white-space: pre-wrap; text-indent: 2em;">行业洞察系统以产业链图谱为核心，结合中国经济信息社传统的数据平台优势、新华社国家高端智库优势，为政府推动产业高质量发展提供一套从“产业规划-政策供给-运行监测-持续优化”的闭环管理体系和运行指挥体系，助力区域产业数字化转型，提升政府数字化治理能力。</p>`;
+    //当前 详情页弹窗 接口返回信息 和 点击 table 某一列信息
+    const externalAuditArticleFindByIdO = reactive({});
+
+
     //时间轴数据
-    const timelineData = [
+    const timelineData = reactive([]);
+    
+  
+
+    /**
+     * 查询 稿件详情
+     */
+    function externalAuditArticleFindByIdFn(scopeP){
+
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      if (popoverShowFlag.value) {
+        //有弹窗打开时 跳出方法
+        return;
+      }
+
+      store.dispatch('externalAuditArticleFindByIdFn',scopeP.row.externalAuditArticleId)
+      .then((D)=>{
+        console.log('D 稿件详情',D);
+        const { data,success } = D.data
+        if(!success){
+          ElMessage({
+            message: '稿件详情请求失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '稿件详情请求成功',
+          type: 'success',
+          plain: true,
+        });
+      
+        popoverShowFlag.value = true;
+        scopeP.row.visible = true;
+        scopeP.row.articleHtmlCon = data.articleHtmlCon;//在element-ui中，table的列中 赋值 articleHtmlCon
+        scopeP.row.trueName = data.trueName;//在element-ui中，table的列中 赋值 trueName
+
+        //把当前打开的详情信息储存起来
+        for(let key in data){
+          externalAuditArticleFindByIdO[key] = data[key];
+        }
+        //把点击 table 某列的文章 信息储存起来
+        for(let key in scopeP.row){
+          externalAuditArticleFindByIdO[key] = scopeP.row[key];
+        }
+
+        externalAuditArticleRecordListAjaxFn(scopeP);//文章正文右侧的“审核流程记录”板块
+
+      })
+      .catch((error)=>{
+        console.log('error 稿件详情',error);
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+    }
+
+    /**
+     * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
+     * radio = '待审核'
+     */
+     function getNeedAuditCountAjaxFn(){
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
+        return o.desc
+      });
+
+      const paramsO = {
+        // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
+        // currentNode:2,//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
+        articleKind:1,//0外审稿件  1外审报题   （属于哪个栏目）
+        listStatus:0,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
+        pageSize:limit.value,
+        currPage:page.value,
+      }
+      
+      langSelectValue.value&&(paramsO.language=langSelectValue.value);//这个接口 表现“全部语种” 是 什么都不传
+
+      switch(searchSelectValue.value){
+        case 0:
+        paramsO.articleTitle = searchInput.value;//按标题搜索
+          break;
+        case 1:
+        paramsO.articleContent = searchInput.value;//按正文搜索
+          break;
+      }
+
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.startTime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endTime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      }
+
+      httpAxiosO({
+        method:'get',
+        url:'/api/web/externalAuditArticle/list.do',
+        params:paramsO,
+      })
+      .then((D)=>{
+        console.log('D 查询审核稿件、报题',D);
+        const { data,success } = D.data
+        if(!success){
+          ElMessage({
+            message: '查询请求失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '查询请求成功',
+          type: 'success',
+          plain: true,
+        });
+
+        tableData.splice(0,tableData.length);
+        data.ldata.forEach((o)=>{
+          let _o = o;
+          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
+          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
+          tableData.push(_o);
+        });
+        pageTotal.value = data.totalResults;
+      })
+      .catch((error)=>{
+        console.log('error 查询审核稿件、报题',error);
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+    }
+    // end of getNeedAuditCountAjaxFn
+
+    /**
+     * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
+     * radio = '已处理'
+     */
+     function getNeedAuditCountAjaxFn1(){
+      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
+        return o.desc
+      });
+
+      const paramsO = {
+        // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
+        
+        articleKind:1,//0外审稿件  1外审报题   （属于哪个栏目）
+        listStatus:2,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
+        pageSize:limit1.value,
+        currPage:page1.value,
+      }
+
+      if(
+        nodeSelectValue.value!==''
+        &&nodeSelectValue.value !=='全部节点'
+      )
       {
-        timestamp: "2018-04-12 20:46",
-        fir: "修改后送审国家改革发展委员会",
-        sec: "显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见",
-        thi: "国家改革发展委员会",
-      },
-      {
-        timestamp: "2018-04-03 20:46",
-        fir: "审核通过",
-        sec: "显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见",
-        thi: "国家改革发展委员会",
-      },
-      {
-        timestamp: "2018-04-03 20:46",
-        fir: "送审国家改革发展委员会",
-        sec: "显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见",
-        thi: "国家改革发展委员会",
-      },
-      {
-        timestamp: "2018-04-03 20:46",
-        fir: "送审国家改革发展委员会",
-        sec: "显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见显示审核意见",
-        thi: "国家改革发展委员会",
-      },
-    ];
-    //审核意见
-    const commentTextarea = ref("");
-    //审核意见Radio
-    const commentRadio = ref(0);
-    const commentRadioData = reactive([
-      {
-        value: 0,
-        label: "审核通过",
-      },
-      {
-        value: 1,
-        label: "修改后直接签发",
-      },
-      {
-        value: 2,
-        label: "修改后送审国家发展和改革委员会",
-      },
-      {
-        value: 3,
-        label: "修改后送审国家信息中心",
-      },
-      {
-        value: 4,
-        label: "送审国家发展和改革委员会",
-      },
-      {
-        value: 5,
-        label: "审核未通过",
-      },
-    ]);
+        paramsO.currentNode=nodeSelectValue.value;//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
+      }
+
+      langSelectValue1.value&&(paramsO.language=langSelectValue1.value);//这个接口 表现“全部语种” 是 什么都不传
+
+      switch(searchSelectValue1.value){
+        case 0:
+        paramsO.articleTitle = searchInput1.value;//按标题搜索
+          break;
+        case 1:
+        paramsO.articleContent = searchInput1.value;//按正文搜索
+          break;
+      }
+
+      //时间段
+      if(
+        dateDefaultTime1.value
+      ){
+        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD'] //结束时间
+      }
+
+      httpAxiosO({
+        method:'get',
+        url:'/api/web/externalAuditArticle/list.do',
+        params:paramsO,
+      })
+      .then((D)=>{
+        console.log('D 查询审核稿件、报题 已处理',D);
+        const { data,success } = D.data
+        if(!success){
+          ElMessage({
+            message: '查询请求失败',
+            type: 'error',
+            plain: true,
+          })
+          return;
+        }
+        ElMessage({
+          message: '查询请求成功',
+          type: 'success',
+          plain: true,
+        });
+        tableData1.splice(0,tableData1.length);
+        data.ldata.forEach((o)=>{
+          let _o = o;
+          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
+          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD hh:mm']
+
+          switch(o.articleStatus){//显示状态名字
+            case 1:
+              _o.articleStatusName = '审核中'
+            break;
+            case 2:
+              _o.articleStatusName = '已发布'
+            break;
+            case 3:
+              _o.articleStatusName = '未通过'
+            break;
+          }
+
+          //显示节点名字
+          switch(o.currentNode){
+            case 0:
+              _o.currentNodeName = '编辑'
+            break;
+            case 1:
+              _o.currentNodeName = '国家信息中心'
+            break;
+            case 2:
+              _o.currentNodeName = '国家发改委'
+            break;
+            case 4:
+              _o.currentNodeName = ' '//未通过或已发布
+            break;
+          }
+
+          
+          tableData1.push(_o);
+        });
+        pageTotal1.value = data.totalResults;
+      })
+      .catch((error)=>{
+        console.log('error 查询审核稿件、报题',error);
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      })
+      ;
+    }
+    // end of getNeedAuditCountAjaxFn1
+
+    /**
+     * 审核流程记录 板块
+     * 查询外审记录 接口
+     */
+    function externalAuditArticleRecordListAjaxFn(scopeP){
+      
+      const { externalAuditArticleId } = scopeP.row;externalAuditArticleId
+
+      const paramsO = {
+        externalAuditArticleId:1,//必传，id为1有假数据
+      }
+      httpAxiosO({
+        method:'get',
+        url:'/api/web/externalAuditArticleRecord/list.do',
+        params:paramsO,
+      })
+      .then((D)=>{
+        console.log('D 审核流程记录',D);
+        timelineData.splice(0,timelineData.length);
+        const { data } = D.data;
+        data.ldata.forEach((o)=>{
+          let _o = o;
+          _o.auditSignName = store.state.ROLESETO[userAuthority.value]['auditSign'][o.auditSign]
+          _o.auditTimeFormat = timeFormatFn(o.auditTime)['YYYY-MM-DD hh:mm'];
+          timelineData.push(_o);
+        });
+      })
+      .catch((error)=>{
+        console.log('error 审核流程记录',error);
+      })
+      ;
+    }
+    //end of externalAuditArticleRecordListAjaxFn
+
+    onMounted(() => {
+      restaurants.value = loadAll();
+      getNeedAuditCountAjaxFn();//待审核
+      getNeedAuditCountAjaxFn1();//已处理
+    });
 
     return {
       searchInput,
@@ -969,16 +1148,23 @@ export default {
       dateDefaultTime,
       locale: zhCn, //date-range 语言设置
       tableData,
+
       limit,
       page,
+      pageTotal,
       handleSizeChange,
       handleCurrentChange,
       isClickedArr,
-      rowTitleClick,
+
       popoverShowFlag,
       originInput,
       querySearch,
+      
       statusRadio,
+
+      dialogBatchProcessingVisible,
+      dialogBatchProcessingFn,
+      handleSelectionTableDataFn,
 
       //已处理部分
       searchInput1,
@@ -994,6 +1180,7 @@ export default {
       tableData1,
       limit1,
       page1,
+      pageTotal1,
       handleSizeChange1,
       handleCurrentChange1,
       isClickedArr1,
@@ -1003,11 +1190,16 @@ export default {
       querySearch1,
 
       fontSelect,
-      articleHtmlCon,
       timelineData,
-      commentTextarea,
-      commentRadio,
-      commentRadioData,
+
+      getNeedAuditCountAjaxFn,
+      getNeedAuditCountAjaxFn1,
+      externalAuditArticleFindByIdFn,
+      externalAuditArticleRecordListAjaxFn,
+
+      externalAuditArticleFindByIdO,
+      tableSelectedDataArray,
+
     };
   },
 };
@@ -1193,13 +1385,13 @@ export default {
         margin-top: 20px;
       }
       :deep(.el-timeline-item__node--normal) {
-        background: url(../assets/timeline.png) no-repeat;
+        background: url(@/assets/timeline.png) no-repeat;
         width: 19px;
         height: 19px;
         left: -4px;
       }
       :deep(.el-timeline-item__timestamp.is-top) {
-        background: url(../assets/timelinebg.png) no-repeat;
+        background: url(@/assets/timelinebg.png) no-repeat;
         height: 42px;
         line-height: 25px;
         padding-left: 15px;
@@ -1229,43 +1421,7 @@ export default {
       }
     }
   }
-  .elpopover-comment {
-    height: 300px;
-    background-color: #f5f6fa;
-    padding: 0 47px;
-    .elpopover-comment-header {
-      padding-top: 30px;
-      .elpopover-comment-header-divide {
-        width: 5px;
-        height: 20px;
-        border-radius: 5px;
-        background-color: #1890ff;
-      }
-      span {
-        font-size: 20px;
-        font-weight: 700;
-        color: #000;
-        margin-left: 20px;
-      }
-    }
-    .elpopover-comment-header-textarea {
-      margin-top: 15px;
-    }
-    .elpopover-comment-header-radio {
-      margin-top: 15px;
-    }
-    .elpopover-comment-header-btn {
-      margin-top: 15px;
-      justify-content: center;
-      .el-button {
-        width: 240px;
-        height: 45px;
-        border-radius: 5px;
-        background-color: #1890ff;
-        color: #fff;
-      }
-    }
-  }
+
   .elpopover-content-left-text1 {
     max-height: 575px !important;
   }

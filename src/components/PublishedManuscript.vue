@@ -74,7 +74,7 @@
       data-desc="已发投稿组件-列表区"
     >
       <el-table
-        :data="tableData1.slice((page1 - 1) * limit1, page1 * limit1)"
+        :data="tableData1"
         border
         style="width: 100%"
         :header-cell-style="{

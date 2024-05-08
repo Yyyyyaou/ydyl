@@ -90,7 +90,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
-            :data="tableDataComputed"
+            :data="tableData"
             @selection-change="handleSelectionTableDataFn"
             border
             style="width: 100%"
@@ -394,7 +394,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
-            :data="tableData1.slice((page1 - 1) * limit1, page1 * limit1)"
+            :data="tableData1"
             border
             style="width: 100%"
             :header-cell-style="{
@@ -700,9 +700,7 @@ export default {
       page.value = val;
     }
 
-    const tableDataComputed = computed(()=>{
-      return tableData.slice((page.value - 1) * limit.value, page.value * limit.value);
-    });
+
 
     //稿件标题点击置灰
     const isClickedArr = ref([]);
@@ -1150,7 +1148,7 @@ export default {
       dateDefaultTime,
       locale: zhCn, //date-range 语言设置
       tableData,
-      tableDataComputed,
+
       limit,
       page,
       pageTotal,

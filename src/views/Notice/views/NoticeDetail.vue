@@ -77,11 +77,11 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, toRefs, } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage, ElLoading } from "element-plus";
-// import { timeFormatFn } from "@/utils/timeFormat.js";
+import { timeFormatFn } from "@/utils/timeFormat.js";
 
 
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
@@ -89,12 +89,21 @@ import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 
 export default {
   props: {
-    id: {//稿件ID，用来请求稿件详情接口
+    propsId: {//稿件ID，用来请求稿件详情接口
       type: String,
       default: "",
     },
+    propsArticleO:{//用于 弹出层显示详情页，通过它传递
+      type: Object,
+      default: () => {
+        return {};
+      },
+    }
   },
-  setup() {
+  setup(props,ctx) {
+
+    const { propsArticleO } = toRefs(props);
+
     const router = useRouter();
     const { id } = router.currentRoute.value.query; //稿件ID，用来请求稿件详情接口
 
@@ -110,9 +119,88 @@ export default {
     const fileAccessory = reactive([]);//普通附件
 
     /**
+     * 当详情信息对象 通过 propsArticleO 传进来时
+     */
+    function readPropsArticleOFn(){
+      console.log('propsArticleO',propsArticleO);
+
+      articleTitle.value = propsArticleO.value.articleTitle||'';
+      articleSource.value = propsArticleO.value.articleSource||'';
+      articleHtmlCon.value = propsArticleO.value.articleHtmlCon||'';
+      
+      //这个字段为投稿人，但‘web/user/getLoginUser.do’接口暂时没返回 postUser，所以暂用 userName 顶替
+      postUser.value = store.state.StroeLoginO.loginUser.postUser||store.state.StroeLoginO.loginUser.userName;
+      
+      
+      pubTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD'];
+      remark.value = propsArticleO.value.remark||'';
+
+
+      //审核附件列表
+      fileUnit.splice(0,fileUnit.length);
+      propsArticleO.value.fileUnit.forEach(async (o)=>{
+
+        //如果没有附件名字
+        if(!o){
+          return;
+        }
+        
+        const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(o);
+        let fileUrl
+        if(isPicture){//有图片时候
+          fileUrl = await handleAuditingGetobjFn(o);
+        }
+
+        const _o = {
+          isPicture,
+          fileUrl,
+          fileName: o,
+        }
+
+        fileUnit.push(_o);
+      });
+      //普通附件列表
+      fileAccessory.splice(0,fileAccessory.length);
+      propsArticleO.value.fileAccessory.forEach(async (o)=>{
+
+        //如果没有附件名字
+        if(!o){
+          return;
+        }
+        
+        const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(o);
+        let fileUrl
+        if(isPicture){//有图片时候
+          fileUrl = await handleAuditingGetobjFn(o);
+        }
+
+        const _o = {
+          isPicture,
+          fileUrl,
+          fileName: o,
+        }
+
+        fileAccessory.push(_o);
+      });
+
+      console.log('propsArticleO.value',propsArticleO.value);
+
+    }
+    // end of readPropsArticleOFn
+    
+    ctx.expose({
+      readPropsArticleOFn,
+    });
+
+    /**
      * 获取稿件详情
      */
     async function getFindByIdAjaxFn() {
+
+      if (!id) {
+        return;
+      }
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       store
         .dispatch("getFindByIdFn", id)
@@ -208,23 +296,10 @@ export default {
     */
     async function handleAuditingGetobjFn(fileNameP,downloadP){
 
-      // if(downloadP){//下载
-      //     httpAxiosO({
-      //       url: '/api/web/article/getobj',
-      //       method: 'get',
-      //       params: {
-      //         fileName:fileNameP,
-      //       }
-      //     })
-      //     .then((D)=>{
-      //       const {data} = D;
-      //       const blob = new Blob([data]); // 根据文件类型调整MIME类型
-      //       const url = URL.createObjectURL(blob);
-      //       // window.open(url);
-      //       navigator.download(url, fileNameP);
-      //     })
-      //     return;
-      // }
+      if(downloadP){//下载
+        window.open('/api/web/article/getobj?fileName='+fileNameP+'&download=true');
+        return;
+      }
 
 
       let fileUrl = '';
@@ -250,16 +325,6 @@ export default {
       })
       .then((fileReader)=>{
         fileUrl = fileReader;
-        if(downloadP){//下载
-          const link = document.createElement('a');
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.href = fileReader;
-          link.download = fileNameP;
-          link.click();
-          document.body.removeChild(link);
-          return;
-        }
       });
       return fileUrl;
     }
@@ -270,6 +335,7 @@ export default {
     }
 
     onMounted(() => {
+      // readPropsArticleOFn();
       getFindByIdAjaxFn();
     });
 

@@ -298,7 +298,7 @@ import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import MySubmission from "@/components/MySubmission.vue";
 import PublishedManuscript from "@/components/PublishedManuscript.vue";
 import ManuscriptAuditing from "@/components/ManuscriptAuditingComponents/ManuscriptAuditing.vue";
-import PaperAuditing from "@/components/PaperAuditing.vue";
+import PaperAuditing from "@/components/PaperAuditingComponents/PaperAuditing.vue";
 export default {
   components: {
     MySubmission, //我的投稿组件
