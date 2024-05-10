@@ -13,7 +13,7 @@
       </div>
       <div class="mid-divider"></div>
       <div class="noticedetail-content-word flexcenter">
-        <div v-html="articleHtmlCon"></div>
+        <div class="htmlContentC" v-html="articleHtmlCon"></div>
       </div>
       <!-- 没数据时不显示 -->
       <div>
@@ -34,7 +34,7 @@
                     title="点击下载"
                   >
                     <span v-if="!o.isPicture">{{ o.fileName }}</span>
-                    <div v-if="o.isPicture"><img :src="o.fileUrl" alt="" /></div>
+                    <img v-if="o.isPicture" :src="o.fileUrl" alt="" />
                   </div>
                 </div>
               </td>
@@ -144,7 +144,7 @@ export default {
         if(!o){
           return;
         }
-        
+
         const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(o);
         let fileUrl
         if(isPicture){//有图片时候
@@ -393,11 +393,14 @@ export default {
     }
   }
 }
+.htmlContentC{font-size:18px;line-height:2.6em;padding:20px;overflow:hidden;
+  &>*{padding:10px 0;}
+}
 
 .noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
   .noticedetail-bottom-content-img {
     display: flex;flex-wrap:wrap;
-    &>div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
+    >div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
     img{width:100%;height:100%;}
   }
 }
