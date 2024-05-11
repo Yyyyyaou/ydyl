@@ -322,7 +322,7 @@ export default {
 
       httpAxiosO({
         method: 'get',
-        url: '/api/web/article/articleList.do',
+        url: '/web/article/articleList.do',
         params:paramsO,
       })
       .then((D)=>{
@@ -408,7 +408,10 @@ export default {
           message: '删除到回收站',
           type: 'success',
           plain: true,
-        })
+        });
+
+        getArticleListAjaxFn();//更新我的投稿列表
+
       })
       .catch(()=>{
         ElMessage({

@@ -39,7 +39,7 @@ export default {
     const btngroupArr = ref([
       { name: "原创稿件" },
       { name: "转载稿件" },
-      { name: "数据上传" },
+      // { name: "数据上传" },//数据上传界面搬到了 数据上传 本栏目页上 注释于20240509.1057
     ]);
     const selectIndex = ref(0);
     function btnClick(index) {

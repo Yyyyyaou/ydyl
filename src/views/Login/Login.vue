@@ -59,10 +59,11 @@
   </section>
 </template>
 
+<script id="login_script_ID"></script>
 <script>
 import "@/assets/PcBaseStyle.css";
 import "@/assets/login.less";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import { HomeFilled,Lock,Iphone } from "@element-plus/icons-vue";
@@ -70,6 +71,14 @@ import {
   getUserInfoFn,
   initLanguageListFn,
 }  from 'ROOT_URL/initialization/initSomeValue.js'
+
+import {
+  encryptedString,
+  setMaxDigits,
+  RSAKeyPair,
+} from './rsa/RSA.js';
+
+
 import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 
 
@@ -89,16 +98,37 @@ export default {
       loginCaptcha:''
     });
 
-    const postUserLoginConstFn = () => {
+// 普通投稿用户 / Trsadmin@123
+// 国家发改委 / Trsadmin@123
+
+
+
+    const postUserLoginConstFn = async () => {
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
+
+      // eslint-disable-next-line
+      const userPassword = encryptedString(bodyRSA(setMaxDigits,RSAKeyPair),inputValueO.value.password);
+
+      console.log('userPassword',userPassword);
+
       store.dispatch("postUserLoginFn",{
-        loginName:inputValueO.value.loginName||'chengxuefei',
-        password:inputValueO.value.password||'7f95e858409fa87fab2db7718cdcb3c9245e4a77a1be9759b79e0a7ab0d46cf80acb0f1ae64aa208cd3300638d9f5f53b73e37dc33f52008146ca5d567b47034ed7e230572eaf7aa988281370fff30ddaf086e842b3f079a2a6a87806976b164475fbbe8e5aea82f5e29d7c81ec4c6edd634184b3bf7b8b3757fe090ef4e3f67',
+        loginName:inputValueO.value.loginName||'国家信息中心',
+        password:inputValueO.value.password?userPassword:'7f95e858409fa87fab2db7718cdcb3c9245e4a77a1be9759b79e0a7ab0d46cf80acb0f1ae64aa208cd3300638d9f5f53b73e37dc33f52008146ca5d567b47034ed7e230572eaf7aa988281370fff30ddaf086e842b3f079a2a6a87806976b164475fbbe8e5aea82f5e29d7c81ec4c6edd634184b3bf7b8b3757fe090ef4e3f67',
         loginCaptcha:inputValueO.value.loginCaptcha||'004241',
       })
       .then((D)=>{
-        
+        const { data } = D;
         console.log('用户登录 D',D);
+        if(
+          !data.success
+        ){
+          ElMessage({
+            message: '登录失败 '+data.message,
+            type: 'warning',
+            plain: true,
+          })
+          return;
+        }
         ElMessage({
           message: '登录成功',
           type: 'success',
@@ -144,8 +174,8 @@ export default {
      */
     const getSmsFn = ()=>{
       httpAxiosO({
-        method: 'get',
-        url: '/api/web/code/tg/sms.do',
+        method: 'post',
+        url: '/web/code/tg/sms.do',
       })
       .then((D)=>{
         console.log('登录短信发送 D',D);
@@ -155,6 +185,39 @@ export default {
       })
     };
 
+    /**
+     * 获取加密方法
+     */
+
+    async function encryptionMethods() {
+
+      await httpAxiosO({
+          method: "get",
+          url: "/web/user/publicKey.do",
+          // dataType: "text",
+      })
+      .then((D)=>{
+          console.log('D',D)
+
+          const regExp =  /(?<=function bodyRSA\()/
+          const str = D.data.replace(regExp,'setMaxDigits,RSAKeyPair')
+
+          document.querySelector('#encryption')&&document.querySelector('#encryption').remove();
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.id = 'encryption'
+          script.text = str;
+          document.body.appendChild(script);
+
+      })
+      ;
+    }
+    // end of encryptionMethods
+
+
+    onMounted(()=>{
+      encryptionMethods();
+    })
 
 
     return {

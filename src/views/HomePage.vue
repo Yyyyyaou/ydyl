@@ -38,10 +38,10 @@
                   <p>{{ item.name }}</p>
                 </div>
               </template>
-              <template v-else-if="userAuthority == '外部用户_国家信息中心'">
+              <template v-else-if="userAuthority == '国家信息中心用户'">
                 <div
                   class="flexcenter mid-content-statistics-left-content-div mid-content-statistics-left-content-infocenter"
-                  data-desc="外部用户_国家发改委 稿件统计"
+                  data-desc="国家发改委用户 稿件统计"
                 >
                   <div
                     class="flexcenter mid-content-statistics-left-content-img"
@@ -69,11 +69,11 @@
                   <p>已审报题</p>
                 </div>
               </template>
-              <!-- end of 外部用户_国家信息中心 -->
-              <template v-else-if="userAuthority == '外部用户_国家发改委'">
+              <!-- end of 国家信息中心用户 -->
+              <template v-else-if="userAuthority == '国家发改委用户'">
                 <div
                   class="flexcenter mid-content-statistics-left-content-divfgw"
-                  data-desc="外部用户_国家发改委 稿件统计"
+                  data-desc="国家发改委用户 稿件统计"
                 >
                   <div
                     class="flexcenter mid-content-statistics-left-content-img"
@@ -143,7 +143,7 @@
                   <el-icon><InfoFilled /></el-icon>
                 </div>
               </template>
-              <!-- end of 外部用户_国家发改委 -->
+              <!-- end of 国家发改委用户 -->
 
 
             </div>
@@ -221,7 +221,7 @@
               @tab-click="tableTabClick"
               v-if="
                 userAuthority == '外部用户' ||
-                userAuthority == '外部用户_国家发改委'
+                userAuthority == '国家发改委用户'
               "
             >
               <el-tab-pane v-if="userAuthority == '外部用户'">
@@ -248,12 +248,12 @@
                 <PublishedManuscript />
               </el-tab-pane>
             </el-tabs>
-            <!-- end of 外部用户_国家发改委 -->
+            <!-- end of 国家发改委用户 -->
 
             <el-tabs
               type="border-card"
               @tab-click="tableTabClick"
-              v-else-if="userAuthority == '外部用户_国家信息中心'"
+              v-else-if="userAuthority == '国家信息中心用户'"
             >
               <el-tab-pane>
                 <template #label>
@@ -279,7 +279,7 @@
                 <PaperAuditing />
               </el-tab-pane>
             </el-tabs>
-            <!-- end of 外部用户_国家信息中心 -->
+            <!-- end of 国家信息中心用户 -->
 
           </div>
         </div>
@@ -335,12 +335,12 @@ export default {
       },
     ]);
 
-    //外部用户_国家发改委 稿件统计数据
+    //国家发改委用户 稿件统计数据
     const statisticsGJFGWData = reactive([
 
     ]);statisticsGJFGWData
 
-    //外部用户_国家信息中心 稿件统计数据
+    //国家信息中心用户 稿件统计数据
     const statisticsGJXXZXData = reactive([
       {
         name: "待审稿件",
@@ -428,7 +428,7 @@ export default {
 
       httpAxiosO({
         method: "get",
-        url: "/api/web/notice/list.do",
+        url: "/web/notice/list.do",
       })
         .then((D) => {
           console.log("首页公告 D", D);
@@ -464,14 +464,14 @@ export default {
     // end of getArticleListAjaxFn
 
     /**
-     * 外部用户_国家信息中心 稿件统计 接口请求
+     * 国家信息中心用户 稿件统计 接口请求
      */
     function getNicCountAjaxFn() {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
         method: "get",
-        url: "/api/web/externalAuditCount/getNicCount",
+        url: "/web/externalAuditCount/getNicCount",
         params: {
           searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
         },
@@ -520,7 +520,7 @@ export default {
 
       httpAxiosO({
         method: "get",
-        url: "/api/web/article/articleCount",
+        url: "/web/article/articleCount",
         params: {
           searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
         },
@@ -562,7 +562,7 @@ export default {
 
     onMounted(() => {
       getArticleCountAjaxFn(); //外部用户 稿件统计
-      getNicCountAjaxFn();//外部用户_国家信息中心 稿件统计
+      getNicCountAjaxFn();//国家信息中心用户 稿件统计
       getSYNoticeListAjaxFn(); //首页通知公告
     });
 

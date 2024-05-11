@@ -204,7 +204,7 @@ console.log('paramsO',paramsO);
 return;
       httpAxiosO({
         method:'get',
-        url:'/api/web/notice/noticeList.do',
+        url:'/web/notice/noticeList.do',
         params:paramsO
       })
       .then((D)=>{

@@ -9,7 +9,7 @@ import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 export async function deleteLogicDeleteFn(ctx,idsP){
   return await httpAxiosO({
     method: 'delete',
-    url: '/api/web/article/delete.do',
+    url: '/web/article/delete.do',
     params: {
       ids: idsP.ids
     },
@@ -23,7 +23,7 @@ export async function deleteLogicDeleteFn(ctx,idsP){
 export async function deletePhysicsDeleteFn(ctx,idsP){
   return await httpAxiosO({
     method: 'delete',
-    url: '/api/web/article/del.do',
+    url: '/web/article/del.do',
     params: {
       ids: idsP
     },
@@ -36,7 +36,7 @@ export async function deletePhysicsDeleteFn(ctx,idsP){
 export async function deleteDelAllFn(){
   return await httpAxiosO({
     method: 'delete',
-    url: '/api/web/article/delAll',
+    url: '/web/article/delAll',
   })
 }
 
@@ -49,7 +49,7 @@ export async function getUpdateFn(ctx,paramsP){
 
   return await httpAxiosO({
     method: 'get',
-    url: '/api/web/article/update.do',
+    url: '/web/article/update.do',
     params: paramsP.params
   })
 }
@@ -62,7 +62,7 @@ export async function getFindByIdFn(ctx,idP){
   ctx
   return await httpAxiosO({
     method: 'get',
-    url: '/api/web/article/findById.do',
+    url: '/web/article/findById.do',
     params: {
       id: idP
     }

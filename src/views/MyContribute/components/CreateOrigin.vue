@@ -75,7 +75,7 @@ before-remove 在附件列表删除文件钩子
              -->
             <el-upload
               class="auditingUploadC"
-              action="/api/web/article/upload"
+              action="/web/article/upload"
               v-model:file-list="auditingUploadFilesArray"
               multiple
               show-file-list
@@ -107,7 +107,7 @@ before-remove 在附件列表删除文件钩子
             <el-button type="primary" class="createorigin-content-upload-auditing1">上传</el-button>
             <el-upload
             class="auditingUploadC"
-              action="/api/web/article/upload"
+              action="/web/article/upload"
               v-model:file-list="auditingUploadFilesArray1"
               multiple
               show-file-list
@@ -120,7 +120,6 @@ before-remove 在附件列表删除文件钩子
                 fileText:1,//	0审核单,1附件,2正文
               }"
             >
-
             </el-upload>
           </el-form-item>
         </el-col>
@@ -145,6 +144,9 @@ before-remove 在附件列表删除文件钩子
 
   <el-dialog v-model="dialogNoticeDetailVisible" width="80vw" height="80vh">
     <NoticeDetail ref="NoticeDetailRef" :propsArticleO="formData"  />
+    <div class="createorigin-btngroup flexcenter">
+      <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
+    </div>
   </el-dialog>
 
 </template>
@@ -237,6 +239,7 @@ export default {
       })
     });
 
+
     //审核单附件列表
     const auditingUploadFilesArray = ref([]);//fileText=0
     //普通附件列表
@@ -244,9 +247,9 @@ export default {
     //正文附件列表
     const auditingUploadFilesArray2 = ref([]);//fileText=2
     //审核资质附件
-    const postAddEditAjaxFormData = new FormData();
+    // const postAddEditAjaxFormData = new FormData();
     function handleAuditingUploadChangeFn(file,files){file,files
-      
+
       files.forEach((o)=>{
         switch(o.fileText){
           case 0://审核单附件
@@ -259,8 +262,9 @@ export default {
           auditingUploadFilesArray2.value.push(o);
           break;
         }
-        // postAddEditAjaxFormData.append('files',o);
+
       });
+
     }
     // end of handleAuditingUploadChange
 
@@ -291,9 +295,9 @@ export default {
       console.log('handleAuditingUploadErrorFn error',error);
       console.log('handleAuditingUploadErrorFn uploadFile',uploadFile);
       console.log('handleAuditingUploadErrorFn uploadFiles',uploadFiles);
-      auditingUploadFilesArray.value.forEach((o)=>{
-        console.log('o',o);
-      });
+      // auditingUploadFilesArray.value.forEach((o)=>{
+      //   console.log('o',o);
+      // });
 
     }
 
@@ -305,7 +309,7 @@ export default {
       const {fileName} = uploadFile.response.data[0];
 
       return httpAxiosO({
-        url: '/api/web/article/delFileObj',
+        url: '/web/article/delFileObj',
         method: 'delete',
         params: {
           fileName
@@ -322,7 +326,7 @@ export default {
      */
     function handleAuditingGetobjFn(fileNameP){
       httpAxiosO({
-        url: '/api/web/article/getobj',
+        url: '/web/article/getobj',
         method: 'get',
         params: {
           fileName:fileNameP,
@@ -335,18 +339,18 @@ export default {
     /**
      * 资质附件上传
      */
-    function articleFilesUploadFn(){
-      httpAxiosO({
-        url: '/api/web/article/upload',
-        method: 'post',
-        data: postAddEditAjaxFormData,
-      }).then((D)=>{
-        console.log('D 资质附件上传',D)
-      }).catch((error)=>{
-        console.log('资质附件上传 error',error)
-      })
-    }
-    articleFilesUploadFn
+    // function articleFilesUploadFn(){
+    //   httpAxiosO({
+    //     url: '/web/article/upload',
+    //     method: 'post',
+    //     data: postAddEditAjaxFormData,
+    //   }).then((D)=>{
+    //     console.log('D 资质附件上传',D)
+    //   }).catch((error)=>{
+    //     console.log('资质附件上传 error',error)
+    //   })
+    // }
+    // articleFilesUploadFn
     // end of articleFilesUploadFn
 
 
@@ -492,7 +496,7 @@ export default {
      * @param {*} datasOP 
      */
     function checkFieldValueFn(datasOP){
-      const { articleTitle,articleSource,language,articleContent } = datasOP;
+      const { articleTitle,articleSource,language,articleHtmlCon } = datasOP;
 
       let checkResult = true;
       if(
@@ -526,8 +530,10 @@ export default {
         checkResult = false;
       }
       if(
-        !articleContent
-        ||articleContent==='\n'
+        !articleHtmlCon
+        ||articleHtmlCon==='<p></p>'
+        ||articleHtmlCon===''
+        ||articleHtmlCon==='\n'
       ){
         ElMessage({
           message: '请编辑正文内容',
@@ -540,9 +546,9 @@ export default {
     }
 
     /**
-     * articleStatus:0 时
+     * articleStatusP:0 时
      * 提交稿件到 “草稿箱”列表里
-     * articleStatus:1 时
+     * articleStatusP:1 时
      * 提交稿件到 “我的投稿”列表里
      *  
      */
@@ -555,42 +561,68 @@ export default {
 
         articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
       };
-      
-      // datasO.articleHtmlCon = QuillEditorInitFn.getSemanticHTML()//文章HTML内容
-      // datasO.articleContent = QuillEditorInitFn.getText();//文章文本内容
+
+      datasO.articleHtmlCon = editorHTMLContent.value||'';//稿件HTML内容
+
+      datasO.articleContent = editorTEXTContent.value||'';//稿件文本内容
+
+      //审核附件列表
+      const _fileUnit = auditingUploadFilesArray.value.map((o)=>{
+        if(o.response){
+          return o.response?.data[0].fileName
+        }else{
+          return;
+        }
+      });
+      //接口接受字符串
+      datasO.fileUnit =  _fileUnit.toString();
+
+
+      //普通附件列表
+      const _fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
+        if(o.response){
+          return o.response?.data[0].fileName
+        }else{
+          return;
+        }
+      });
+      //接口接受字符串
+      datasO.fileAccessory =  _fileAccessory.toString();
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       const _regExp1 = /\n$/;
       datasO.articleContent = datasO.articleContent.replace(_regExp1, '');
 
-      if(!checkFieldValueFn(datasO)){//验证各个字段
-        return;
+
+      const datasOFormData = new FormData();
+
+      for(let key in datasO){
+        datasOFormData.append(key,datasO[key]); 
       }
 
-return;
-      //验证完普通字段，把它们都塞进formData 里
-      postAddEditAjaxFormData.append('articleTitle',datasO.articleTitle);//稿件标题
-      postAddEditAjaxFormData.append('articleSource',datasO.articleSource);//稿件来源
-      postAddEditAjaxFormData.append('language',datasO.language);//语种
-      postAddEditAjaxFormData.append('remark',datasO.remark);//备注
-      postAddEditAjaxFormData.append('articleStatus',articleStatusP);//稿件状态 （-1：已删除，0：草稿，1：已投稿）
+      // //验证完普通字段，把它们都塞进formData 里
+      // postAddEditAjaxFormData.append('articleTitle',datasO.articleTitle);//稿件标题
+      // postAddEditAjaxFormData.append('articleSource',datasO.articleSource);//稿件来源
+      // postAddEditAjaxFormData.append('language',datasO.language);//语种
+      // postAddEditAjaxFormData.append('remark',datasO.remark);//备注
+      // postAddEditAjaxFormData.append('articleStatus',articleStatusP);//稿件状态 （-1：已删除，0：草稿，1：已投稿）
 
-      postAddEditAjaxFormData.append('articleHtmlCon', datasO.articleHtmlCon);//文章HTML内容
+      // postAddEditAjaxFormData.append('articleHtmlCon', datasO.articleHtmlCon);//文章HTML内容
 
-      //接口传参需要去掉datasO.articleContent 结尾的 \n
-      postAddEditAjaxFormData.append('articleContent', datasO.articleContent);//文章文本内容
+      // //接口传参需要去掉datasO.articleContent 结尾的 \n
+      // postAddEditAjaxFormData.append('articleContent', datasO.articleContent);//文章文本内容
       
 
-      auditingUploadFilesArray.value.length&&auditingUploadFilesArray.value.forEach((o)=>{
-        postAddEditAjaxFormData.append(o.name,o);
-      });
+      // auditingUploadFilesArray.value.length&&auditingUploadFilesArray.value.forEach((o)=>{
+      //   postAddEditAjaxFormData.append(o.name,o);
+      // });
 
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       httpAxiosO({
-        url:'/api/web/article/addEdit.do',
+        url:'/web/article/addEdit.do',
         method:'post',
-        data:postAddEditAjaxFormData
+        data:datasOFormData,
       })
       .then((D)=>{
         console.log('原创稿件提交 D',D);
@@ -609,6 +641,8 @@ return;
           plain: true,
         });
 
+        dialogNoticeDetailVisible.value = false;//关闭详情预览弹窗
+        
       })
       .catch((error)=>{
         console.log('原创稿件提交 error',error);
@@ -636,11 +670,8 @@ return;
 
         formData.articleContent = editorTEXTContent.value||'';//稿件文本内容
 
-
         //审核附件列表
         formData.fileUnit = auditingUploadFilesArray.value.map((o)=>{
-          console.log('o',o);
-          console.log('o.response',o.response);
           return o.response?.data[0].fileName || ''
         });
 
@@ -648,6 +679,13 @@ return;
         formData.fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
           return o.response?.data[0].fileName || ''
         });
+
+
+        if(!checkFieldValueFn(formData)){//验证各个字段
+          return;
+        }
+
+        dialogNoticeDetailVisible.value = true;//打开详情预览弹窗
 
         await nextTick();
 
@@ -676,7 +714,6 @@ return;
           }
         )
         .then(() => {
-          dialogNoticeDetailVisible.value = true;
           forFormDataValue();
         })
         .catch(() => {
@@ -685,7 +722,6 @@ return;
         return;
       }
 
-      dialogNoticeDetailVisible.value = true;
       forFormDataValue();
 
     }

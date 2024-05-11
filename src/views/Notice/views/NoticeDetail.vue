@@ -13,7 +13,7 @@
       </div>
       <div class="mid-divider"></div>
       <div class="noticedetail-content-word flexcenter">
-        <div v-html="articleHtmlCon"></div>
+        <div class="htmlContentC" v-html="articleHtmlCon"></div>
       </div>
       <!-- 没数据时不显示 -->
       <div>
@@ -34,7 +34,7 @@
                     title="点击下载"
                   >
                     <span v-if="!o.isPicture">{{ o.fileName }}</span>
-                    <div v-if="o.isPicture"><img :src="o.fileUrl" alt="" /></div>
+                    <img v-if="o.isPicture" :src="o.fileUrl" alt="" />
                   </div>
                 </div>
               </td>
@@ -84,7 +84,7 @@ import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 
 
-import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";httpAxiosO
 
 
 export default {
@@ -101,6 +101,8 @@ export default {
     }
   },
   setup(props,ctx) {
+
+    const URL_IS_API = process.env.NODE_ENV === 'development'?'/api':'';
 
     const { propsArticleO } = toRefs(props);
 
@@ -144,7 +146,7 @@ export default {
         if(!o){
           return;
         }
-        
+
         const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(o);
         let fileUrl
         if(isPicture){//有图片时候
@@ -297,35 +299,50 @@ export default {
     async function handleAuditingGetobjFn(fileNameP,downloadP){
 
       if(downloadP){//下载
-        window.open('/api/web/article/getobj?fileName='+fileNameP+'&download=true');
+        const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(fileNameP);
+        if(//如果是图片的话
+          isPicture
+        ){
+          const a = document.createElement('a');
+          const id ='aDownloadID'+new Date().getTime();
+          a.href = `${URL_IS_API}/web/article/getobj?fileName=${fileNameP}`;
+          a.download = fileNameP;
+          a.target = '_blank';
+          a.setAttribute('id',id);
+          document.querySelector('body').appendChild(a);
+          a.click();
+          document.querySelector('#'+id).remove();
+          return;
+        }
+        window.open(URL_IS_API+'/web/article/getobj?fileName='+fileNameP+'&download=true');
         return;
       }
 
 
-      let fileUrl = '';
-      await httpAxiosO({
-        url: '/api/web/article/getobj',
-        method: 'get',
-        responseType:'blob',//响应类型
-        params: {
-          fileName:fileNameP,
-        }
-      })
-      .then((D)=>{
-        const {data} = D;
+      let fileUrl = URL_IS_API+'/web/article/getobj?fileName='+fileNameP;
+      // await httpAxiosO({
+      //   url: '/web/article/getobj',
+      //   method: 'get',
+      //   responseType:'blob',//响应类型
+      //   params: {
+      //     fileName:fileNameP,
+      //   }
+      // })
+      // .then((D)=>{
+      //   const {data} = D;
 
-        return new Promise((resolve, reject) => {  
-          const fileReader = new FileReader();  
-          fileReader.onloadend = () => resolve(fileReader.result); // 读取完成，解析结果  
-          fileReader.onerror = reject;  
-          fileReader.readAsDataURL(data); // 将Blob对象转换为Data URL 
+      //   return new Promise((resolve, reject) => {  
+      //     const fileReader = new FileReader();  
+      //     fileReader.onloadend = () => resolve(fileReader.result); // 读取完成，解析结果  
+      //     fileReader.onerror = reject;  
+      //     fileReader.readAsDataURL(data); // 将Blob对象转换为Data URL 
         
-        });  
+      //   });  
 
-      })
-      .then((fileReader)=>{
-        fileUrl = fileReader;
-      });
+      // })
+      // .then((fileReader)=>{
+      //   fileUrl = fileReader;
+      // });
       return fileUrl;
     }
     // end of handleAuditingGetobjFn
@@ -393,11 +410,14 @@ export default {
     }
   }
 }
+.htmlContentC{font-size:18px;line-height:2.6em;padding:20px;overflow:hidden;
+  &>*{padding:10px 0;}
+}
 
 .noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
   .noticedetail-bottom-content-img {
     display: flex;flex-wrap:wrap;
-    &>div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
+    >div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
     img{width:100%;height:100%;}
   }
 }

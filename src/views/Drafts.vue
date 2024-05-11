@@ -61,12 +61,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
@@ -94,7 +94,9 @@
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div :title="scope.row.articleTitle"  @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">编辑</div>
                   <span></span>
-                  <div>删除</div>
+                  <div
+                    @click="deleteArticleAjaxFn(scope.row.id)"
+                  >删除</div>
                   <span></span>
                 </div>
               </template>
@@ -204,6 +206,8 @@ export default {
         return o.desc
       });
 
+      console.log('languageNameArr',languageNameArr);
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       const paramsO = {
         articleStatus:0,//0 代表草稿
@@ -233,7 +237,7 @@ export default {
 
       httpAxiosO({
         method: 'get',
-        url: '/api/web/article/draftList.do',
+        url: '/web/article/draftList.do',
         params:paramsO,
       })
       .then((D)=>{
@@ -279,6 +283,34 @@ export default {
     }
     // end of getArticleDraftListAjaxFn
 
+    //草稿箱的删除，应该删除到回收站
+    function deleteArticleAjaxFn(idP){
+      httpAxiosO({
+        url:'/web/article/delete.do',
+        method:'delete',
+        params:{
+          ids:idP
+        }
+      })
+      .then((D)=>{D
+        ElMessage({
+          message: '删除成功',
+          type: 'success',
+          plain: true,
+        })
+        getArticleDraftListAjaxFn();
+      })
+      .catch((error)=>{error
+        ElMessage({
+          message: '删除失败',
+          type: 'error',
+          plain: true,
+        })
+      });
+    }
+    // end of deleteArticleAjaxFn
+
+
     onMounted(() => {
       getArticleDraftListAjaxFn();
     });
@@ -300,6 +332,7 @@ export default {
       tableSelectionChange,
 
       getArticleDraftListAjaxFn,
+      deleteArticleAjaxFn,
 
     };
   },

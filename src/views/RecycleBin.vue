@@ -97,7 +97,7 @@
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div :title="scope.row.articleTitle" @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">继续采用</div>
                   <span></span>
-                  <div>删除</div>
+                  <div @click="deleteArticleAjaxFn(scope.row.id)">删除</div>
                   <span></span>
                 </div>
               </template>
@@ -235,7 +235,7 @@ export default {
 
       httpAxiosO({
         method: 'get',
-        url: '/api/web/article/draftList.do',
+        url: '/web/article/draftList.do',
         params:paramsO,
       })
       .then((D)=>{
@@ -340,6 +340,37 @@ export default {
       // });
     };
 
+    /**
+     * 回收站列表删除接口，真正的删除
+     */
+     function deleteArticleAjaxFn(idP){
+      httpAxiosO({
+        url:'/web/article/del.do',
+        method:'delete',
+        params:{
+          ids:idP
+        }
+      })
+      .then((D)=>{D
+        ElMessage({
+          message: '删除成功',
+          type: 'success',
+          plain: true,
+        })
+
+        getArticleDraftListAjaxFn();//更新回收站列表
+
+      })
+      .catch((error)=>{error
+        ElMessage({
+          message: '删除失败',
+          type: 'error',
+          plain: true,
+        })
+      });
+    }
+    // end of deleteArticleAjaxFn
+
     onMounted(() => {
       getArticleDraftListAjaxFn();
     });
@@ -366,6 +397,7 @@ export default {
       getArticleDraftListAjaxFn,
       clearRecyclebinFn,
       continueUsingFn,
+      deleteArticleAjaxFn,
     };
   },
 };

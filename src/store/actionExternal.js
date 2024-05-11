@@ -8,7 +8,7 @@ export function externalAuditArticleFindByIdFn(ctx,idP){
   ctx
   return httpAxiosO({
     mothed:'get',
-    url:'/api/web/externalAuditArticle/findById.do',
+    url:'/web/externalAuditArticle/findById.do',
     params:{
       id:idP
     }

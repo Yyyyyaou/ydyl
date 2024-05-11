@@ -10,7 +10,7 @@ import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 export async function getLanguageListFn(){
   return await httpAxiosO({
     method: 'get',
-    url: '/api/web/language/list.do',
+    url: '/web/language/list.do',
   })
 }
 
@@ -33,7 +33,7 @@ export async function postUserLoginFn(ctx,params){
 
   return await httpAxiosO({
     method: 'post',
-    url: '/api/web/user/tg/login.do',
+    url: '/web/user/tg/login.do',
     headers:{
       'methodName': 'postUserLoginFn',
     },
@@ -49,7 +49,7 @@ export async function postUserLoginFn(ctx,params){
 export async function getUserLogoutFn(){
   return await httpAxiosO({
     method: 'post',
-    url: '/api/web/user/logout.do',
+    url: '/web/user/logout.do',
   })
 }
 // end of getUserLogoutFn
@@ -90,17 +90,17 @@ export async function getNeedAuditCountFn(ctx){
 
   let displayNode = null;
   switch(CURRENT_ROLE){
-    case '外部用户_国家信息中心':
+    case '国家信息中心用户':
       displayNode = '1';
     break;
-    case '外部用户_国家发改委':
+    case '国家发改委用户':
       displayNode = '2';
     break;
   }
 
   return await httpAxiosO({
     method: 'get',
-    url: '/api/web/articleRecord/getNeedAuditCount.do',
+    url: '/web/articleRecord/getNeedAuditCount.do',
     params:{
       displayNode,//1为国家信息中心 2为国家发改委
     }

@@ -243,7 +243,7 @@ export default {
 
       httpAxiosO({
         method:'get',
-        url:'/api/web/articleRecord/getArticleRecordList.do',
+        url:'/web/articleRecord/getArticleRecordList.do',
         params:paramsO
       })
       .then((D)=>{
