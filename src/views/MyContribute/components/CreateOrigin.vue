@@ -75,7 +75,7 @@ before-remove 在附件列表删除文件钩子
              -->
             <el-upload
               class="auditingUploadC"
-              action="/api/web/article/upload"
+              action="/web/article/upload"
               v-model:file-list="auditingUploadFilesArray"
               multiple
               show-file-list
@@ -107,7 +107,7 @@ before-remove 在附件列表删除文件钩子
             <el-button type="primary" class="createorigin-content-upload-auditing1">上传</el-button>
             <el-upload
             class="auditingUploadC"
-              action="/api/web/article/upload"
+              action="/web/article/upload"
               v-model:file-list="auditingUploadFilesArray1"
               multiple
               show-file-list
@@ -239,6 +239,7 @@ export default {
       })
     });
 
+
     //审核单附件列表
     const auditingUploadFilesArray = ref([]);//fileText=0
     //普通附件列表
@@ -308,7 +309,7 @@ export default {
       const {fileName} = uploadFile.response.data[0];
 
       return httpAxiosO({
-        url: '/api/web/article/delFileObj',
+        url: '/web/article/delFileObj',
         method: 'delete',
         params: {
           fileName
@@ -325,7 +326,7 @@ export default {
      */
     function handleAuditingGetobjFn(fileNameP){
       httpAxiosO({
-        url: '/api/web/article/getobj',
+        url: '/web/article/getobj',
         method: 'get',
         params: {
           fileName:fileNameP,
@@ -340,7 +341,7 @@ export default {
      */
     // function articleFilesUploadFn(){
     //   httpAxiosO({
-    //     url: '/api/web/article/upload',
+    //     url: '/web/article/upload',
     //     method: 'post',
     //     data: postAddEditAjaxFormData,
     //   }).then((D)=>{
@@ -619,7 +620,7 @@ export default {
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       httpAxiosO({
-        url:'/api/web/article/addEdit.do',
+        url:'/web/article/addEdit.do',
         method:'post',
         data:datasOFormData,
       })

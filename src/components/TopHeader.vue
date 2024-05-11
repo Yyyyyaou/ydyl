@@ -28,7 +28,7 @@
       <div class="flexcenter">
         <!-- <el-avatar shape="square" src="../assets/avatar.png" key="0"/> -->
         <img src="../assets/avatar.png" alt="" srcset="" />
-        <span>{{ loginUser.bankName }}</span>
+        <span>{{ loginUser.userName }}</span>
         <a href="javascript:;" @click="logoutFn">退出</a>
         <i class="iconfont icon-goit" />
       </div>

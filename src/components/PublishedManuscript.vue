@@ -245,7 +245,7 @@ export default {
 
       httpAxiosO({
         method: "get",
-        url: "/api/web/article/brokeList.do",
+        url: "/web/article/brokeList.do",
         params: {
           language: 0, //0 可能代表 所有语种，文档里有提示 写 0
         },

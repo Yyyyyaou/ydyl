@@ -944,7 +944,7 @@ export default {
 
       httpAxiosO({
         method:'get',
-        url:'/api/web/externalAuditArticle/list.do',
+        url:'/web/externalAuditArticle/list.do',
         params:paramsO,
       })
       .then((D)=>{
@@ -1031,7 +1031,7 @@ export default {
 
       httpAxiosO({
         method:'get',
-        url:'/api/web/externalAuditArticle/list.do',
+        url:'/web/externalAuditArticle/list.do',
         params:paramsO,
       })
       .then((D)=>{
@@ -1112,7 +1112,7 @@ export default {
       }
       httpAxiosO({
         method:'get',
-        url:'/api/web/externalAuditArticleRecord/list.do',
+        url:'/web/externalAuditArticleRecord/list.do',
         params:paramsO,
       })
       .then((D)=>{

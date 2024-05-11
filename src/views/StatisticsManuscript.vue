@@ -6,7 +6,7 @@
           v-model="companySelectValue"
           placeholder="投稿单位"
           style="width: 140px"
-          v-if="userAuthority == '外部用户_国家发改委'"
+          v-if="userAuthority == '国家发改委用户'"
         >
           <el-option
             v-for="item in companyOptions"
@@ -40,10 +40,10 @@
         </el-config-provider>
       </div>
 
-      <!-- 外部用户_国家发改委 -->
+      <!-- 国家发改委用户 -->
       <div
         class="flexcenter mid-content-statistics-left-content-div"
-        v-if="userAuthority == '外部用户_国家发改委'"
+        v-if="userAuthority == '国家发改委用户'"
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
           <img src="../assets/contributenum.png" alt="" />
@@ -56,7 +56,7 @@
       <div
         class="flexcenter mid-content-statistics-left-content-divmid"
         style="margin-left: 10px"
-        v-if="userAuthority == '外部用户_国家发改委'"
+        v-if="userAuthority == '国家发改委用户'"
       >
         <div class="divmid-bg flexcenter">
           <div class="flexcenter mid-content-statistics-left-content-div">
@@ -93,7 +93,7 @@
       <div
         class="flexcenter mid-content-statistics-left-content-div"
         style="margin-left: 10px"
-        v-if="userAuthority == '外部用户_国家发改委'"
+        v-if="userAuthority == '国家发改委用户'"
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
           <img src="../assets/fgwnum3.png" alt="" />
@@ -105,11 +105,11 @@
         <el-icon><InfoFilled /></el-icon>
       </div>
 
-      <!-- 外部用户_国家信息中心 -->
+      <!-- 国家信息中心用户 -->
       <div
         class="flexcenter mid-content-statistics-left-content-div1"
         v-if="
-          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '国家信息中心用户' ||
           userAuthority == '外部用户'
         "
       >
@@ -125,7 +125,7 @@
         class="flexcenter mid-content-statistics-left-content-divmid1"
         style="margin-left: 10px"
         v-if="
-          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '国家信息中心用户' ||
           userAuthority == '外部用户'
         "
       >
@@ -165,7 +165,7 @@
         class="flexcenter mid-content-statistics-left-content-div1"
         style="margin-left: 10px"
         v-if="
-          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '国家信息中心用户' ||
           userAuthority == '外部用户'
         "
       >
@@ -181,7 +181,7 @@
         class="flexcenter mid-content-statistics-left-content-div1"
         style="margin-left: 10px"
         v-if="
-          userAuthority == '外部用户_国家信息中心' ||
+          userAuthority == '国家信息中心用户' ||
           userAuthority == '外部用户'
         "
       >
@@ -271,7 +271,7 @@ export default {
 
       httpAxiosO({
         method: "get",
-        url: "/api/web/article/articleCount",
+        url: "/web/article/articleCount",
         params: {
           searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
         },

@@ -84,7 +84,7 @@ import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 
 
-import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";httpAxiosO
 
 
 export default {
@@ -101,6 +101,8 @@ export default {
     }
   },
   setup(props,ctx) {
+
+    const URL_IS_API = process.env.NODE_ENV === 'development'?'/api':'';
 
     const { propsArticleO } = toRefs(props);
 
@@ -297,35 +299,50 @@ export default {
     async function handleAuditingGetobjFn(fileNameP,downloadP){
 
       if(downloadP){//下载
-        window.open('/api/web/article/getobj?fileName='+fileNameP+'&download=true');
+        const isPicture = /.png$|.jpg$|.jpeg$|.gif$|.bmp$/.test(fileNameP);
+        if(//如果是图片的话
+          isPicture
+        ){
+          const a = document.createElement('a');
+          const id ='aDownloadID'+new Date().getTime();
+          a.href = `${URL_IS_API}/web/article/getobj?fileName=${fileNameP}`;
+          a.download = fileNameP;
+          a.target = '_blank';
+          a.setAttribute('id',id);
+          document.querySelector('body').appendChild(a);
+          a.click();
+          document.querySelector('#'+id).remove();
+          return;
+        }
+        window.open(URL_IS_API+'/web/article/getobj?fileName='+fileNameP+'&download=true');
         return;
       }
 
 
-      let fileUrl = '';
-      await httpAxiosO({
-        url: '/api/web/article/getobj',
-        method: 'get',
-        responseType:'blob',//响应类型
-        params: {
-          fileName:fileNameP,
-        }
-      })
-      .then((D)=>{
-        const {data} = D;
+      let fileUrl = URL_IS_API+'/web/article/getobj?fileName='+fileNameP;
+      // await httpAxiosO({
+      //   url: '/web/article/getobj',
+      //   method: 'get',
+      //   responseType:'blob',//响应类型
+      //   params: {
+      //     fileName:fileNameP,
+      //   }
+      // })
+      // .then((D)=>{
+      //   const {data} = D;
 
-        return new Promise((resolve, reject) => {  
-          const fileReader = new FileReader();  
-          fileReader.onloadend = () => resolve(fileReader.result); // 读取完成，解析结果  
-          fileReader.onerror = reject;  
-          fileReader.readAsDataURL(data); // 将Blob对象转换为Data URL 
+      //   return new Promise((resolve, reject) => {  
+      //     const fileReader = new FileReader();  
+      //     fileReader.onloadend = () => resolve(fileReader.result); // 读取完成，解析结果  
+      //     fileReader.onerror = reject;  
+      //     fileReader.readAsDataURL(data); // 将Blob对象转换为Data URL 
         
-        });  
+      //   });  
 
-      })
-      .then((fileReader)=>{
-        fileUrl = fileReader;
-      });
+      // })
+      // .then((fileReader)=>{
+      //   fileUrl = fileReader;
+      // });
       return fileUrl;
     }
     // end of handleAuditingGetobjFn

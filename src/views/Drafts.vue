@@ -206,6 +206,8 @@ export default {
         return o.desc
       });
 
+      console.log('languageNameArr',languageNameArr);
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       const paramsO = {
         articleStatus:0,//0 代表草稿
@@ -235,7 +237,7 @@ export default {
 
       httpAxiosO({
         method: 'get',
-        url: '/api/web/article/draftList.do',
+        url: '/web/article/draftList.do',
         params:paramsO,
       })
       .then((D)=>{
@@ -284,7 +286,7 @@ export default {
     //草稿箱的删除，应该删除到回收站
     function deleteArticleAjaxFn(idP){
       httpAxiosO({
-        url:'/api/web/article/delete.do',
+        url:'/web/article/delete.do',
         method:'delete',
         params:{
           ids:idP

@@ -73,7 +73,7 @@
               <el-upload
                 class="auditingUploadC"
                 :id="'auditingUploadID_'+index"
-                action="/api/web/article/upload"
+                action="/web/article/upload"
                 multiple
                 show-file-list
                 disabled
@@ -253,7 +253,7 @@ export default {
       // const {fileName} = uploadFile.response.data[0];
 
       // return httpAxiosO({
-      //   url: '/api/web/article/delFileObj',
+      //   url: '/web/article/delFileObj',
       //   method: 'delete',
       //   params: {
       //     fileName
@@ -389,7 +389,7 @@ export default {
       console.log('dataList',dataList);
 
       httpAxiosO({
-        url:'/api/web/article/addEditReprint.do',
+        url:'/web/article/addEditReprint.do',
         method:'post',
         data:dataList.value
       })

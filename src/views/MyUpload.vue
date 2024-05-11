@@ -248,7 +248,7 @@ export default {
 
       httpAxiosO({
         method: "get",
-        url: "/api/web/excel/getExcelList",
+        url: "/web/excel/getExcelList",
         params: paramsO,
       })
         .then((D) => {
