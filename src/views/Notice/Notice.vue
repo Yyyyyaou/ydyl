@@ -73,7 +73,7 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="稿件标题">
+            <el-table-column prop="noticeTitle" label="稿件标题">
               <template #default="scope">
                 <span
                   style="
@@ -88,11 +88,11 @@
                   @click="rowTitleClick(scope)"
                 >
                   <!-- <a href="https://www.ceis.cn/" target="_blank"></a> -->
-                  {{ scope.row.title }}
+                  {{ scope.row.noticeTitle }}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="date" label="时间" width="140" />
+            <el-table-column prop="crtimeFormat" label="时间" width="140" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination
@@ -187,8 +187,8 @@ export default {
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       loadingInstance1.close();
       const paramsO = {
-        displayNode:0,// 0 我的投稿  1 国家信息信息中心  2 国家发改委
-        pageIndex:page.value,//页码
+        // displayNode:0,// 0 我的投稿  1 国家信息信息中心  2 国家发改委
+        currPage:page.value,//页码
         pageSize:limit.value,//每页显示条数
       }
 
@@ -200,38 +200,38 @@ export default {
         paramsO.content = searchInput.value;//检索关键词，模糊检索正文
           break;
       }
-console.log('paramsO',paramsO);
-return;
+
+
       httpAxiosO({
         method:'get',
         url:'/web/notice/noticeList.do',
         params:paramsO
       })
       .then((D)=>{
-        console.log('获取系统消息列表数据 D',D);
+        console.log('通知公告列表数据 D',D);
         const { data,success } = D.data;
         if(!success){
           ElMessage({
-            message: '获取系统消息列表数据失败',
+            message: '通知公告列表数据失败',
             type: 'error',
             plain: true,
           })
           return;
         }
         ElMessage({
-          message: '获取系统消息列表数据成功',
+          message: '通知公告列表数据成功',
           type: 'success',
           plain: true,
         })
         data.ldata.forEach((o)=>{
           let _o = o;
-          _o.crtimeFormat = timeFormatFn(o.cRtime)['YYYY-MM-DD hh:mm:ss']//时间格式化
+          _o.crtimeFormat = timeFormatFn(o.pubTime)['YYYY-MM-DD hh:mm:ss']//时间格式化
           tableData.push(_o);  
         });
         pageTotal.value = data.totalResults;
       })
       .catch((error)=>{
-        console.log('获取系统消息列表数据 error',error)
+        console.log('通知公告列表数据 error',error)
       })
       .finally(()=>{
         loadingInstance1.close();

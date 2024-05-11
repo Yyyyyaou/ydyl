@@ -1105,10 +1105,10 @@ export default {
      */
     function externalAuditArticleRecordListAjaxFn(scopeP){
       
-      const { externalAuditArticleId } = scopeP.row;externalAuditArticleId
+      const { externalAuditArticleId } = scopeP.row;
 
       const paramsO = {
-        externalAuditArticleId:1,//必传，id为1有假数据
+        externalAuditArticleId,//必传，id为1有假数据
       }
       httpAxiosO({
         method:'get',

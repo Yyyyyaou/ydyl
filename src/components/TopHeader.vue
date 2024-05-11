@@ -36,6 +36,7 @@
   </div>
 </template>
 <script>
+import router from '@/router';
 import { useStore } from "vuex";
 
 export default {
@@ -50,6 +51,7 @@ export default {
       .then((D)=>{
         console.log('D',D);
         store.commit('MStroeLoginOIsLogin',false);//改变登录状态为“登出”
+        router.push({ path: '/' })
       })
     }
 

@@ -88,6 +88,13 @@ export async function postExternalAuditArticleFn(ctx,params){ctx
 export async function getNeedAuditCountFn(ctx){
   const { CURRENT_ROLE } = ctx.state.StroeLoginO.loginUser;//获取当前登录用户角色
 
+  console.log('CURRENT_ROLE',CURRENT_ROLE);
+
+  console.log("CURRENT_ROLE === '外部用户'",CURRENT_ROLE === '外部用户');
+  if(CURRENT_ROLE === '外部用户'){//不执行
+    return;
+  }
+
   let displayNode = null;
   switch(CURRENT_ROLE){
     case '国家信息中心用户':

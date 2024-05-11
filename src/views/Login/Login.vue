@@ -1,5 +1,5 @@
 <template>
-  <section class="login_container_bg">
+  <section class="login_container_bg" id="login_container_bg_ID">
     <div class="login_container">
       <div class="login_container_1">
         <div class="chnldescA">
@@ -11,7 +11,7 @@
           <li>
             <el-input
               v-model="inputValueO.loginName"
-              placeholder="输入"
+              placeholder="请输入用户名"
               :prefix-icon="HomeFilled"
             />
           </li>
@@ -19,16 +19,18 @@
           <li>
             <el-input
               v-model="inputValueO.password"
-              placeholder="输入"
+              placeholder="请输入密码"
               :prefix-icon="Lock"
+              type="password"
             />
           </li>
 
           <li>
             <el-input
               v-model="inputValueO.phoneTel"
-              placeholder="输入"
+              placeholder="请输入手机号"
               :prefix-icon="Iphone"
+              
             />
           </li>  
 
@@ -36,7 +38,7 @@
             <el-input
               class="_width1 flBox"
               v-model="inputValueO.loginCaptcha"
-              placeholder="输入短信验证码"
+              placeholder="请输入短信验证码"
               :prefix-icon="Lock"
             />
             <div class="yzm_btn" @click="getSmsFn">获取验证码</div>
@@ -59,7 +61,7 @@
   </section>
 </template>
 
-<script id="login_script_ID"></script>
+
 <script>
 import "@/assets/PcBaseStyle.css";
 import "@/assets/login.less";
@@ -106,8 +108,17 @@ export default {
     const postUserLoginConstFn = async () => {
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
 
-      // eslint-disable-next-line
-      const userPassword = encryptedString(bodyRSA(setMaxDigits,RSAKeyPair),inputValueO.value.password);
+      
+      const userPassword = (()=>{
+        if(typeof bodyRSA === 'function'){
+          // eslint-disable-next-line
+          return encryptedString(bodyRSA(setMaxDigits,RSAKeyPair),inputValueO.value.password);
+        }else{
+          return inputValueO.value.password;
+        }
+      })()
+
+
 
       console.log('userPassword',userPassword);
 
@@ -135,6 +146,10 @@ export default {
           plain: true,
         })
         
+        if(document.querySelector('#login_container_bg_ID')){
+          document.querySelector('#login_container_bg_ID').classList.add('exit')
+        }
+
         const { loginUser,appToken,requestToken } = D.data;
         store.commit('MStroeLoginORequestToken',requestToken);//记录 requestToken
         store.commit('MStroeLoginOAppToken',appToken);//记录 appToken

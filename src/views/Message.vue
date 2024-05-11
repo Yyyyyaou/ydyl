@@ -227,7 +227,7 @@ export default {
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       const paramsO = {
         displayNode:0,// 0 我的投稿  1 国家信息信息中心  2 国家发改委
-        pageIndex:page.value,//页码
+        currPage:page.value,//页码
         pageSize:limit.value,//每页显示条数
       }
 

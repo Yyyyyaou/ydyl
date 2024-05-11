@@ -422,37 +422,37 @@ export default {
       }
     }
 
-    //首页公告接口
+    //通知公告接口
     function getSYNoticeListAjaxFn() {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
         method: "get",
-        url: "/web/notice/list.do",
+        url: "/web/notice/noticeList.do",
       })
         .then((D) => {
-          console.log("首页公告 D", D);
+          console.log("通知公告 D", D);
           const { data, success } = D.data;
           if (!success) {
             ElMessage({
-              message: "首页公告数据请求失败",
+              message: "通知公告数据请求失败",
               type: "error",
               plain: true,
             });
             return;
           }
           ElMessage({
-            message: "首页公告数据请求成功",
+            message: "通知公告数据请求成功",
             type: "success",
             plain: true,
           });
 
-          activities.push(...data);
+          activities.push(...data.ldata );
         })
         .catch((error) => {
-          console.log("首页公告 接口请求 error", error);
+          console.log("通知公告 接口请求 error", error);
           ElMessage({
-            message: "首页公告接口请求失败",
+            message: "通知公告接口请求失败",
             type: "error",
             plain: true,
           });

@@ -10,7 +10,7 @@ import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
  * authInfo：具体权限
  */
 export async function getUserRoleFn() {
-    let result = await httpAxiosO.post('web/user/getCurrUserAuthInfo.do');
+    let result = await httpAxiosO.post('/web/user/getCurrUserAuthInfo.do');
     console.log('getUserRoleFn result',result);
 
     if(

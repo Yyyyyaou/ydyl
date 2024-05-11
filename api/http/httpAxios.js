@@ -6,8 +6,8 @@ import { ElMessage } from "element-plus";
 // 创建 axios 实例  
 const httpAxiosO = axios.create({  
   // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url  
-  baseURL: process.env.NODE_ENV === 'development'? '/api' : process.env.VUE_APP_BASE_API, //开发环境就加 /api 前缀
-  timeout: 50000 // 请求超时时间  
+  baseURL: process.env.NODE_ENV === 'development'? '/api/tougaoadmin' : '/tougaoadmin', // 开发环境就加 /api 前缀
+  timeout: 50000 // 请求超时时间
 });
 
 

@@ -1108,7 +1108,7 @@ export default {
       const { externalAuditArticleId } = scopeP.row;externalAuditArticleId
 
       const paramsO = {
-        externalAuditArticleId:1,//必传，id为1有假数据
+        externalAuditArticleId,//必传，id为1有假数据
       }
       httpAxiosO({
         method:'get',
