@@ -22,7 +22,7 @@
         >
           <el-upload
             v-model:file-list="fileList"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            action="http://yapi.trsmedia.cn/mock/84/web/excel/upload"
           >
             <el-button type="primary">上传文件</el-button>
             <p v-if="fileList.length == 0">（未选择任何文件）</p>

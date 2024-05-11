@@ -36,6 +36,8 @@
             end-placeholder="结束日期"
             :locale="locale"
             style="margin-left: 10px; width: 270px"
+            @change="handleChange"
+            :disabled-date="disabledDate"
           />
         </el-config-provider>
       </div>
@@ -117,7 +119,7 @@
           <img src="../assets/contributenum.png" alt="" />
         </div>
         <div class="mid-content-statistics-left-content-num">
-          <p>{{num1}}</p>
+          <p>{{ num1 }}</p>
           <p>投稿总数</p>
         </div>
       </div>
@@ -135,7 +137,7 @@
               <img src="../assets/contributenum.png" alt="" />
             </div>
             <div class="mid-content-statistics-left-content-num">
-              <p>{{num2}}</p>
+              <p>{{ num2 }}</p>
               <p>发布总数</p>
             </div>
           </div>
@@ -145,7 +147,7 @@
               <img src="../assets/papernum.png" alt="" />
             </div>
             <div class="mid-content-statistics-left-content-num">
-              <p>{{num3}}</p>
+              <p>{{ num3 }}</p>
               <p>原创稿件</p>
             </div>
           </div>
@@ -155,7 +157,7 @@
               <img src="../assets/statisticsnum3.png" alt="" />
             </div>
             <div class="mid-content-statistics-left-content-num">
-              <p>{{num4}}</p>
+              <p>{{ num4 }}</p>
               <p>转载稿件</p>
             </div>
           </div>
@@ -173,7 +175,7 @@
           <img src="../assets/contributenum.png" alt="" />
         </div>
         <div class="mid-content-statistics-left-content-num">
-          <p>{{num5}}</p>
+          <p>{{ num5 }}</p>
           <p>待处理稿件</p>
         </div>
       </div>
@@ -189,7 +191,7 @@
           <img src="../assets/fgwnum3.png" alt="" />
         </div>
         <div class="mid-content-statistics-left-content-num">
-          <p>{{num6}}</p>
+          <p>{{ num6 }}</p>
           <p>采用率</p>
         </div>
         <el-icon><InfoFilled /></el-icon>
@@ -234,6 +236,7 @@ import PublishedManuscript from "@/components/PublishedManuscript.vue";
 import TrendEcharts from "@/components/TrendEcharts.vue";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import { ElMessage, ElLoading } from "element-plus";
+import { timeFormatFn } from "@/utils/timeFormat.js";
 export default {
   components: {
     PublishedManuscript, //审核稿件
@@ -250,22 +253,27 @@ export default {
     // console.log("HomePage userAuthority", userAuthority);
     const companySelectValue = ref("");
     const companyOptions = reactive([{ label: "中经社", value: 0 }]);
-    const timeSelectValue = ref("");
+    const timeSelectValue = ref(0);
     const timeOptions = reactive([
-      { label: "近7天", value: 0 },
-      { label: "近30天", value: 1 },
+      { label: "近1天", value: 0 },
+      { label: "近7天", value: 1 },
+      { label: "近30天", value: 2 },
     ]);
     //日期选择 数据
     const dateDefaultTime = ref([]);
+    const disabledDate = (time) => {
+      return time.getTime() > Date.now();
+    };
+
     /**
      * 外部用户 稿件统计 接口请求
      */
-    const num1 = ref(0);//投稿总数
-    const num2 = ref(0);//发布总数
-    const num3 = ref(0);//原创稿件
-    const num4 = ref(0);//转载稿件
-    const num5 = ref(0);//待处理稿件
-    const num6 = ref(0);//采用率
+    const num1 = ref(0); //投稿总数
+    const num2 = ref(0); //发布总数
+    const num3 = ref(0); //原创稿件
+    const num4 = ref(0); //转载稿件
+    const num5 = ref(0); //待处理稿件
+    const num6 = ref(0); //采用率
     function getArticleCountAjaxFn() {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
@@ -274,6 +282,8 @@ export default {
         url: "/api/web/article/articleCount",
         params: {
           searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
+          endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
         },
       })
         .then((D) => {
@@ -307,7 +317,14 @@ export default {
         });
     }
     // end of getArticleCountAjaxFn
+    function handleChange() {
+      if(dateDefaultTime.value == null){
+        return
+      }
+      getArticleCountAjaxFn();
+    }
     onMounted(() => {
+      dateDefaultTime.value = [new Date(), new Date()]; //日期范围选择初始化
       getArticleCountAjaxFn(); //外部用户 稿件统计
     });
     return {
@@ -317,6 +334,7 @@ export default {
       timeSelectValue,
       timeOptions,
       dateDefaultTime,
+      disabledDate,
       locale: zhCn, //date-range 语言设置
       num1,
       num2,
@@ -324,6 +342,7 @@ export default {
       num4,
       num5,
       num6,
+      handleChange,
     };
   },
 };
