@@ -1,6 +1,9 @@
 import store from '@/store';
 import axios from 'axios';
+import router from '@/router'
 import { ElMessage } from "element-plus";
+
+
 
 
 // 创建 axios 实例  
@@ -46,8 +49,15 @@ httpAxiosO.interceptors.response.use(
         type: 'warning',
         plain: true,
       })
-      store.commit('MStroeLoginOIsLogin',false);
-      // location.reload();
+      store.commit('MStroeLoginOIsLogin',false);//显示登录页
+      router.replace({path:'/'});//初始化路由，简单规避切换不同角色登录产生的问题
+      
+      if(//显示登录页
+        document.querySelector('#login_container_bg_ID')
+      ){
+        document.querySelector('#login_container_bg_ID').classList.add('entrance')
+      }
+
       return;
     }
     return response;

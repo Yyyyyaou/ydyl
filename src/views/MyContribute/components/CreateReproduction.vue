@@ -145,14 +145,14 @@ export default {
         {
           required: true,
           message: "必填项",
-          trigger: "change",
+          trigger: "blur",
         },
       ],
       articleSource: [//稿件来源
         {
           required: true,
           message: "必填项",
-          trigger: "change",
+          trigger: "blur",
         },
       ],
       language: [//语种
@@ -165,8 +165,16 @@ export default {
       url: [//稿件原地址
         {
           required: true,
-          message: "必填项",
-          trigger: "change",
+          trigger: "blur",
+          validator:(rule, value, callback)=>{rule
+            if(!value){
+              return callback(new Error('请输入稿件原地址 例：https://www.trs.com.cn'))
+            }
+            const regExp = /^https?:\/\/[a-zA-Z0-9]+\.*/
+            if(!regExp.test(value)){
+              return callback(new Error('请输入稿件原地址 例：https://www.trs.com.cn'))
+            }
+          }
         },
       ],
       fileAccessory:[

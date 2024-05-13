@@ -1,4 +1,5 @@
 <template>
+  <section>
   <div class="createorigin-content">
     <el-form :model="formData" :rules="rules">
       <el-form-item label="稿件标题" prop="articleTitle">
@@ -143,21 +144,21 @@ before-remove 在附件列表删除文件钩子
   </div>
 
   <el-dialog v-model="dialogNoticeDetailVisible" width="80vw" height="80vh">
-    <NoticeDetail ref="NoticeDetailRef" :propsArticleO="formData"  />
+    <PubDetail ref="NoticeDetailRef" :propsArticleO="formData"  />
     <div class="createorigin-btngroup flexcenter">
       <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
     </div>
   </el-dialog>
-
+  </section>
 </template>
 
 <script>
 // import Quill from 'quill';
 // import "quill/dist/quill.core.css";
 import Editor from '@tinymce/tinymce-vue';
-import NoticeDetail from '@/views/Notice/views/NoticeDetail.vue';
+import PubDetail from '@/views/Notice/views/PubDetail.vue';
 
-import { onMounted, reactive,ref,nextTick } from "vue";
+import { onMounted, reactive,ref,nextTick, toRefs } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
@@ -169,16 +170,19 @@ import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   components:{
     Editor,
-    NoticeDetail,
+    PubDetail,
   },
-  setup() {
+  props:{
+    forPropsGetFindByIdAjaxFnReturnO:Object,
+  },
+  setup(props,ctx) {ctx;
     //路由实例
     const router = useRouter();
-    const { id } = router.currentRoute.value.query;//稿件ID，用来请求稿件详情接口
     
     //vuex实例
     const store = useStore();
 
+    const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
 
     const formData = reactive({});//表单数据
     const rules = reactive({
@@ -186,14 +190,14 @@ export default {
         {
           required: true,
           message: "必填项",
-          trigger: "change",
+          trigger: "blur",
         },
       ],
       articleSource: [//文章来源
         {
           required: true,
           message: "必填项",
-          trigger: "change",
+          trigger: "blur",
         },
       ],
       language: [//语种
@@ -207,7 +211,7 @@ export default {
         {
           required: true,
           message: "必填项",
-          trigger: "change",
+          trigger: "blur",
         },
       ],
       auditing: [//司局级审核单
@@ -222,7 +226,6 @@ export default {
         {
           required: false,
           message: "非必填项",
-          trigger: "change",
         },
       ]
     });
@@ -434,62 +437,6 @@ export default {
     // end of editorVideoTemplateCallbackFn
 
 
-    /**
-     * 获取稿件详情
-     */
-     function getFindByIdAjaxFn(){
-      
-      //没有id就退出
-      if(!id){
-        return;
-      }
-
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      store.dispatch('getFindByIdFn',id)
-      .then((D)=>{
-        console.log('我的投稿-查看 D',D);
-        const { data,success } = D.data;
-        if(!success){
-          ElMessage({
-            message: '我的投稿-查看数据请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '我的投稿-查看数据请求成功',
-          type: 'success',
-          plain: true,
-        })
-
-        formData.articleTitle = data.articleTitle;//稿件标题
-        formData.articleSource = data.articleSource||'';//稿件来源
-        
-        formData.articleHtmlCon = data.articleHtmlCon||'';//稿件HTML内容
-        editorHTMLContent.value = data.articleHtmlCon||'';//稿件HTML内容
-
-        formData.articleContent = data.articleContent||'';//稿件文本内容
-        editorTEXTContent.value = data.articleContent||'';//稿件文本内容
-        
-        formData.language = data.language||'';//语种
-        formData.remark = data.remark||'';//备注
-
-      })
-      .catch((error)=>{
-        console.log('我的投稿-查看 接口请求 error',error);
-        ElMessage({
-          message: '我的投稿-查看接口请求失败',
-          type: 'error',
-          plain: true,
-        })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
-    }
-    //end of getFindByIdAjaxFn
 
     /**
      * 校验 原创稿件 用户所填表单 各个字段 合法性
@@ -727,12 +674,27 @@ export default {
     }
     // end of previewAddEditFn
 
-    
+    //获取来自父组件的 稿件详情的数据
+    function getPropsFn(){
+
+
+      formData.articleTitle = forPropsGetFindByIdAjaxFnReturnO.value.articleTitle;//稿件标题
+      formData.articleSource = forPropsGetFindByIdAjaxFnReturnO.value.articleSource||'';//稿件来源
+      
+      formData.articleHtmlCon = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
+      editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
+
+      formData.articleContent = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
+      editorTEXTContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
+      
+      formData.language = forPropsGetFindByIdAjaxFnReturnO.value.language||'';//语种
+      formData.remark = forPropsGetFindByIdAjaxFnReturnO.value.remark||'';//备注
+    }
 
 
     onMounted(()=>{
-      getFindByIdAjaxFn();//根据稿件id获取稿件内容，用于回显稿件内容
-
+      //to do
+      getPropsFn();
     })
 
     return {

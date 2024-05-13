@@ -298,7 +298,7 @@ export default {
     const router = useRouter();
     function rowTitleClick(scope) {
       const c = router.resolve({
-        path: "/Notice/NoticeDetail",
+        path: "/PubDetail",
         query: {
           title: scope.row.title,
           time: scope.row.date,

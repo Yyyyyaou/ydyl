@@ -168,13 +168,26 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, computed } from "vue";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage,ElLoading } from "element-plus";
+import { useStore } from 'vuex';
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   setup() {
+    const store = useStore();
+
+    // 获取用户角色
+    const CURRENT_ROLE_Computed = computed(()=>{
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
+    });
+    // 获取用户角色value
+    const CURRENT_ROLE_VALUE_Computed = computed(()=>{
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE_VALUE;
+    });
+  
+
     //关键词
     const searchInput = ref("");
     const searchSelectValue = ref(0);
@@ -225,8 +238,10 @@ export default {
     function getArticleRecordListAjaxFn(){
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const displayNode = CURRENT_ROLE_VALUE_Computed.value;
+
       const paramsO = {
-        displayNode:0,// 0 我的投稿  1 国家信息信息中心  2 国家发改委
+        displayNode,// 0 我的投稿  1 国家信息信息中心  2 国家发改委
         currPage:page.value,//页码
         pageSize:limit.value,//每页显示条数
       }
@@ -299,6 +314,9 @@ export default {
       isClickedArr,
       rowTitleClick,
       popoverShowFlag,
+
+      CURRENT_ROLE_Computed,
+      CURRENT_ROLE_VALUE_Computed,
 
       getArticleRecordListAjaxFn,
     };

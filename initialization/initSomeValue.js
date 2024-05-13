@@ -12,12 +12,11 @@ import httpAxiosO from 'ROOT_URL/api/http/httpAxios';
 export async function getUserRoleFn() {
     let result = await httpAxiosO.post('/web/user/getCurrUserAuthInfo.do');
     console.log('getUserRoleFn result',result);
-
+    const { message } = result.data;
+    const role = JSON.parse(message);
     if(
       result.data.success
     ){
-      const { message } = result.data;
-      const role = JSON.parse(message);
 
       var roleName = '';
       switch(role.role){
@@ -31,11 +30,17 @@ export async function getUserRoleFn() {
           roleName = '国家发改委用户'
           break;
       }
+
     }
-    return roleName
+
+    const returnO = {
+      roleName,
+      roleNum:role.role,
+    }
+
+    return returnO;
     //外部用户  国家信息中心用户  国家发改委用户
 }
-
 
 
 /**
@@ -57,8 +62,10 @@ export function getUserInfoFn(){
 
     const userRole = await getUserRoleFn();
 
+
     //加入 当前角色
-    loginUser.CURRENT_ROLE = userRole;//外部用户  国家信息中心用户  国家发改委用户
+    loginUser.CURRENT_ROLE = userRole.roleName;//外部用户  国家信息中心用户  国家发改委用户
+    loginUser.CURRENT_ROLE_VALUE = userRole.roleNum;//外部用户 0  国家信息中心用户 1  国家发改委用户 2
 
     if(success){
       store.commit('MStroeLoginOLoginUser',JSON.stringify(loginUser));//记录语种列表
@@ -69,6 +76,7 @@ export function getUserInfoFn(){
   })
   .catch((error)=>{
     console.log('web/user/getLoginUser.do error',error);
+
   })
   ;
 }

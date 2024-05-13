@@ -175,7 +175,7 @@ export default {
         isClickedArr.value.push(scope.$index);
       }
       const c = router.resolve({
-        path: "/Notice/NoticeDetail",
+        path: "/NoticeDetail",
         query: {
           id: scope.row.id,
         },

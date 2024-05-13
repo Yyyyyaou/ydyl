@@ -58,11 +58,25 @@ export async function getUpdateFn(ctx,paramsP){
 /**
  * 我的投稿-查看
  */
-export async function getFindByIdFn(ctx,idP){
+export async function getArticleFindByIdFn(ctx,idP){
   ctx
   return await httpAxiosO({
     method: 'get',
     url: '/web/article/findById.do',
+    params: {
+      id: idP
+    }
+  })
+}
+
+/**
+ * 通知公告-查看
+ */
+export async function getNoticeFindByIdFn(ctx,idP){
+  ctx
+  return await httpAxiosO({
+    method: 'get',
+    url: '/web/notice/findById.do',
     params: {
       id: idP
     }

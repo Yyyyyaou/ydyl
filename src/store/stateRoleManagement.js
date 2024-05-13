@@ -18,7 +18,7 @@ export const ROLESETO = {
         '2_4':'修改后送审国家改革发展委员会',
       },
       //外审提交 接口地址
-      'auditInterfaceUrl':'api/web/externalAuditArticle/DevelopmentReformCommission/audit.do',
+      'auditInterfaceUrl':'/web/externalAuditArticle/DevelopmentReformCommission/audit.do',
 
   },
 
@@ -34,7 +34,7 @@ export const ROLESETO = {
         '1_6':'送审国家改革发展委员会',
     },
     //外审提交 接口地址
-    'auditInterfaceUrl':'api/web/externalAuditArticle/NationalInformationCenter/audit.do',
+    'auditInterfaceUrl':'/web/externalAuditArticle/NationalInformationCenter/audit.do',
   },
 
 }

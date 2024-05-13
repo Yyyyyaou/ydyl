@@ -51,14 +51,30 @@ const routes = [
     name: 'Notice',
     component: RouterReplaceComp(()=>import('../views/Notice/Notice.vue')),
     meta: { title: '通知公告' },
-    children: [{
-      path: 'NoticeDetail',
-      name: 'NoticeDetail',
-      component: function () {
-        return import('../views/Notice/views/NoticeDetail.vue')
-      },
-      meta: { title: '通知公告详情' },
-    }],
+    // children: [{
+    //   path: 'NoticeDetail',
+    //   name: 'NoticeDetail',
+    //   component: function () {
+    //     return import('../views/Notice/views/PubDetail.vue')
+    //   },
+    //   meta: { title: '通知公告详情' },
+    // }],
+  },
+  {
+    path: '/PubDetail',
+    name: 'PubDetail',
+    component: function () {
+      return import('../views/Notice/views/PubDetail.vue')
+    },
+    meta: { title: '通用详情' }
+  },
+  {
+    path: '/NoticeDetail',
+    name: 'NoticeDetail',
+    component: function () {
+      return import('../views/Notice/views/NoticeDetail.vue')
+    },
+    meta: { title: '通知公告详情' }
   },
   {
     path: '/ManuscriptAuditing',

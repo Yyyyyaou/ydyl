@@ -1,5 +1,8 @@
 <template>
-  <section class="login_container_bg" id="login_container_bg_ID">
+  <!-- 获取到用户角色 CURRENT_ROLE_Computed 后 再显示 entrance -->
+  <section class="login_container_bg" id="login_container_bg_ID"
+    :class="CURRENT_ROLE_Computed?'entrance':''"
+  >
     <div class="login_container">
       <div class="login_container_1">
         <div class="chnldescA">
@@ -65,7 +68,7 @@
 <script>
 import "@/assets/PcBaseStyle.css";
 import "@/assets/login.less";
-import { onMounted, ref } from "vue";
+import { onMounted, ref,computed, } from "vue";
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import { HomeFilled,Lock,Iphone } from "@element-plus/icons-vue";
@@ -99,6 +102,12 @@ export default {
       phoneTel:'',
       loginCaptcha:''
     });
+
+    // 获取用户角色
+    const CURRENT_ROLE_Computed = computed(()=>{
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
+    });
+
 
 // 普通投稿用户 / Trsadmin@123
 // 国家发改委 / Trsadmin@123
@@ -201,9 +210,8 @@ export default {
     };
 
     /**
-     * 获取加密方法
-     */
-
+     * 获取加密方法 bodyRSA()
+    */
     async function encryptionMethods() {
 
       await httpAxiosO({
@@ -241,6 +249,8 @@ export default {
       getSmsFn,
 
       HomeFilled,Lock,Iphone,
+
+      CURRENT_ROLE_Computed,
 
     };
   },

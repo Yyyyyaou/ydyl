@@ -7,7 +7,7 @@
             <div class="mid-content-statistics-left-header flexcenter">
               <div class="flexcenter">
                 <div class="mid-content-statistics-left-header-i">
-                  <img src="../assets/statistics.png" alt="" />
+                  <img src="@/assets/statistics.png" alt="" />
                 </div>
                 <!-- <i
                   class="iconfont icon-gupiao mid-content-statistics-left-header-i"
@@ -563,6 +563,7 @@ export default {
     onMounted(() => {
       getArticleCountAjaxFn(); //外部用户 稿件统计
       getNicCountAjaxFn();//国家信息中心用户 稿件统计
+      
       getSYNoticeListAjaxFn(); //首页通知公告
     });
 

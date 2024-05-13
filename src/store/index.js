@@ -18,7 +18,8 @@ import {
   deletePhysicsDeleteFn,
   deleteDelAllFn,
   getUpdateFn,
-  getFindByIdFn,
+  getArticleFindByIdFn,
+  getNoticeFindByIdFn,
 } from './actionSubmission.js';
 
 import {
@@ -107,7 +108,8 @@ export default createStore({
     deletePhysicsDeleteFn,
     deleteDelAllFn,
     getUpdateFn,
-    getFindByIdFn,
+    getArticleFindByIdFn,
+    getNoticeFindByIdFn,
 
     externalAuditArticleFindByIdFn,
 

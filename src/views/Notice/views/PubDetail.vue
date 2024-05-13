@@ -2,24 +2,24 @@
   <div class="mid-content" data-desc="稿件详情">
     <div class="noticedetail-content">
       <div class="noticedetail-content-title flexcenter">
-        {{ noticeTitle }}
+        {{ articleTitle }}
       </div>
       <div class="noticedetail-content-info flexcenter">
-        <!-- <span v-if="postUser">作者：{{ postUser }}</span>
+        <span v-if="postUser">作者：{{ postUser }}</span>
         <span v-if="articleSource" class="sx"></span>
         <span v-if="articleSource">稿件来源：{{ articleSource }}</span>
-        <span v-if="pubTime" class="sx"></span> -->
-        <span v-if="pubTime">发布时间：{{ pubTime }}</span>
+        <span v-if="postTime" class="sx"></span>
+        <span v-if="postTime">发布时间：{{ postTime }}</span>
       </div>
       <div class="mid-divider"></div>
       <div class="noticedetail-content-word flexcenter">
-        <div class="htmlContentC" v-html="noticeContent"></div>
+        <div class="htmlContentC" v-html="articleHtmlCon"></div>
       </div>
       <!-- 没数据时不显示 -->
       <div>
         <!-- v-if -->
-        <!-- <div class="mid-dividerdashed"></div> -->
-        <!-- <div class="noticedetail-bottom-content">
+        <div class="mid-dividerdashed"></div>
+        <div class="noticedetail-bottom-content">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td width="110" v-show="fileUnit.length">司局审批单：</td>
@@ -65,7 +65,7 @@
             </tr>
           </table>
           
-        </div> -->
+        </div>
         <!-- end of noticedetail-bottom-content -->
 
 
@@ -111,11 +111,11 @@ export default {
 
     const store = useStore();
 
-    const noticeTitle = ref(""); //稿件标题
+    const articleTitle = ref(""); //稿件标题
     const articleSource = ref(""); //稿件来源
-    const noticeContent = ref(""); //稿件HTML正文
+    const articleHtmlCon = ref(""); //稿件HTML正文
     const postUser = ref(""); //投稿人
-    const pubTime = ref(""); //发布时间
+    const postTime = ref(""); //发布时间
     const remark = ref("");//备注
     const fileUnit = reactive([]);//审核单附件
     const fileAccessory = reactive([]);//普通附件
@@ -126,15 +126,15 @@ export default {
     function readPropsArticleOFn(){
       console.log('propsArticleO',propsArticleO);
 
-      noticeTitle.value = propsArticleO.value.noticeTitle||'';
+      articleTitle.value = propsArticleO.value.articleTitle||'';
       articleSource.value = propsArticleO.value.articleSource||'';
-      noticeContent.value = propsArticleO.value.noticeContent||'';
+      articleHtmlCon.value = propsArticleO.value.articleHtmlCon||'';
       
       //这个字段为投稿人，但‘web/user/getLoginUser.do’接口暂时没返回 postUser，所以暂用 userName 顶替
       postUser.value = store.state.StroeLoginO.loginUser.postUser||store.state.StroeLoginO.loginUser.userName;
       
       
-      pubTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD'];
+      postTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD'];
       remark.value = propsArticleO.value.remark||'';
 
 
@@ -205,29 +205,29 @@ export default {
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       store
-        .dispatch("getNoticeFindByIdFn", id)
+        .dispatch("getArticleFindByIdFn", id)
         .then((D) => {
-          console.log("通知公告-查看 D", D);
+          console.log("我的投稿-查看 D", D);
           const { data, success } = D.data;
           if (!success) {
             ElMessage({
-              message: "通知公告-查看数据请求失败",
+              message: "我的投稿-查看数据请求失败",
               type: "error",
               plain: true,
             });
             return;
           }
           ElMessage({
-            message: "通知公告-查看数据请求成功",
+            message: "我的投稿-查看数据请求成功",
             type: "success",
             plain: true,
           });
 
-          noticeTitle.value = data.noticeTitle;
+          articleTitle.value = data.articleTitle;
           articleSource.value = data.articleSource;
-          noticeContent.value = data.noticeContent;
+          articleHtmlCon.value = data.articleHtmlCon;
           postUser.value = data.postUser;
-          pubTime.value = data.pubTime;
+          postTime.value = data.postTime;
           remark.value = data.remark;
 
           //为 fileUnit 赋值
@@ -279,9 +279,9 @@ export default {
 
         })
         .catch((error) => {
-          console.log("通知公告-查看 接口请求 error", error);
+          console.log("我的投稿-查看 接口请求 error", error);
           ElMessage({
-            message: "通知公告-查看接口请求失败",
+            message: "我的投稿-查看接口请求失败",
             type: "error",
             plain: true,
           });
@@ -357,11 +357,11 @@ export default {
     });
 
     return {
-      noticeTitle,
+      articleTitle,
       articleSource,
-      noticeContent,
+      articleHtmlCon,
       postUser,
-      pubTime,
+      postTime,
       remark,
       fileUnit,
       fileAccessory,

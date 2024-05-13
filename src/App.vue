@@ -63,7 +63,10 @@ export default {
       () => router.currentRoute.value,
       (newValue) => {
         //console.log("newValue", newValue);
-        if (newValue.fullPath.indexOf("/Notice/NoticeDetail") != -1) {
+        if (
+          newValue.fullPath.indexOf("/NoticeDetail") != -1
+          || newValue.fullPath.indexOf("/PubDetail") != -1
+        ) {
           showNoticeDetail.value = true;
         }
       },

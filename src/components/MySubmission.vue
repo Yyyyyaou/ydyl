@@ -375,7 +375,7 @@ export default {
      */
     function getFindByIdAjaxFn(scopeP){
       const c = router.resolve({
-        path: "/Notice/NoticeDetail",
+        path: "/PubDetail",
         query: {
           id: scopeP.row.id,
         },
