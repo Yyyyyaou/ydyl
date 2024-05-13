@@ -20,6 +20,7 @@
           placeholder="时间范围"
           style="width: 140px"
           class="marl10"
+          @change="timeSelectChange"
         >
           <el-option
             v-for="item in timeOptions"
@@ -111,8 +112,7 @@
       <div
         class="flexcenter mid-content-statistics-left-content-div1"
         v-if="
-          userAuthority == '国家信息中心用户' ||
-          userAuthority == '外部用户'
+          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
         "
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
@@ -127,8 +127,7 @@
         class="flexcenter mid-content-statistics-left-content-divmid1"
         style="margin-left: 10px"
         v-if="
-          userAuthority == '国家信息中心用户' ||
-          userAuthority == '外部用户'
+          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
         "
       >
         <div class="divmid-bg flexcenter">
@@ -167,8 +166,7 @@
         class="flexcenter mid-content-statistics-left-content-div1"
         style="margin-left: 10px"
         v-if="
-          userAuthority == '国家信息中心用户' ||
-          userAuthority == '外部用户'
+          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
         "
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
@@ -183,8 +181,7 @@
         class="flexcenter mid-content-statistics-left-content-div1"
         style="margin-left: 10px"
         v-if="
-          userAuthority == '国家信息中心用户' ||
-          userAuthority == '外部用户'
+          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
         "
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
@@ -210,7 +207,7 @@
         class="mid-divider mid-divider-display"
         style="margin-bottom: 20px"
       ></div>
-      <TrendEcharts />
+      <TrendEcharts ref="trendEcharts" />
     </div>
     <div class="mid-content-mycontribute" style="margin-top: 20px">
       <div class="mid-content-mycontribute-header flexcenter">
@@ -243,6 +240,8 @@ export default {
     TrendEcharts, //投稿趋势图
   },
   setup() {
+    // 获取子组件的引用
+    const trendEcharts = ref();
     const store = useStore();
     //用户角色名字
     const userAuthority = computed(() => {
@@ -274,17 +273,27 @@ export default {
     const num4 = ref(0); //转载稿件
     const num5 = ref(0); //待处理稿件
     const num6 = ref(0); //采用率
-    function getArticleCountAjaxFn() {
-      const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
-      httpAxiosO({
-        method: "get",
-        url: "/web/article/articleCount",
-        params: {
+    function getArticleCountAjaxFn(fromTimeSelect = false) {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+      let param = {};
+      if (fromTimeSelect) {
+        param = {
+          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
+          endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
+        };
+      } else {
+        param = {
           searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
-        },
+        };
+      }
+      httpAxiosO({
+        method: "get",
+        url: "/web/article/articleCount",
+        params: param,
       })
         .then((D) => {
           console.log("稿件统计 D", D);
@@ -296,13 +305,21 @@ export default {
               plain: true,
             });
             return;
+          } else {
+            if (trendEcharts.value) {
+              trendEcharts.value.initEcharts(
+                data.dateList,
+                data.typeOriginalList,
+                data.typeReprintList
+              );
+            }
+            num1.value = data.articleCount;
+            num2.value = data.pubCount;
+            num3.value = data.normalArticle;
+            num4.value = data.reprArticle;
+            num5.value = data.waitArticle;
+            num6.value = data.useRate;
           }
-          num1.value = data.articleCount;
-          num2.value = data.pubCount;
-          num3.value = data.normalArticle;
-          num4.value = data.reprArticle;
-          num5.value = data.waitArticle;
-          num6.value = data.useRate;
         })
         .catch((error) => {
           console.log("稿件统计 接口请求 error", error);
@@ -317,11 +334,32 @@ export default {
         });
     }
     // end of getArticleCountAjaxFn
+    //日期选择器change
     function handleChange() {
-      if(dateDefaultTime.value == null){
-        return
+      if (dateDefaultTime.value == null) {
+        return;
       }
       getArticleCountAjaxFn();
+    }
+    //时间范围选择器change（1天 7天）
+    let startTime = new Date();
+    let endTime = new Date();
+    function timeSelectChange(val) {
+      console.log(val);
+      if (val == 0) {
+        startTime = new Date();
+      } else if (val == 1) {
+        startTime = timeForMat(6);
+      }else if (val == 2) {
+        startTime = timeForMat(29);
+      }
+
+      getArticleCountAjaxFn(true);
+    }
+    function timeForMat(count) {
+      return new Date().setTime(
+        endTime.getTime() - 24 * 60 * 60 * 1000 * count
+      );
     }
     onMounted(() => {
       dateDefaultTime.value = [new Date(), new Date()]; //日期范围选择初始化
@@ -343,6 +381,10 @@ export default {
       num5,
       num6,
       handleChange,
+      timeSelectChange,
+      startTime,
+      endTime,
+      trendEcharts,
     };
   },
 };

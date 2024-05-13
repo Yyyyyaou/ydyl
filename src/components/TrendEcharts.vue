@@ -11,8 +11,11 @@ export default {
     const { proxy } = getCurrentInstance(); // 获取全局配置项
     const myRef = ref(null); // 获取dom实例
 
+    let ylist = [];
+    let x1list = [];
+    let x2list = [];
     onMounted(() => {
-      renderChart(); // 生命周期挂载函数渲染图表
+      //renderChart(); // 生命周期挂载函数渲染图表
     });
 
     const option = {
@@ -46,37 +49,7 @@ export default {
       },
       xAxis: {
         type: "category",
-        data: [5.03,5.04,5.05,5.06,5.07,5.08,5.09],
-        // [
-        //   "Mon",
-        //   "Tue",
-        //   "Wed",
-        //   "Thu",
-        //   "Fri",
-        //   "Sat",
-        //   "Sun",
-        //   "Mon",
-        //   "Tue",
-        //   "Wed",
-        //   "Thu",
-        //   "Fri",
-        //   "Sat",
-        //   "Sun",
-        //   "Mon",
-        //   "Tue",
-        //   "Wed",
-        //   "Thu",
-        //   "Fri",
-        //   "Sat",
-        //   "Sun",
-        //   "Mon",
-        //   "Tue",
-        //   "Wed",
-        //   "Thu",
-        //   "Fri",
-        //   "Sat",
-        //   "Sun",
-        // ],
+        data: ylist,
       },
       series: [
         {
@@ -86,12 +59,7 @@ export default {
           emphasis: {
             focus: "series",
           },
-          data: [10,11,12,12,15,85,12,12],
-          // [
-          //   320, 302, 301, 334, 390, 330, 320, 320, 302, 301, 334, 390, 330,
-          //   320, 320, 302, 301, 334, 390, 330, 320, 320, 302, 301, 334, 390,
-          //   330, 320,
-          // ],
+          data: x1list,
           itemStyle: {
             color: new proxy.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
@@ -113,12 +81,7 @@ export default {
           emphasis: {
             focus: "series",
           },
-          data: [10,11,12,12,15,85,12,12],
-          //  [
-          //   120, 132, 101, 134, 90, 230, 210, 320, 302, 301, 334, 390, 330, 320,
-          //   320, 302, 301, 334, 390, 330, 320, 320, 302, 301, 334, 390, 330,
-          //   320,
-          // ],
+          data: x2list,
           barWidth: 15, // 设置柱子粗细
           itemStyle: {
             //前四个参数用于配置渐变色的起止位置，这四个参数依次对应 右下左上 四个方位。也就是从右边开始顺时针方向。
@@ -145,14 +108,26 @@ export default {
     const renderChart = () => {
       const myChart = proxy.$echarts.init(myRef.value);
 
+      option.xAxis.data = ylist;
+      option.series[0].data = x1list;
+      option.series[1].data = x2list;
       myChart.setOption(option);
       window.addEventListener("resize", () => {
         myChart.resize();
       });
     };
-
+    const initEcharts = (y, x1, x2) => {
+      ylist = y;
+      x1list = x1;
+      x2list = x2;
+      renderChart();
+    };
     return {
       myRef,
+      initEcharts,
+      ylist,
+      x1list,
+      x2list,
     };
   },
 };
