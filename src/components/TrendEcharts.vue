@@ -50,6 +50,10 @@ export default {
       xAxis: {
         type: "category",
         data: ylist,
+        axisLabel: {
+          interval:0,
+          rotate: 15,
+        },
       },
       series: [
         {
