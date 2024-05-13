@@ -279,13 +279,13 @@ export default {
       let param = {};
       if (fromTimeSelect) {
         param = {
-          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          searchUser: 1, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
           endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
         };
       } else {
         param = {
-          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          searchUser: 1, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
         };
