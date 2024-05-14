@@ -140,7 +140,9 @@ before-remove 在附件列表删除文件钩子
   <div class="createorigin-btngroup flexcenter">
     <el-button class="createorigin-btngroup-save" @click="postAddEditAjaxFn(0)">保存到草稿箱</el-button>
     <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn">预 览</el-button>
-    <el-button class="createorigin-btngroup-reset">重 置</el-button>
+    <el-button class="createorigin-btngroup-reset"
+      @click="resetFormFn"
+    >重 置</el-button>
   </div>
 
   <el-dialog v-model="dialogNoticeDetailVisible" width="80vw" height="80vh">
@@ -698,6 +700,54 @@ export default {
       formData.remark = forPropsGetFindByIdAjaxFnReturnO.value.remark||'';//备注
     }
 
+    /**
+     * 重置页面表单字段，
+     * 如果是新建稿件就全部清空
+     * 如果是“继续采用”稿件就回到初始状态
+     */
+    function resetFormFn(){
+      //如果没有id 就是 新建稿件
+      if(
+        !forPropsGetFindByIdAjaxFnReturnO.value.id
+      ){
+        if(//清空正文
+          editorHTMLContent.value !== ''
+          ||editorHTMLContent.value === '<p></p>'
+          ||editorHTMLContent.value === '<br/>'
+          ||editorHTMLContent.value === '<br />'
+        ){
+          editorHTMLContent.value = '';
+        }
+
+        for(let key in formData){
+          if(//初始化 语种
+            key === 'language'
+          ){
+            formData[key] = langOptions.filter((o)=>{
+              return o.label == '中文';
+            })[0]['value'];
+          }else if(
+            key === 'articleHtmlCon'
+            ||key === 'articleContent'
+          ){
+            editorHTMLContent.value = '';
+            editorTEXTContent.value = '';
+            formData[key] = '';
+          }else{
+            formData[key] = '';//清空其它字段
+          }
+        }
+        // end of for
+        return;
+      }
+
+
+
+
+
+    }
+    // end of resetFormFn
+
 
     onMounted(()=>{
       //to do
@@ -730,7 +780,7 @@ export default {
 
       postAddEditAjaxFn,
       previewAddEditFn,
-      // QuillEditorInitFn,
+      resetFormFn,
 
 
     };
