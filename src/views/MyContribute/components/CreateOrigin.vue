@@ -763,7 +763,7 @@ export default {
   }
   .createorigin-content-upload {position:relative;
     .el-input {
-      width: 90%;
+      width: 83%;
     }
 
   }
