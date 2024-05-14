@@ -107,7 +107,7 @@
             <p>82.6%</p>
             <p>采用率</p>
           </div>
-          <el-icon><InfoFilled /></el-icon>
+          <el-icon title="采用率=发布总数+投稿总数x100%"><InfoFilled /></el-icon>
         </div>
 
         <!-- 国家信息中心用户 -->
@@ -194,7 +194,7 @@
             <p>{{ num6 }}</p>
             <p>采用率</p>
           </div>
-          <el-icon><InfoFilled /></el-icon>
+          <el-icon title="采用率=发布总数+投稿总数x100%"><InfoFilled /></el-icon>
         </div>
       </div>
     </div>

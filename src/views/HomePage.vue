@@ -140,7 +140,7 @@
                   </div>
                   <p>{{statisticsGJFGWData?.useRate}}</p>
                   <p>采用率</p>
-                  <el-icon><InfoFilled /></el-icon>
+                  <el-icon title="采用率=发布总数+投稿总数x100%"><InfoFilled /></el-icon>
                 </div>
               </template>
               <!-- end of 国家发改委用户 -->
@@ -332,11 +332,11 @@ export default {
         num: 0,
         src: "pendingnum",
       },
-      {
-        name: "待处理稿件",
-        num: 0,
-        src: "pendingnum",
-      },
+      // {
+      //   name: "待处理稿件",
+      //   num: 0,
+      //   src: "pendingnum",
+      // },
     ]);
 
     //国家发改委用户 稿件统计数据
