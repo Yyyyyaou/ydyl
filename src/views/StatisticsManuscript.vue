@@ -350,7 +350,8 @@ export default {
     let endTime = new Date();
     function timeSelectChange(val) {
       if (val == 0) {
-        startTime = timeForMat(1);
+        //startTime = timeForMat(1);
+        startTime = new Date();
       } else if (val == 1) {
         startTime = timeForMat(6);
       } else if (val == 2) {
@@ -365,7 +366,7 @@ export default {
       );
     }
     onMounted(() => {
-      dateDefaultTime.value = [timeForMat(1), new Date()]; //日期范围选择初始化
+      dateDefaultTime.value = [new Date(), new Date()]; //日期范围选择初始化
       getArticleCountAjaxFn(); //外部用户 稿件统计
     });
     return {
