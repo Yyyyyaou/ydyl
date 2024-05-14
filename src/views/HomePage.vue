@@ -660,8 +660,9 @@ export default {
       display: flex;
       min-width: 1120px;
       .mid-content-statistics-left {
-        width: 65%;
-        min-width: 1077px;
+        // width: 65%;
+        // min-width: 1077px;
+        width: 72%;   //new
         margin-right: 1%;
         background-color: #fff;
         .mid-content-statistics-left-header {
@@ -690,6 +691,7 @@ export default {
         }
         .mid-content-statistics-left-content {
           padding: 20px 18px;
+          overflow: auto;//new
           .mid-content-statistics-left-content-divfgw {
             height: 108px;
             min-width: 330px;
@@ -777,7 +779,7 @@ export default {
         }
       }
       .mid-content-statistics-right {
-        width: 34%;
+        width: 27%;
         background-color: #fff;
         position: relative;
         .el-tabs--border-card {

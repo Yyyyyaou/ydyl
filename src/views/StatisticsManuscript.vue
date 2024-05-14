@@ -42,156 +42,160 @@
           />
         </el-config-provider>
       </div>
+      <div style="overflow: auto" class="flexcenter">
+        <!-- 国家发改委用户 -->
+        <div
+          class="flexcenter mid-content-statistics-left-content-div"
+          v-if="userAuthority == '国家发改委用户'"
+          style="min-width: 300px"
+        >
+          <!-- //new -->
+          <div class="flexcenter mid-content-statistics-left-content-img">
+            <img src="../assets/contributenum.png" alt="" />
+          </div>
+          <div class="mid-content-statistics-left-content-num">
+            <p>247</p>
+            <p>联络员投稿总数</p>
+          </div>
+        </div>
+        <div
+          class="flexcenter mid-content-statistics-left-content-divmid"
+          style="margin-left: 10px"
+          v-if="userAuthority == '国家发改委用户'"
+        >
+          <div class="divmid-bg flexcenter">
+            <div class="flexcenter mid-content-statistics-left-content-div">
+              <div class="flexcenter mid-content-statistics-left-content-img">
+                <img src="../assets/contributenum.png" alt="" />
+              </div>
+              <div class="mid-content-statistics-left-content-num">
+                <p>247</p>
+                <p>联络员投稿总数</p>
+              </div>
+            </div>
+            <div class="divmid-divide"></div>
+            <div class="flexcenter mid-content-statistics-left-content-div">
+              <div class="flexcenter mid-content-statistics-left-content-img">
+                <img src="../assets/papernum.png" alt="" />
+              </div>
+              <div class="mid-content-statistics-left-content-num">
+                <p>154</p>
+                <p>联络员原创稿件</p>
+              </div>
+            </div>
+            <div class="divmid-divide"></div>
+            <div class="flexcenter mid-content-statistics-left-content-div">
+              <div class="flexcenter mid-content-statistics-left-content-img">
+                <img src="../assets/statisticsnum3.png" alt="" />
+              </div>
+              <div class="mid-content-statistics-left-content-num">
+                <p>50</p>
+                <p>联络员转载稿件</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flexcenter mid-content-statistics-left-content-div"
+          style="margin-left: 10px"
+          v-if="userAuthority == '国家发改委用户'"
+        >
+          <div class="flexcenter mid-content-statistics-left-content-img">
+            <img src="../assets/fgwnum3.png" alt="" />
+          </div>
+          <div class="mid-content-statistics-left-content-num">
+            <p>82.6%</p>
+            <p>采用率</p>
+          </div>
+          <el-icon><InfoFilled /></el-icon>
+        </div>
 
-      <!-- 国家发改委用户 -->
-      <div
-        class="flexcenter mid-content-statistics-left-content-div"
-        v-if="userAuthority == '国家发改委用户'"
-      >
-        <div class="flexcenter mid-content-statistics-left-content-img">
-          <img src="../assets/contributenum.png" alt="" />
-        </div>
-        <div class="mid-content-statistics-left-content-num">
-          <p>247</p>
-          <p>联络员投稿总数</p>
-        </div>
-      </div>
-      <div
-        class="flexcenter mid-content-statistics-left-content-divmid"
-        style="margin-left: 10px"
-        v-if="userAuthority == '国家发改委用户'"
-      >
-        <div class="divmid-bg flexcenter">
-          <div class="flexcenter mid-content-statistics-left-content-div">
-            <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/contributenum.png" alt="" />
-            </div>
-            <div class="mid-content-statistics-left-content-num">
-              <p>247</p>
-              <p>联络员投稿总数</p>
-            </div>
+        <!-- 国家信息中心用户 -->
+        <div
+          class="flexcenter mid-content-statistics-left-content-div1"
+          v-if="
+            userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
+          "
+          style="min-width: 240px"
+        >
+          <div class="flexcenter mid-content-statistics-left-content-img">
+            <img src="../assets/contributenum.png" alt="" />
           </div>
-          <div class="divmid-divide"></div>
-          <div class="flexcenter mid-content-statistics-left-content-div">
-            <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/papernum.png" alt="" />
-            </div>
-            <div class="mid-content-statistics-left-content-num">
-              <p>154</p>
-              <p>联络员原创稿件</p>
-            </div>
-          </div>
-          <div class="divmid-divide"></div>
-          <div class="flexcenter mid-content-statistics-left-content-div">
-            <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/statisticsnum3.png" alt="" />
-            </div>
-            <div class="mid-content-statistics-left-content-num">
-              <p>50</p>
-              <p>联络员转载稿件</p>
-            </div>
+          <div class="mid-content-statistics-left-content-num">
+            <p>{{ num1 }}</p>
+            <p>投稿总数</p>
           </div>
         </div>
-      </div>
-      <div
-        class="flexcenter mid-content-statistics-left-content-div"
-        style="margin-left: 10px"
-        v-if="userAuthority == '国家发改委用户'"
-      >
-        <div class="flexcenter mid-content-statistics-left-content-img">
-          <img src="../assets/fgwnum3.png" alt="" />
-        </div>
-        <div class="mid-content-statistics-left-content-num">
-          <p>82.6%</p>
-          <p>采用率</p>
-        </div>
-        <el-icon><InfoFilled /></el-icon>
-      </div>
-
-      <!-- 国家信息中心用户 -->
-      <div
-        class="flexcenter mid-content-statistics-left-content-div1"
-        v-if="
-          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
-        "
-      >
-        <div class="flexcenter mid-content-statistics-left-content-img">
-          <img src="../assets/contributenum.png" alt="" />
-        </div>
-        <div class="mid-content-statistics-left-content-num">
-          <p>{{ num1 }}</p>
-          <p>投稿总数</p>
-        </div>
-      </div>
-      <div
-        class="flexcenter mid-content-statistics-left-content-divmid1"
-        style="margin-left: 10px"
-        v-if="
-          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
-        "
-      >
-        <div class="divmid-bg flexcenter">
-          <div class="flexcenter mid-content-statistics-left-content-div">
-            <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/contributenum.png" alt="" />
+        <div
+          class="flexcenter mid-content-statistics-left-content-divmid1"
+          style="margin-left: 10px"
+          v-if="
+            userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
+          "
+        >
+          <div class="divmid-bg flexcenter">
+            <div class="flexcenter mid-content-statistics-left-content-div">
+              <div class="flexcenter mid-content-statistics-left-content-img">
+                <img src="../assets/releasenum.png" alt="" />
+              </div>
+              <div class="mid-content-statistics-left-content-num">
+                <p>{{ num2 }}</p>
+                <p>发布总数</p>
+              </div>
             </div>
-            <div class="mid-content-statistics-left-content-num">
-              <p>{{ num2 }}</p>
-              <p>发布总数</p>
+            <div class="divmid-divide"></div>
+            <div class="flexcenter mid-content-statistics-left-content-div">
+              <div class="flexcenter mid-content-statistics-left-content-img">
+                <img src="../assets/fgwnum2.png" alt="" />
+              </div>
+              <div class="mid-content-statistics-left-content-num">
+                <p>{{ num3 }}</p>
+                <p>原创稿件</p>
+              </div>
             </div>
-          </div>
-          <div class="divmid-divide"></div>
-          <div class="flexcenter mid-content-statistics-left-content-div">
-            <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/papernum.png" alt="" />
-            </div>
-            <div class="mid-content-statistics-left-content-num">
-              <p>{{ num3 }}</p>
-              <p>原创稿件</p>
-            </div>
-          </div>
-          <div class="divmid-divide"></div>
-          <div class="flexcenter mid-content-statistics-left-content-div">
-            <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/statisticsnum3.png" alt="" />
-            </div>
-            <div class="mid-content-statistics-left-content-num">
-              <p>{{ num4 }}</p>
-              <p>转载稿件</p>
+            <div class="divmid-divide"></div>
+            <div class="flexcenter mid-content-statistics-left-content-div">
+              <div class="flexcenter mid-content-statistics-left-content-img">
+                <img src="../assets/statisticsnum3.png" alt="" />
+              </div>
+              <div class="mid-content-statistics-left-content-num">
+                <p>{{ num4 }}</p>
+                <p>转载稿件</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div
-        class="flexcenter mid-content-statistics-left-content-div1"
-        style="margin-left: 10px"
-        v-if="
-          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
-        "
-      >
-        <div class="flexcenter mid-content-statistics-left-content-img">
-          <img src="../assets/contributenum.png" alt="" />
+        <div
+          class="flexcenter mid-content-statistics-left-content-div1"
+          style="margin-left: 10px; min-width: 240px"
+          v-if="
+            userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
+          "
+        >
+          <div class="flexcenter mid-content-statistics-left-content-img">
+            <img src="../assets/pendingnum.png" alt="" />
+          </div>
+          <div class="mid-content-statistics-left-content-num">
+            <p>{{ num5 }}</p>
+            <p>待处理稿件</p>
+          </div>
         </div>
-        <div class="mid-content-statistics-left-content-num">
-          <p>{{ num5 }}</p>
-          <p>待处理稿件</p>
+        <div
+          class="flexcenter mid-content-statistics-left-content-div1"
+          style="margin-left: 10px"
+          v-if="
+            userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
+          "
+        >
+          <div class="flexcenter mid-content-statistics-left-content-img">
+            <img src="../assets/fgwnum3.png" alt="" />
+          </div>
+          <div class="mid-content-statistics-left-content-num">
+            <p>{{ num6 }}</p>
+            <p>采用率</p>
+          </div>
+          <el-icon><InfoFilled /></el-icon>
         </div>
-      </div>
-      <div
-        class="flexcenter mid-content-statistics-left-content-div1"
-        style="margin-left: 10px"
-        v-if="
-          userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
-        "
-      >
-        <div class="flexcenter mid-content-statistics-left-content-img">
-          <img src="../assets/fgwnum3.png" alt="" />
-        </div>
-        <div class="mid-content-statistics-left-content-num">
-          <p>{{ num6 }}</p>
-          <p>采用率</p>
-        </div>
-        <el-icon><InfoFilled /></el-icon>
       </div>
     </div>
     <div class="mid-content-mycontribute" style="margin-top: 20px">
@@ -349,7 +353,7 @@ export default {
         startTime = timeForMat(1);
       } else if (val == 1) {
         startTime = timeForMat(6);
-      }else if (val == 2) {
+      } else if (val == 2) {
         startTime = timeForMat(29);
       }
 
@@ -534,6 +538,7 @@ export default {
 }
 .mid-content-divs {
   position: relative;
+  //overflow: auto;//new
   .mid-content-divs-searchgroup {
     position: absolute;
     right: 0;

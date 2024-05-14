@@ -23,7 +23,9 @@ export default {
         trigger: "axis",
         // formatter: '{a0}: {c0}<br/>'+'{a1}: {c1}'
         formatter: function (params) {
-          var num = params[0].value + params[1].value;
+          var num1 = params[0]==undefined?0:params[0]?.value;
+          var num2 = params[1]==undefined?0:params[1]?.value;
+          var num = num1+num2;
           var result =
             '<span style="font-weight:700;text-align:center;">今日投稿数' +
             "&nbsp;&nbsp;&nbsp;" +
@@ -64,6 +66,7 @@ export default {
             focus: "series",
           },
           data: x1list,
+          barWidth: 15, // 设置柱子粗细
           itemStyle: {
             color: new proxy.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {

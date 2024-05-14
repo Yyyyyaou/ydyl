@@ -504,7 +504,7 @@ export default {
   flex-direction: column;
   .createreproduction-content-list {
     position: relative;
-    width: 1364px;
+    width: 80%;
     // height: 446px;
     background-color: #f8fbfe;
     border: 1px dashed #b4d3f6;
