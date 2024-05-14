@@ -27,7 +27,7 @@
             <div
               class="mid-content-mycontribute-table-btngroup-search-divide"
             ></div>
-            <div class="mid-content-mycontribute-table-btngroup-search-keyword">
+            <div class="mid-content-mycontribute-table-btngroup-search-keyword flexcenter">
               <el-select
                 v-model="searchSelectValue"
                 placeholder=""
@@ -305,7 +305,7 @@
           <div
             class="mid-content-mycontribute-table-btngroup-search flexcenter"
           >
-            <div class="mid-content-mycontribute-table-btngroup-search-keyword">
+            <div class="mid-content-mycontribute-table-btngroup-search-keyword flexcenter">
               <el-select
                 v-model="searchSelectValue1"
                 placeholder=""
@@ -1428,6 +1428,9 @@ export default {
   .elpopover-content-right1 {
     max-height: 710px !important;
   }
+}
+.mid-content-mycontribute-table-btngroup-search{
+  overflow: auto;
 }
 ///* 滚动条 */
 ::-webkit-scrollbar {

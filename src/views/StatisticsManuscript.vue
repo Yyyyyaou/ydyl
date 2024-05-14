@@ -47,7 +47,9 @@
       <div
         class="flexcenter mid-content-statistics-left-content-div"
         v-if="userAuthority == '国家发改委用户'"
+        style="min-width: 300px;"
       >
+      <!-- //new -->
         <div class="flexcenter mid-content-statistics-left-content-img">
           <img src="../assets/contributenum.png" alt="" />
         </div>
@@ -114,6 +116,7 @@
         v-if="
           userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
         "
+        style="min-width: 240px;"
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
           <img src="../assets/contributenum.png" alt="" />
@@ -133,7 +136,7 @@
         <div class="divmid-bg flexcenter">
           <div class="flexcenter mid-content-statistics-left-content-div">
             <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/contributenum.png" alt="" />
+              <img src="../assets/releasenum.png" alt="" />
             </div>
             <div class="mid-content-statistics-left-content-num">
               <p>{{ num2 }}</p>
@@ -143,7 +146,7 @@
           <div class="divmid-divide"></div>
           <div class="flexcenter mid-content-statistics-left-content-div">
             <div class="flexcenter mid-content-statistics-left-content-img">
-              <img src="../assets/papernum.png" alt="" />
+              <img src="../assets/fgwnum2.png" alt="" />
             </div>
             <div class="mid-content-statistics-left-content-num">
               <p>{{ num3 }}</p>
@@ -164,13 +167,13 @@
       </div>
       <div
         class="flexcenter mid-content-statistics-left-content-div1"
-        style="margin-left: 10px"
+        style="margin-left: 10px;min-width: 240px;"
         v-if="
           userAuthority == '国家信息中心用户' || userAuthority == '外部用户'
         "
       >
         <div class="flexcenter mid-content-statistics-left-content-img">
-          <img src="../assets/contributenum.png" alt="" />
+          <img src="../assets/pendingnum.png" alt="" />
         </div>
         <div class="mid-content-statistics-left-content-num">
           <p>{{ num5 }}</p>
@@ -534,6 +537,7 @@ export default {
 }
 .mid-content-divs {
   position: relative;
+  overflow: auto;//new
   .mid-content-divs-searchgroup {
     position: absolute;
     right: 0;
