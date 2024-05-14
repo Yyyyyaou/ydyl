@@ -242,8 +242,8 @@ export default {
 
       //时间段
       if (dateDefaultTime.value) {
-        paramsO.crtime = timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"]; //起始时间
-        paramsO.endtime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"]; //结束时间
+        paramsO.crTime = timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD hh:mm:ss"]; //起始时间
+        paramsO.endTime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD hh:mm:ss"]; //结束时间
       }
 
       httpAxiosO({

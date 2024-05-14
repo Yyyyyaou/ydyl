@@ -88,8 +88,8 @@ import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";httpAxiosO
 export default {
   props: {
     propsId: {//稿件ID，用来请求稿件详情接口
-      type: String,
-      default: "",
+      type: Number,
+      default: 0,
     },
     propsArticleO:{//用于 弹出层显示详情页，通过它传递
       type: Object,

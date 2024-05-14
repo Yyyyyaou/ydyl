@@ -563,6 +563,7 @@ export default {
         if(forPropsGetFindByIdAjaxFnReturnO.value.id){
           _url = '/web/article/update.do';
           datasOFormData.append('id',forPropsGetFindByIdAjaxFnReturnO.value.id);//父组件传下来的id
+          datasOFormData.append('articleType',forPropsGetFindByIdAjaxFnReturnO.value.articleType);//父组件传下来的 articleType 稿件类型 0原创稿件 1转载稿件
         }else{
           _url = '/web/article/addEdit.do';
         }
@@ -687,17 +688,14 @@ export default {
         return;
       }
 
-      formData.articleTitle = forPropsGetFindByIdAjaxFnReturnO.value.articleTitle;//稿件标题
-      formData.articleSource = forPropsGetFindByIdAjaxFnReturnO.value.articleSource||'';//稿件来源
-      
-      formData.articleHtmlCon = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
+      for(let key in forPropsGetFindByIdAjaxFnReturnO.value){
+        formData[key] = forPropsGetFindByIdAjaxFnReturnO.value[key];
+      }
+
       editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
 
-      formData.articleContent = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
       editorTEXTContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
-      
-      formData.language = forPropsGetFindByIdAjaxFnReturnO.value.language||'';//语种
-      formData.remark = forPropsGetFindByIdAjaxFnReturnO.value.remark||'';//备注
+
     }
 
     /**
@@ -740,6 +738,7 @@ export default {
         // end of for
         return;
       }
+      // end of if
 
 
 
@@ -820,7 +819,7 @@ export default {
   }
   .createorigin-content-upload {position:relative;
     .el-input {
-      width: 83%;
+      width: 90%;
     }
 
   }

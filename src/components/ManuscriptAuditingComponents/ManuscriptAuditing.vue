@@ -511,8 +511,7 @@
                               {{ activity.sec }}
                             </div>
                             <div class="elpopover-content-timeline-details-thi">
-                              <span>审核人：</span
-                              ><span>{{ activity.thi }}</span>
+                              <span>审核人：</span><span>{{ activity.thi }}</span>
                             </div>
                           </div>
                         </el-timeline-item>
@@ -938,8 +937,8 @@ export default {
       if(
         dateDefaultTime.value
       ){
-        paramsO.startTime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.endTime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+        paramsO.startTime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD hh:mm:ss'] //起始时间
+        paramsO.endTime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD hh:mm:ss'] //结束时间
       }
 
       httpAxiosO({
@@ -1025,8 +1024,8 @@ export default {
       if(
         dateDefaultTime1.value
       ){
-        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD'] //结束时间
+        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD hh:mm:ss'] //起始时间
+        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD hh:mm:ss'] //结束时间
       }
 
       httpAxiosO({
