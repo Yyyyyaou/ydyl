@@ -41,7 +41,7 @@
               <template v-else-if="userAuthority == '国家信息中心用户'">
                 <div
                   class="flexcenter mid-content-statistics-left-content-div mid-content-statistics-left-content-infocenter"
-                  data-desc="国家发改委用户 稿件统计"
+                  data-desc="国家信息中心用户 稿件统计"
                 >
                   <div
                     class="flexcenter mid-content-statistics-left-content-img"
@@ -84,7 +84,7 @@
                     <div
                       class="flexcenter mid-content-statistics-left-content-divfgw-num"
                     >
-                      <p>247</p>
+                      <p>{{statisticsGJFGWData?.articleCount}}</p>
                       <p>联络员投稿总数</p>
                     </div>
                     <div
@@ -97,7 +97,7 @@
                     <div
                       class="flexcenter mid-content-statistics-left-content-divfgw-num"
                     >
-                      <p>204</p>
+                      <p>{{statisticsGJFGWData?.pubCount}}</p>
                       <p>联络员发布总数</p>
                     </div>
                   </div>
@@ -114,7 +114,7 @@
                     <div
                       class="flexcenter mid-content-statistics-left-content-divfgw-num"
                     >
-                      <p>154</p>
+                      <p>{{statisticsGJFGWData?.normalArticle}}</p>
                       <p>联络员原创稿件</p>
                     </div>
                     <div
@@ -127,7 +127,7 @@
                     <div
                       class="flexcenter mid-content-statistics-left-content-divfgw-num"
                     >
-                      <p>50</p>
+                      <p>{{statisticsGJFGWData?.reprArticle}}</p>
                       <p>联络员转载稿件</p>
                     </div>
                   </div>
@@ -138,7 +138,7 @@
                   >
                     <img src="../assets/fgwnum3.png" alt="" />
                   </div>
-                  <p>82.6%</p>
+                  <p>{{statisticsGJFGWData?.useRate}}</p>
                   <p>采用率</p>
                   <el-icon><InfoFilled /></el-icon>
                 </div>
@@ -172,7 +172,7 @@
                       :hollow="true"
                       class="hoverpointer"
                       :class="{ isClicked: isClickedArr.includes(index) }"
-                      @click="elTimelineClick(index)"
+                      @click="getNoticeDetailFn(activity)"
                     >
                       {{ activity.noticeTitle }}
                     </el-timeline-item>
@@ -314,7 +314,6 @@ export default {
       return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
     });
 
-    console.log('HomePage userAuthority',userAuthority);
 
     //外部用户 稿件统计数据
     const statisticsData = reactive([
@@ -333,12 +332,22 @@ export default {
         num: 0,
         src: "pendingnum",
       },
+      {
+        name: "待处理稿件",
+        num: 0,
+        src: "pendingnum",
+      },
     ]);
 
     //国家发改委用户 稿件统计数据
-    const statisticsGJFGWData = reactive([
-
-    ]);statisticsGJFGWData
+    const statisticsGJFGWData = reactive({
+      articleCount:0,//投稿总数
+      normalArticle:0,//原创稿件
+      reprArticle:0,//转载稿件
+      pubCount:0,//发布总数
+      waitArticle:0,//待处理稿件
+      useRate:0,//采用率（发布稿件除以总投稿数）进行统计
+    });
 
     //国家信息中心用户 稿件统计数据
     const statisticsGJXXZXData = reactive([
@@ -478,7 +487,7 @@ export default {
       })
         .then((D) => {
           console.log("稿件统计 D", D);
-          const { data, success } = D.data;data
+          const { data, success } = D.data;
           if (!success) {
             ElMessage({
               message: "稿件统计数据请求失败",
@@ -496,6 +505,7 @@ export default {
           statisticsGJXXZXData[2].num = data[0].processedManuscripts;
           //已审报题
           statisticsGJXXZXData[3].num = data[0].processedTopics;
+
         })
         .catch((error) => {
           console.log("稿件统计 接口请求 error", error);
@@ -513,16 +523,17 @@ export default {
 
 
     /**
-     * 外部用户 稿件统计 接口请求
+     * 外部用户 和  国家发改委  稿件统计 接口请求
      */
-     function getArticleCountAjaxFn() {
+     function getArticleCountAjaxFn(searchUserP) {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
         method: "get",
         url: "/web/article/articleCount",
         params: {
-          searchUser: 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          searchUser: searchUserP, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          dateType:3,//0(1天),1(1周),2(1月),3(1年)
         },
       })
         .then((D) => {
@@ -543,6 +554,17 @@ export default {
           statisticsData[1].num = data.pubCount;
           //待处理稿件
           statisticsData[2].num = data.waitArticle;
+
+          console.log('data',data);
+
+          //国家发改委用户 稿件统计
+          statisticsGJFGWData.articleCount = data.articleCount;//投稿总数
+          statisticsGJFGWData.normalArticle = data.normalArticle;//原创稿件
+          statisticsGJFGWData.reprArticle = data.reprArticle;//转载稿件
+          statisticsGJFGWData.pubCount = data.pubCount;//发布总数
+          statisticsGJFGWData.waitArticle = data.waitArticle;//待处理稿件
+          statisticsGJFGWData.useRate = data.useRate;//采用率（发布稿件除以总投稿数）进行统计
+
         })
         .catch((error) => {
           console.log("稿件统计 接口请求 error", error);
@@ -558,10 +580,31 @@ export default {
     }
     // end of getArticleCountAjaxFn
 
+    function getNoticeDetailFn(scope) {
 
+      // if (!isClickedArr.value.includes(scope.$index)) {
+      //   isClickedArr.value.push(scope.$index);
+      // }
+
+      const c = router.resolve({
+        path: "/NoticeDetail",
+        query: {
+          id: scope.id,
+        },
+      });
+      window.open(c.href, "_blank");
+    }
 
     onMounted(() => {
-      getArticleCountAjaxFn(); //外部用户 稿件统计
+
+      switch(userAuthority.value){
+        case '外部用户':
+          getArticleCountAjaxFn(0); //外部用户 稿件统计
+        break;
+        case '国家发改委用户':
+          getArticleCountAjaxFn(1); //国家发改委 稿件统计
+        break;
+      }
       getNicCountAjaxFn();//国家信息中心用户 稿件统计
       
       getSYNoticeListAjaxFn(); //首页通知公告
@@ -572,6 +615,7 @@ export default {
       
       statisticsData,
       statisticsGJXXZXData,
+      statisticsGJFGWData,
 
       activities,
       activities1,
@@ -584,6 +628,9 @@ export default {
       elTimelineClick,
       isClickedArr1,
       elTimelineClick1,
+
+      getNoticeDetailFn,
+
     };
   },
 };

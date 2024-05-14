@@ -32,6 +32,7 @@
             v-model="searchInput"
             style="width: 190px"
             placeholder="请输入关键词"
+            @keydown.enter="getArticleListAjaxFn"
           />
         </div>
         <el-select

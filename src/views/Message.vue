@@ -33,6 +33,7 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                @keydown.enter="getArticleRecordListAjaxFn"
               />
             </div>
             <el-config-provider :locale="locale">
@@ -221,12 +222,12 @@ export default {
     const isClickedArr = ref([]);
     const popoverShowFlag = ref(false);
     function rowTitleClick(scope) {
-      if (popoverShowFlag.value) {
-        //有弹窗打开时 跳出方法
-        return;
-      }
-      popoverShowFlag.value = true;
-      scope.row.visible = true;
+      // if (popoverShowFlag.value) {
+      //   //有弹窗打开时 跳出方法
+      //   return;
+      // }
+      // popoverShowFlag.value = true;
+      scope.row.visible = !scope.row.visible;
       if (!isClickedArr.value.includes(scope.$index)) {
         isClickedArr.value.push(scope.$index);
       }

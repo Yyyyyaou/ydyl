@@ -34,6 +34,7 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                @keydown.enter="getArticleDraftListAjaxFn"
               />
             </div>
             <el-config-provider :locale="locale">

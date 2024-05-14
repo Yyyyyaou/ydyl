@@ -27,7 +27,9 @@
         <CreateOrigin v-if="selectIndex === 0"
         :forPropsGetFindByIdAjaxFnReturnO="propsGetFindByIdAjaxFnReturnO"
         />
-        <CreateReproduction v-if="selectIndex === 1" />
+        <CreateReproduction v-if="selectIndex === 1"
+        :forPropsGetFindByIdAjaxFnReturnO="propsGetFindByIdAjaxFnReturnO"
+        />
         <CreateUpdate v-if="selectIndex === 2" />
       </div>
     </div>
@@ -35,7 +37,7 @@
 </template>
 
 <script>
-import { ref,onMounted, reactive, } from "vue";
+import { ref,onMounted, reactive,nextTick, } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import CreateOrigin from "../components/CreateOrigin.vue";
@@ -70,13 +72,15 @@ export default {
     }
 
 
-    const propsGetFindByIdAjaxFnReturnO = reactive({});
+    const propsGetFindByIdAjaxFnReturnO = reactive({
+      id,
+    });
 
     /**
     * 获取稿件详情
     */
     async function getFindByIdAjaxFn(){
-    
+
       //没有id就退出
       if(!id){
         selectIndex.value = 0
@@ -85,7 +89,7 @@ export default {
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       await store.dispatch('getArticleFindByIdFn',id)
-      .then((D)=>{
+      .then(async (D)=>{
         console.log('我的投稿-查看 D',D);
         const { data,success } = D.data;
         if(!success){
@@ -101,26 +105,26 @@ export default {
           type: 'success',
           plain: true,
         })
-        
 
-        propsGetFindByIdAjaxFnReturnO.articleTitle = data.articleTitle;//稿件标题
-        propsGetFindByIdAjaxFnReturnO.articleSource = data.articleSource||'';//稿件来源
-        
-        propsGetFindByIdAjaxFnReturnO.articleHtmlCon = data.articleHtmlCon||'';//稿件HTML内容
-
-        propsGetFindByIdAjaxFnReturnO.articleContent = data.articleContent||'';//稿件文本内容
-
-        propsGetFindByIdAjaxFnReturnO.language = data.language||'';//语种
-        propsGetFindByIdAjaxFnReturnO.remark = data.remark||'';//备注
-
-        //如果有data.fileUnit 字段 就是 “原创稿件”
-        if(
-          typeof data.fileUnit === undefined
-        ){
-          selectIndex.value = 1;
-        }else{
-          selectIndex.value = 0;
+        for(let key in data){
+          propsGetFindByIdAjaxFnReturnO[key] = data[key]
         }
+
+        // propsGetFindByIdAjaxFnReturnO.articleTitle = data.articleTitle;//稿件标题
+        // propsGetFindByIdAjaxFnReturnO.articleSource = data.articleSource||'';//稿件来源
+        
+        // propsGetFindByIdAjaxFnReturnO.articleHtmlCon = data.articleHtmlCon||'';//稿件HTML内容
+
+        // propsGetFindByIdAjaxFnReturnO.articleContent = data.articleContent||'';//稿件文本内容
+
+        // propsGetFindByIdAjaxFnReturnO.language = data.language||'';//语种
+        // propsGetFindByIdAjaxFnReturnO.remark = data.remark||'';//备注
+
+        //data.articleType = 0  “原创稿件”
+        //data.articleType = 1  “转载稿件”
+        selectIndex.value = data.articleType;
+
+        await nextTick();
 
       })
       .catch((error)=>{
@@ -140,7 +144,7 @@ export default {
     //end of getFindByIdAjaxFn
 
     onMounted(async ()=>{
-      await getFindByIdAjaxFn();//为了给编辑界面 回显各个字段内容，放在父组件上，是为了减少请求次数（因为袁冰的 回收站列表接口 未提供 “原创稿件”与“转载稿件”的区别，要求用接口请求后的 fileUnit（司局级审核单附件） 字段 作为区分）
+      await getFindByIdAjaxFn();//为了给编辑界面 回显各个字段内容，放在父组件上，是为了减少请求次数，符合 请求顺序
     });
 
     return {

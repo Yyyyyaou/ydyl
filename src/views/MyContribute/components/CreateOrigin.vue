@@ -144,7 +144,7 @@ before-remove 在附件列表删除文件钩子
   </div>
 
   <el-dialog v-model="dialogNoticeDetailVisible" width="80vw" height="80vh">
-    <PubDetail ref="NoticeDetailRef" :propsArticleO="formData"  />
+    <PubDetail ref="NoticeDetailRef" :propsArticleO="formData" :propsId="forPropsGetFindByIdAjaxFnReturnO.id" />
     <div class="createorigin-btngroup flexcenter">
       <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
     </div>
@@ -231,16 +231,20 @@ export default {
     });
 
     const langOptions = reactive([]);
-    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o,i)=>{
       //∵ 这个界面不需要全部
       if(o.desc === '全部'){
         return;
+      }
+      if(i===1){
+        formData.language = o.id;
       }
       langOptions.push({
         value: o.id,
         label: o.desc,
       })
     });
+
 
 
     //审核单附件列表
@@ -541,33 +545,31 @@ export default {
       datasO.articleContent = datasO.articleContent.replace(_regExp1, '');
 
 
-      const datasOFormData = new FormData();
+      if(!checkFieldValueFn(datasO)){//验证各个字段
+        return;
+      }
 
+      //接口代码接收流
+      const datasOFormData = new FormData();
       for(let key in datasO){
         datasOFormData.append(key,datasO[key]); 
       }
 
-      // //验证完普通字段，把它们都塞进formData 里
-      // postAddEditAjaxFormData.append('articleTitle',datasO.articleTitle);//稿件标题
-      // postAddEditAjaxFormData.append('articleSource',datasO.articleSource);//稿件来源
-      // postAddEditAjaxFormData.append('language',datasO.language);//语种
-      // postAddEditAjaxFormData.append('remark',datasO.remark);//备注
-      // postAddEditAjaxFormData.append('articleStatus',articleStatusP);//稿件状态 （-1：已删除，0：草稿，1：已投稿）
-
-      // postAddEditAjaxFormData.append('articleHtmlCon', datasO.articleHtmlCon);//文章HTML内容
-
-      // //接口传参需要去掉datasO.articleContent 结尾的 \n
-      // postAddEditAjaxFormData.append('articleContent', datasO.articleContent);//文章文本内容
-      
-
-      // auditingUploadFilesArray.value.length&&auditingUploadFilesArray.value.forEach((o)=>{
-      //   postAddEditAjaxFormData.append(o.name,o);
-      // });
-
+      // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
+      const httpAxiosOUrl = (()=>{
+        let _url = '';
+        if(forPropsGetFindByIdAjaxFnReturnO.value.id){
+          _url = '/web/article/update.do';
+          datasOFormData.append('id',forPropsGetFindByIdAjaxFnReturnO.value.id);//父组件传下来的id
+        }else{
+          _url = '/web/article/addEdit.do';
+        }
+        return _url
+      })();
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       httpAxiosO({
-        url:'/web/article/addEdit.do',
+        url:httpAxiosOUrl,
         method:'post',
         data:datasOFormData,
       })
@@ -617,6 +619,7 @@ export default {
 
         formData.articleContent = editorTEXTContent.value||'';//稿件文本内容
 
+
         //审核附件列表
         formData.fileUnit = auditingUploadFilesArray.value.map((o)=>{
           return o.response?.data[0].fileName || ''
@@ -647,7 +650,7 @@ export default {
 
       //非要判断 稿件标题是否含有中文，如果不含有中文则  字段 language === 1 时提醒....
       if(
-        /[u4e00-u9fa5]/g.test(formData.articleTitle)
+        !/[\u4e00-\u9fa5]/g.test(formData.articleTitle)
         &&formData.language === zhCNValue
       ){
         //预览前要先 检测一下 标题语种，非中文要给提示
@@ -677,6 +680,10 @@ export default {
     //获取来自父组件的 稿件详情的数据
     function getPropsFn(){
 
+      //没有id就退出
+      if(!forPropsGetFindByIdAjaxFnReturnO.value.id){
+        return;
+      }
 
       formData.articleTitle = forPropsGetFindByIdAjaxFnReturnO.value.articleTitle;//稿件标题
       formData.articleSource = forPropsGetFindByIdAjaxFnReturnO.value.articleSource||'';//稿件来源

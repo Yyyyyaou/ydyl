@@ -83,9 +83,7 @@ import { useRouter } from "vue-router";
 import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 
-
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";httpAxiosO
-
 
 export default {
   props: {
@@ -104,13 +102,15 @@ export default {
 
     const URL_IS_API = process.env.NODE_ENV === 'development'?'/api':'';
 
-    const { propsArticleO } = toRefs(props);
+    const { propsArticleO,propsId } = toRefs(props);
+
 
     const router = useRouter();
     const { id } = router.currentRoute.value.query; //稿件ID，用来请求稿件详情接口
 
     const store = useStore();
 
+    const articleType = ref(0);//稿件类型 0 原创稿件 1 转载稿件
     const articleTitle = ref(""); //稿件标题
     const articleSource = ref(""); //稿件来源
     const articleHtmlCon = ref(""); //稿件HTML正文
@@ -199,7 +199,10 @@ export default {
      */
     async function getFindByIdAjaxFn() {
 
-      if (!id) {
+      if (
+        !id//没有地址栏的id 则退出
+        ||propsId.value//如果有父组件传递的详情数据 则退出
+      ) {
         return;
       }
 
@@ -223,9 +226,17 @@ export default {
             plain: true,
           });
 
+          articleType.value = data.articleType;
           articleTitle.value = data.articleTitle;
           articleSource.value = data.articleSource;
-          articleHtmlCon.value = data.articleHtmlCon;
+          
+          //如果是转载稿件
+          if(articleType.value){
+            articleHtmlCon.value=`<p><a href="${data.srcUrl}" target="_blank">${data.srcUrl}</p>`
+          }else{
+            articleHtmlCon.value = data.articleHtmlCon;
+          }
+
           postUser.value = data.postUser;
           postTime.value = data.postTime;
           remark.value = data.remark;
@@ -357,6 +368,7 @@ export default {
     });
 
     return {
+      articleType,
       articleTitle,
       articleSource,
       articleHtmlCon,

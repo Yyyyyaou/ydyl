@@ -34,6 +34,7 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                @keydown.enter="getNoticeListAjaxFn"
               />
             </div>
             <el-config-provider :locale="locale">
@@ -46,7 +47,9 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px">
+            <el-button type="primary" class="marl10" style="width: 78px"
+              @click="getNoticeListAjaxFn"
+            >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
               搜索
             </el-button>
