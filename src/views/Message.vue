@@ -273,11 +273,14 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '获取系统消息列表数据成功',
-          type: 'success',
-          plain: true,
-        })
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '获取系统消息列表数据成功',
+        //   type: 'success',
+        //   plain: true,
+        // })
+        
         tableData.splice(0,tableData.length);
         data.ldata.forEach((o)=>{
           let _o = o;

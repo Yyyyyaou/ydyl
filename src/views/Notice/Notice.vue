@@ -221,11 +221,14 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '通知公告列表数据成功',
-          type: 'success',
-          plain: true,
-        })
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '通知公告列表数据成功',
+        //   type: 'success',
+        //   plain: true,
+        // })
+
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.crtimeFormat = timeFormatFn(o.pubTime)['YYYY-MM-DD hh:mm:ss']//时间格式化

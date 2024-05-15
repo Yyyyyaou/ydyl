@@ -146,7 +146,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>发布时间：</span><span>{{ scope.row.crtimeFormat }}</span>
+                        <span>发布时间：</span><span>{{ scope.row.crtime }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -245,7 +245,7 @@
             </el-table-column>
             <el-table-column prop="origin" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
-            <el-table-column prop="crtimeFormat" label="创建时间" width="200" />
+            <el-table-column prop="postTimeFormat" label="提交日期" width="200" />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
@@ -443,7 +443,7 @@
                         {{ scope.row.articleTitle }}
                       </div>
                       <div class="elpopover-content-left-info flexcenter">
-                        <span>作者：</span><span>啊啊啊啊啊某某</span>
+                        <span>作者：</span><span>{{ scope.row.trueName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -451,7 +451,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>发布时间：</span><span>{{ scope.row.date }}</span>
+                        <span>发布时间：</span><span>{{ scope.row.crtime }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -495,7 +495,7 @@
                       </div>
                       <el-timeline class="elpopover-content-timeline">
                         <el-timeline-item
-                          :timestamp="activity.timestamp"
+                          :timestamp="activity.auditTimeFormat"
                           placement="top"
                           v-for="(activity, index) in timelineData"
                           :key="index"
@@ -511,7 +511,7 @@
                               {{ activity.sec }}
                             </div>
                             <div class="elpopover-content-timeline-details-thi">
-                              <span>审核人：</span><span>{{ activity.thi }}</span>
+                              <span>审核人：</span><span>{{ activity.cRuser }}</span>
                             </div>
                           </div>
                         </el-timeline-item>
@@ -532,7 +532,7 @@
                       :class="{
                         isClicked: isClickedArr.includes(scope.$index),
                       }"
-                      @click="rowTitleClick1(scope)"
+                      @click="externalAuditArticleFindByIdFn(scope)"
                     >
                       {{ scope.row.articleTitle }}
                     </span>
@@ -555,7 +555,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="currentNodeName" label="稿件节点" width="120" />
-            <el-table-column prop="crtimeFormat" label="创建时间" width="200" />
+            <el-table-column prop="postTimeFormat" label="提交日期" width="140" />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
@@ -854,10 +854,19 @@ export default {
     function externalAuditArticleFindByIdFn(scopeP){
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      if (popoverShowFlag.value) {
-        //有弹窗打开时 跳出方法
-        return;
-      }
+      // if (popoverShowFlag.value) {
+      //   //有弹窗打开时 跳出方法
+      //   return;
+      // }
+
+      //关闭所有详情弹窗
+      tableData.forEach((o)=>{
+        o.visible = false;
+      });
+      tableData1.forEach((o)=>{
+        o.visible = false;
+      });
+
 
       store.dispatch('externalAuditArticleFindByIdFn',scopeP.row.externalAuditArticleId)
       .then((D)=>{
@@ -871,16 +880,21 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '稿件详情请求成功',
-          type: 'success',
-          plain: true,
-        });
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '稿件详情请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // });
       
+
         popoverShowFlag.value = true;
         scopeP.row.visible = true;
         scopeP.row.articleHtmlCon = data.articleHtmlCon;//在element-ui中，table的列中 赋值 articleHtmlCon
         scopeP.row.trueName = data.trueName;//在element-ui中，table的列中 赋值 trueName
+        scopeP.row.crtime = data.crtime;//稿件创建时间 2024-04-11 09:18:29
+
 
         //把当前打开的详情信息储存起来
         for(let key in data){
@@ -937,8 +951,10 @@ export default {
       if(
         dateDefaultTime.value
       ){
-        paramsO.startTime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD hh:mm:ss'] //起始时间
-        paramsO.endTime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD hh:mm:ss'] //结束时间
+        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.startTime+=' 00:00:00';
+        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD'] //结束时间
+        paramsO.endTime+=' 23:59:59';
       }
 
       httpAxiosO({
@@ -957,17 +973,19 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '查询请求成功',
-          type: 'success',
-          plain: true,
-        });
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '查询请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // });
 
         tableData.splice(0,tableData.length);
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
+          _o.postTimeFormat = timeFormatFn(o.postTime)['YYYY-MM-DD']//时间格式化
           tableData.push(_o);
         });
         pageTotal.value = data.totalResults;
@@ -1024,9 +1042,13 @@ export default {
       if(
         dateDefaultTime1.value
       ){
-        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD hh:mm:ss'] //起始时间
-        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD hh:mm:ss'] //结束时间
+        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.startTime+=' 00:00:00';
+        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD'] //结束时间
+        paramsO.endTime+=' 23:59:59';
       }
+
+
 
       httpAxiosO({
         method:'get',
@@ -1044,16 +1066,19 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '查询请求成功',
-          type: 'success',
-          plain: true,
-        });
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '查询请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // });
+
         tableData1.splice(0,tableData1.length);
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD hh:mm']
+          _o.postTimeFormat = timeFormatFn(o.postTime)['YYYY-MM-DD']
 
           switch(o.articleStatus){//显示状态名字
             case 1:
@@ -1448,7 +1473,7 @@ export default {
 }
 </style>
 <style lang="less">
-.elpopover-style {
+.elpopover-style {min-height:400px;
   position: fixed !important;
   top: 50% !important;
   left: 63% !important;

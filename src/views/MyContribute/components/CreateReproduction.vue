@@ -73,7 +73,7 @@
               <el-upload
                 class="auditingUploadC"
                 :id="'auditingUploadID_'+index"
-                action="/web/article/upload"
+                :action="auditingUploadFilesPostUrl"
                 multiple
                 show-file-list
                 disabled
@@ -130,6 +130,7 @@
 
 <script>
 import { reactive, ref,toRefs,onMounted } from "vue";
+import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
@@ -142,8 +143,10 @@ export default {
     //vuex实例
     const store = useStore();
 
-    const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
+    //创建路由实例
+    const router = useRouter();
 
+    const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
 
     const dataList = ref([{}]);
     const rules = reactive({
@@ -214,8 +217,12 @@ export default {
       })
     });
 
-    //普通附件列表
+    //附件上传接口地址
+    const auditingUploadFilesPostUrl = ref('');
+    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
 
+    //普通附件列表
+    const auditingUploadFilesArrays = reactive([]);
     /**
      * 转载稿件的附件上传 element plus 有问题，
      * 如果 附件列表 变量 为 嵌套复杂对象 
@@ -228,7 +235,6 @@ export default {
      * 
      * 所以暂时搁置 上传附件开发
      */
-    const auditingUploadFilesArrays = reactive([]);
     function handleAuditingUploadChangeFn(indexP,file,files){indexP,file,files;
       if(
         !Array.isArray(auditingUploadFilesArrays[indexP])
@@ -236,7 +242,6 @@ export default {
         auditingUploadFilesArrays[indexP] = [];
       }
 
-      console.count();
       console.log('files',files);
       files.forEach((o,i)=>{
         console.log('o,i===========',o,i);
@@ -305,7 +310,10 @@ export default {
       dataList.value.forEach((element) => {
         element.fold = true;
       });
-      dataList.value.push({ fold: false });
+      dataList.value.push({ 
+        fold: false,
+        language: 1,
+      });
     }
     function deleteData(index) {
       dataList.value.splice(index, 1);
@@ -330,6 +338,7 @@ export default {
       let checkResult = true;
       if(
         !articleTitle
+        ||(articleTitle&&articleTitle.trim() === '')
       ){
         ElMessage({
           message: '请重新填写稿件标题',
@@ -340,6 +349,7 @@ export default {
       }
       if(
         !articleSource
+        ||(articleSource&&articleSource.trim() === '')
       ){
         ElMessage({
           message: '请重新填写稿件来源',
@@ -391,6 +401,9 @@ export default {
         //   let _str = old===''?next.response?.data[0].fileName:old+','+next.response?.data[0].fileName;
         //   return _str
         // },'');
+        o.articleTitle = o.articleTitle.trim();
+        o.articleSource = o.articleSource.trim();
+
         o.articleStatus = articleStatusP;
         checkFieldValueFnResult = checkFieldValueFn(o);
       });
@@ -441,6 +454,11 @@ export default {
           type: 'success',
           plain: true,
         });
+        //跳到 我的投稿 界面
+        router.push({
+          path:'/MyContribute'
+        });
+
 
       })
       .catch((error)=>{
@@ -468,6 +486,7 @@ export default {
         language : forPropsGetFindByIdAjaxFnReturnO.value.language||'',//语种
         remark : forPropsGetFindByIdAjaxFnReturnO.value.remark||'',//备注
         srcUrl:forPropsGetFindByIdAjaxFnReturnO.value.srcUrl||'',//稿件原地址
+        articleType:1,//稿件类型 0原创稿件 1转载稿件
       }
       dataList.value.splice(0,dataList.value.length);
       dataList.value.push(o);//回显详情各个字段
@@ -487,6 +506,7 @@ export default {
       addData,
       deleteData,
 
+      auditingUploadFilesPostUrl,
       auditingUploadFilesArrays,
       handleAuditingUploadChangeFn,
       handleAuditingUploadErrorFn,

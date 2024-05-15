@@ -98,7 +98,10 @@
           'font-size': '16px',
         }"
       >
-        <el-table-column label="序号" width="100">
+        <el-table-column label="序号" width="100"
+          header-align="center"
+          align="center"
+        >
           <template #default="scope">
             {{ scope.$index + 1 }}
           </template>
@@ -119,10 +122,18 @@
         <el-table-column
           prop="articleSource"
           label="稿件来源"
+          header-align="center"
+          align="center"
           width="125"
         />
-        <el-table-column prop="languageName" label="语种" width="120" />
-        <el-table-column prop="articleUseStatus" label="状态" width="110">
+        <el-table-column prop="languageName" label="语种" 
+        header-align="center"
+        align="center"
+        width="120" />
+        <el-table-column prop="articleUseStatus" label="状态"
+        header-align="center"
+        align="center"
+        width="110">
           <template #default="scope">
             <span
               :class="{
@@ -138,9 +149,15 @@
         <el-table-column
           prop="crtimeFormat"
           label="创建日期"
+          header-align="center"
+          align="center"
           width="140"
         />
-        <el-table-column prop="articleUseStatus" label="操作" width="130" >
+        <el-table-column prop="articleUseStatus" label="操作"
+        header-align="center"
+        align="center" 
+        width="130" 
+        >
           <template #default="scope">
             <div
               class="mid-content-statistics-table-tabledata-operate"
@@ -337,11 +354,13 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '我的投稿数据请求成功',
-          type: 'success',
-          plain: true,
-        })
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '我的投稿数据请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // })
         
         tableData.splice(0,tableData.length);   //清空tableData
         data.ldata.forEach((o)=>{

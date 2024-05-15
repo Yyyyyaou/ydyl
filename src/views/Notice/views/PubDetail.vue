@@ -134,7 +134,7 @@ export default {
       postUser.value = store.state.StroeLoginO.loginUser.postUser||store.state.StroeLoginO.loginUser.userName;
       
       
-      postTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD'];
+      postTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD hh:mm:ss'];
       remark.value = propsArticleO.value.remark||'';
 
 
@@ -220,11 +220,13 @@ export default {
             });
             return;
           }
-          ElMessage({
-            message: "我的投稿-查看数据请求成功",
-            type: "success",
-            plain: true,
-          });
+
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: "我的投稿-查看数据请求成功",
+          //   type: "success",
+          //   plain: true,
+          // });
 
           articleType.value = data.articleType;
           articleTitle.value = data.articleTitle;

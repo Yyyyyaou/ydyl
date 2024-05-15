@@ -76,7 +76,7 @@ before-remove 在附件列表删除文件钩子
              -->
             <el-upload
               class="auditingUploadC"
-              action="/web/article/upload"
+              :action="auditingUploadFilesPostUrl"
               v-model:file-list="auditingUploadFilesArray"
               multiple
               show-file-list
@@ -108,7 +108,7 @@ before-remove 在附件列表删除文件钩子
             <el-button type="primary" class="createorigin-content-upload-auditing1">上传</el-button>
             <el-upload
             class="auditingUploadC"
-              action="/web/article/upload"
+              :action="auditingUploadFilesPostUrl"
               v-model:file-list="auditingUploadFilesArray1"
               multiple
               show-file-list
@@ -139,7 +139,7 @@ before-remove 在附件列表删除文件钩子
   </div>
   <div class="createorigin-btngroup flexcenter">
     <el-button class="createorigin-btngroup-save" @click="postAddEditAjaxFn(0)">保存到草稿箱</el-button>
-    <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn">预 览</el-button>
+    <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn" data-desc="预 览">提 交</el-button>
     <el-button class="createorigin-btngroup-reset"
       @click="resetFormFn"
     >重 置</el-button>
@@ -248,7 +248,11 @@ export default {
     });
 
 
+    //附件上传接口地址
+    const auditingUploadFilesPostUrl = ref('');
+    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
 
+    
     //审核单附件列表
     const auditingUploadFilesArray = ref([]);//fileText=0
     //普通附件列表
@@ -454,6 +458,7 @@ export default {
       let checkResult = true;
       if(
         !articleTitle
+        ||(articleTitle&&articleTitle.trim() === '')
       ){
         ElMessage({
           message: '请重新填写稿件标题',
@@ -464,6 +469,7 @@ export default {
       }
       if(
         !articleSource
+        ||(articleSource&&articleSource.trim() === '')
       ){
         ElMessage({
           message: '请重新填写稿件来源',
@@ -484,6 +490,9 @@ export default {
       }
       if(
         !articleHtmlCon
+        ||articleHtmlCon==='　'
+        ||articleHtmlCon==='<p> </p>'
+        ||articleHtmlCon==='<p>　</p>'
         ||articleHtmlCon==='<p></p>'
         ||articleHtmlCon===''
         ||articleHtmlCon==='\n'
@@ -507,11 +516,11 @@ export default {
      */
     function postAddEditAjaxFn(articleStatusP){
       const datasO = {
-        articleTitle:formData.articleTitle,//稿件标题
-        articleSource:formData.articleSource,//稿件来源
+        articleTitle:formData.articleTitle.trim(),//稿件标题
+        articleSource:formData.articleSource.trim(),//稿件来源
         language:formData.language,//语种
         remark:formData.remark,//备注
-
+        articleType:0,//稿件类型 0原创稿件 1转载稿件
         articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
       };
 
@@ -529,7 +538,6 @@ export default {
       });
       //接口接受字符串
       datasO.fileUnit =  _fileUnit.toString();
-
 
       //普通附件列表
       const _fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
@@ -563,7 +571,7 @@ export default {
         if(forPropsGetFindByIdAjaxFnReturnO.value.id){
           _url = '/web/article/update.do';
           datasOFormData.append('id',forPropsGetFindByIdAjaxFnReturnO.value.id);//父组件传下来的id
-          datasOFormData.append('articleType',forPropsGetFindByIdAjaxFnReturnO.value.articleType);//父组件传下来的 articleType 稿件类型 0原创稿件 1转载稿件
+
         }else{
           _url = '/web/article/addEdit.do';
         }
@@ -595,6 +603,11 @@ export default {
 
         dialogNoticeDetailVisible.value = false;//关闭详情预览弹窗
         
+        //跳到 我的投稿 界面
+        router.push({
+          path:'/MyContribute'
+        });
+
       })
       .catch((error)=>{
         console.log('原创稿件提交 error',error);
@@ -651,9 +664,12 @@ export default {
         return o.label == '中文';
       })[0]['value'];
 
+
       //非要判断 稿件标题是否含有中文，如果不含有中文则  字段 language === 1 时提醒....
       if(
         !/[\u4e00-\u9fa5]/g.test(formData.articleTitle)
+        &&typeof formData.articleTitle !== undefined
+        &&(formData.articleTitle&&formData.articleTitle.trim() !== '')
         &&formData.language === zhCNValue
       ){
         //预览前要先 检测一下 标题语种，非中文要给提示
@@ -740,8 +756,7 @@ export default {
       }
       // end of if
 
-
-
+      
 
 
     }
@@ -769,6 +784,7 @@ export default {
       editorVideoTemplateCallbackFn,
       editorFilePickerCallbackFn,
 
+      auditingUploadFilesPostUrl,
       auditingUploadFilesArray,
       auditingUploadFilesArray1,
       auditingUploadFilesArray2,

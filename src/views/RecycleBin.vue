@@ -65,18 +65,21 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="序号" width="100">
+            <el-table-column label="序号" width="100"
+              header-align="center"
+              align="center" 
+            >
               <template #default="scope">
                 {{ scope.$index + 1 }}
               </template>
@@ -90,10 +93,22 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="articleSource" label="稿件来源" width="125" />
-            <el-table-column prop="languageName" label="语种" width="120" />
-            <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
-            <el-table-column prop="articleUseStatus" label="操作" width="200">
+            <el-table-column prop="articleSource" label="稿件来源" width="125" 
+              header-align="center"
+              align="center" 
+            />
+            <el-table-column prop="languageName" label="语种" width="120" 
+              header-align="center"
+              align="center" 
+            />
+            <el-table-column prop="crtimeFormat" label="创建日期" width="140" 
+              header-align="center"
+              align="center" 
+            />
+            <el-table-column prop="articleUseStatus" label="操作" width="200"
+              header-align="center"
+              align="center" 
+            >
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div :title="scope.row.articleTitle" @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">继续采用</div>
@@ -251,11 +266,13 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '回收站数据请求成功',
-          type: 'success',
-          plain: true,
-        })
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '回收站数据请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // })
         
         tableData.splice(0,tableData.length);   //清空tableData
         data.ldata.forEach((o)=>{

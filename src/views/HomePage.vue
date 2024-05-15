@@ -14,7 +14,9 @@
                 ></i> -->
                 <span>稿件统计</span>
               </div>
-              <div class="flexcenter hoverpointer">
+              <div class="flexcenter hoverpointer"
+                @click="$router.push('/StatisticsManuscript')"
+              >
                 <el-icon><DArrowRight /></el-icon>
               </div>
             </div>
@@ -150,8 +152,10 @@
           </div>
           <div class="mid-content-statistics-right">
             <div
+              v-if="statisticsTabsSelected==='0'"
               class="flexcenter mid-content-statistics-right-arrow hoverpointer"
-              @click="noticeArrowClick"
+              data-desc="通知公告更多"
+              @click="$router.push('/Notice')"
             >
               <el-icon><DArrowRight /></el-icon>
             </div>
@@ -211,14 +215,45 @@
             style="width: 100%; margin-top: 20px"
           >
             <div
+              data-desc="我的投稿更多"
+              v-if="
+                tableTabsSelected==='0' 
+                && userAuthority==='外部用户'
+              "
               class="flexcenter mid-content-statistics-right-arrow hoverpointer"
-              @click="tableArrowClick"
+              @click="$router.push('/MyContribute')"
             >
               <el-icon><DArrowRight /></el-icon>
             </div>
+
+            <div
+              data-desc="审核稿件 更多"
+              v-if=" 
+                tableTabsSelected==='0'
+                &&userAuthority==='国家信息中心用户'
+              "
+              class="flexcenter mid-content-statistics-right-arrow hoverpointer"
+              @click="$router.push('/ManuscriptAuditing')"
+            >
+              <el-icon><DArrowRight /></el-icon>
+            </div>
+
+            <div
+              data-desc="审核报题 更多"
+              v-if=" 
+                tableTabsSelected==='1'
+                &&userAuthority==='国家信息中心用户'
+              "
+              class="flexcenter mid-content-statistics-right-arrow hoverpointer"
+              @click="$router.push('/PaperAuditing')"
+            >
+              <el-icon><DArrowRight /></el-icon>
+            </div>
+
+
             <el-tabs
               type="border-card"
-              @tab-click="tableTabClick"
+              @tab-click="tableTabClickFn"
               v-if="
                 userAuthority == '外部用户' ||
                 userAuthority == '国家发改委用户'
@@ -252,7 +287,7 @@
 
             <el-tabs
               type="border-card"
-              @tab-click="tableTabClick"
+              @tab-click="tableTabClickFn"
               v-else-if="userAuthority == '国家信息中心用户'"
             >
               <el-tab-pane>
@@ -390,24 +425,26 @@ export default {
       },
     ]);
     //通知公告tabs选中index
-    let statisticsTabsSelected = 0;
+
+    const statisticsTabsSelected = ref('0');
     function statisticsTabClick(tab) {
-      statisticsTabsSelected = tab.index;
+      statisticsTabsSelected.value = tab.index;
     }
     //通知公告点击更多
-    function noticeArrowClick() {
-      console.log(statisticsTabsSelected);
-    }
+    // function noticeArrowClick() {
+    //   console.log(statisticsTabsSelected);
+    // }
 
     //table tabs选中index
-    let tableTabsSelected = 0;
-    function tableTabClick(tab) {
-      tableTabsSelected = tab.index;
+    const tableTabsSelected = ref('0');
+
+    function tableTabClickFn(tab) {
+      tableTabsSelected.value = tab.index;
     }
     //table 点击更多
-    function tableArrowClick() {
-      console.log(tableTabsSelected);
-    }
+    // function tableArrowClick() {
+    //   console.log(tableTabsSelected);
+    // }
 
     //投稿 -> 跳转到我的投稿页面
     const router = useRouter();
@@ -450,11 +487,13 @@ export default {
             });
             return;
           }
-          ElMessage({
-            message: "通知公告数据请求成功",
-            type: "success",
-            plain: true,
-          });
+
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: "通知公告数据请求成功",
+          //   type: "success",
+          //   plain: true,
+          // });
 
           activities.push(...data.ldata );
         })
@@ -620,9 +659,11 @@ export default {
       activities,
       activities1,
       statisticsTabClick,
-      noticeArrowClick,
-      tableTabClick,
-      tableArrowClick,
+      statisticsTabsSelected,
+      // noticeArrowClick,
+      tableTabClickFn,
+      tableTabsSelected,
+      // tableArrowClick,
       toPage,
       isClickedArr,
       elTimelineClick,

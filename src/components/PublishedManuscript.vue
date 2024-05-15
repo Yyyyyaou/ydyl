@@ -88,7 +88,10 @@
           'font-size': '16px',
         }"
       >
-        <el-table-column label="序号" width="100">
+        <el-table-column label="序号" width="100"
+          header-align="center"
+          align="center" 
+        >
           <template #default="scope">
             {{ scope.$index + 1 }}
           </template>
@@ -121,9 +124,18 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="articleSource" label="稿件来源" width="125" />
-        <el-table-column prop="languageName" label="语种" width="120" />
-        <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
+        <el-table-column prop="articleSource" label="稿件来源" width="125"
+          header-align="center"
+          align="center" 
+        />
+        <el-table-column prop="languageName" label="语种" width="120"
+          header-align="center"
+          align="center" 
+        />
+        <el-table-column prop="crtimeFormat" label="创建日期" width="140"
+          header-align="center"
+          align="center" 
+        />
       </el-table>
     </div>
     <div class="flexcenter el-pagination-style">
@@ -262,11 +274,13 @@ export default {
             });
             return;
           }
-          ElMessage({
-            message: "已发稿件数据请求成功",
-            type: "success",
-            plain: true,
-          });
+
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: "已发稿件数据请求成功",
+          //   type: "success",
+          //   plain: true,
+          // });
 
           tableData1.value = []; //清空tableData1
           data.ldata.forEach((o) => {

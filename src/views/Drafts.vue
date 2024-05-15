@@ -73,7 +73,10 @@
             @selection-change="tableSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="序号" width="100">
+            <el-table-column label="序号" width="100"
+              header-align="center"
+              align="center" 
+            >
               <template #default="scope">
                 {{ scope.$index + 1 }}
               </template>
@@ -87,9 +90,18 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="articleSource" label="稿件来源" width="125" />
-            <el-table-column prop="languageName" label="语种" width="120" />
-            <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
+            <el-table-column prop="articleSource" label="稿件来源" width="125"
+              header-align="center"
+              align="center" 
+            />
+            <el-table-column prop="languageName" label="语种" width="120"
+              header-align="center"
+              align="center" 
+            />
+            <el-table-column prop="crtimeFormat" label="创建日期" width="140"
+              header-align="center"
+              align="center" 
+            />
             <el-table-column prop="articleUseStatus" label="操作" width="200">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">

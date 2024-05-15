@@ -73,18 +73,21 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="序号" width="100">
+            <el-table-column label="序号" width="100"
+              header-align="center"
+              align="center" 
+            >
               <template #default="scope">
                 {{ scope.$index + 1 }}
               </template>
@@ -99,7 +102,10 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="crtimeFormat" label="创建日期" width="140" />
+            <el-table-column prop="crtimeFormat" label="创建日期" width="140"
+              header-align="center"
+              align="center" 
+            />
             <el-table-column prop="articleUseStatus" label="操作" width="180">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
