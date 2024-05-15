@@ -107,7 +107,9 @@
             <p>82.6%</p>
             <p>采用率</p>
           </div>
-          <el-icon title="采用率=发布总数+投稿总数x100%"><InfoFilled /></el-icon>
+          <el-icon title="采用率=发布总数+投稿总数x100%"
+            ><InfoFilled
+          /></el-icon>
         </div>
 
         <!-- 国家信息中心用户 -->
@@ -194,7 +196,9 @@
             <p>{{ num6 }}</p>
             <p>采用率</p>
           </div>
-          <el-icon title="采用率=发布总数+投稿总数x100%"><InfoFilled /></el-icon>
+          <el-icon title="采用率=发布总数+投稿总数x100%"
+            ><InfoFilled
+          /></el-icon>
         </div>
       </div>
     </div>
@@ -283,13 +287,13 @@ export default {
       let param = {};
       if (fromTimeSelect) {
         param = {
-          searchUser: 1, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
           endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
         };
       } else {
         param = {
-          searchUser: 1, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
+          searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
         };
