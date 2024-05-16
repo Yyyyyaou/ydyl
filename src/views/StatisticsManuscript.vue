@@ -2,7 +2,7 @@
   <div class="mid-content">
     <div class="mid-content-divs flexcenter">
       <div class="mid-content-divs-searchgroup">
-        <el-select
+        <!-- <el-select
           v-model="companySelectValue"
           placeholder="投稿单位"
           style="width: 140px"
@@ -14,7 +14,14 @@
             :label="item.label"
             :value="item.value"
           />
-        </el-select>
+        </el-select> -->
+        <el-autocomplete
+          v-model="companySelectValue"
+          style="width: 140px"
+          :fetch-suggestions="querySearch"
+          clearable
+          placeholder="投稿单位"
+        />
         <el-select
           v-model="timeSelectValue"
           placeholder="时间范围"
@@ -259,12 +266,37 @@ export default {
 
     // console.log("HomePage userAuthority", userAuthority);
     const companySelectValue = ref("");
-    const companyOptions = reactive([{ label: "中经社", value: 0 }]);
-    const timeSelectValue = ref(0);
+    // const companyOptions = reactive([{ label: "中经社", value: 0 }]);
+    //联想输入框
+    const restaurants = ref([]);
+    const querySearch = (queryString, cb) => {
+      const results = queryString
+        ? restaurants.value.filter(createFilter(queryString))
+        : restaurants.value;
+      // call callback function to return suggestions
+      cb(results);
+    };
+    const loadAll = () => {
+      return [
+        { value: "a单位", link: "https://github.com/vuejs/vue" },
+        { value: "b单位", link: "https://github.com/ElemeFE/element" },
+        { value: "c单位", link: "https://github.com/ElemeFE/cooking" },
+        { value: "db单位", link: "https://github.com/ElemeFE/mint-ui" },
+      ];
+    };
+    const createFilter = (queryString) => {
+      return (restaurant) => {
+        return (
+          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    };
+    const timeSelectValue = ref(1);
     const timeOptions = reactive([
-      { label: "近1天", value: 0 },
-      { label: "近7天", value: 1 },
-      { label: "近30天", value: 2 },
+      { label: "近7天", value: 0 },
+      { label: "近30天", value: 1 },
+      { label: "近3个月", value: 2 },
     ]);
     //日期选择 数据
     const dateDefaultTime = ref([]);
@@ -349,19 +381,18 @@ export default {
       }
       getArticleCountAjaxFn();
     }
-    //时间范围选择器change（1天 7天）
+    //时间范围选择器change（7天 30天）
     let startTime = new Date();
     let endTime = new Date();
     function timeSelectChange(val) {
       if (val == 0) {
-        //startTime = timeForMat(1);
-        startTime = new Date();
-      } else if (val == 1) {
         startTime = timeForMat(6);
-      } else if (val == 2) {
+      } else if (val == 1) {
         startTime = timeForMat(29);
+      } else if (val == 2) {
+        startTime = timeForMat(90);
       }
-
+      dateDefaultTime.value = [startTime, new Date()]; //日期范围选择初始化
       getArticleCountAjaxFn(true);
     }
     function timeForMat(count) {
@@ -370,13 +401,15 @@ export default {
       );
     }
     onMounted(() => {
-      dateDefaultTime.value = [new Date(), new Date()]; //日期范围选择初始化
-      getArticleCountAjaxFn(); //外部用户 稿件统计
+      restaurants.value = loadAll(); //联想输入框赋值
+      dateDefaultTime.value = [timeForMat(29), new Date()]; //日期范围选择初始化
+      getArticleCountAjaxFn(); //外部用户 稿件统计 
     });
     return {
       userAuthority,
       companySelectValue,
-      companyOptions,
+      querySearch,
+      // companyOptions,
       timeSelectValue,
       timeOptions,
       dateDefaultTime,
@@ -560,7 +593,8 @@ export default {
     :deep(.el-select__caret),
     :deep(.el-date-editor .el-range__icon),
     :deep(.el-range-input),
-    :deep(.el-range-separator) {
+    :deep(.el-range-separator),
+    :deep(.el-input__inner) {
       color: #fff;
       &::placeholder {
         color: #fff;
