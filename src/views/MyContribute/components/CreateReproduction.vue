@@ -76,11 +76,12 @@
                 :action="auditingUploadFilesPostUrl"
                 multiple
                 show-file-list
-                disabled
+                :file-list="auditingUploadFilesArrays[index]"
+
                 :on-change="handleAuditingUploadChangeFn.bind(this,index)"
                 :on-error="handleAuditingUploadErrorFn.bind(this,index)"
                 :before-remove="handleAuditingUploadBeforeRemoveFn.bind(this,index)"
-                :on-success="handleAuditingUploadSuccessFn"
+                :on-success="handleAuditingUploadSuccessFn.bind(this,index)"
                 name="files"
                 :data="{
                   fileText:1,//	0审核单,1附件,2正文
@@ -129,7 +130,7 @@
 </template>
 
 <script>
-import { reactive, ref,toRefs,onMounted } from "vue";
+import { reactive, ref,toRefs,onMounted, } from "vue";
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { ElMessage,ElLoading } from "element-plus";
@@ -218,11 +219,15 @@ export default {
     });
 
     //附件上传接口地址
-    const auditingUploadFilesPostUrl = ref('');
+    const auditingUploadFilesPostUrl = ref('');    
     process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
 
     //普通附件列表
     const auditingUploadFilesArrays = reactive([]);
+    function getAuditingUploadFilesArraysFn(indexP){
+      return eval('auditingUploadFilesArrays_'+indexP)
+    }
+
     /**
      * 转载稿件的附件上传 element plus 有问题，
      * 如果 附件列表 变量 为 嵌套复杂对象 
@@ -236,18 +241,18 @@ export default {
      * 所以暂时搁置 上传附件开发
      */
     function handleAuditingUploadChangeFn(indexP,file,files){indexP,file,files;
-      if(
-        !Array.isArray(auditingUploadFilesArrays[indexP])
-      ){
-        auditingUploadFilesArrays[indexP] = [];
-      }
+      // if(
+      //   !Array.isArray(auditingUploadFilesArrays[indexP])
+      // ){
+      //   auditingUploadFilesArrays[indexP] = [];
+      // }
 
-      console.log('files',files);
-      files.forEach((o,i)=>{
-        console.log('o,i===========',o,i);
-        console.log(document.querySelector('#auditingUploadID_'+indexP+' input[type=file]'));
-        // auditingUploadFilesArrays[indexP].push(o);
-      });
+      // console.log('files',files);
+      // files.forEach((o,i)=>{
+      //   console.log('o,i===========',o,i);
+      //   console.log(document.querySelector('#auditingUploadID_'+indexP+' input[type=file]'));
+      //   // auditingUploadFilesArrays[indexP].push(o);
+      // });
 
     }
     // end of handleAuditingUploadChange
@@ -289,15 +294,26 @@ export default {
     /**
      * 附件上传成功
      */
-    function handleAuditingUploadSuccessFn(response, uploadFile, uploadFiles){uploadFile, uploadFiles
+    function handleAuditingUploadSuccessFn(indexP,responseP, uploadFile, uploadFiles){uploadFile, uploadFiles
 
-      if(response.success){
+      if(responseP.success){
         ElMessage({
           message: '附件上传成功',
           type: 'success',
           plain: true,
         })
       }
+      
+      if(
+        !Array.isArray(auditingUploadFilesArrays[indexP])
+      ){
+        auditingUploadFilesArrays[indexP] = [];
+      }
+
+      console.log('uploadFiles',uploadFiles);
+      console.log('responseP',responseP);
+
+      auditingUploadFilesArrays[indexP] = uploadFiles;
 
     }
     // end of handleAuditingUploadSuccessFn
@@ -390,10 +406,11 @@ export default {
 
       let checkFieldValueFnResult = true;//true为校验通过
 
-      console.log('auditingUploadFilesArrays',auditingUploadFilesArrays);
+      // console.log('auditingUploadFilesArrays',auditingUploadFilesArrays);
 
 
-      dataList.value.forEach((o)=>{
+      dataList.value.forEach((o,i)=>{
+
         // o.fileAccessory = auditingUploadFilesArrays[i].fileAccessory.reduce((old,next)=>{
         //   if(!next.response){
         //     return '';
@@ -401,6 +418,16 @@ export default {
         //   let _str = old===''?next.response?.data[0].fileName:old+','+next.response?.data[0].fileName;
         //   return _str
         // },'');
+
+        o.fileAccessory = auditingUploadFilesArrays[i].reduce((old,next)=>{
+          // let _str = ''
+          console.log('next',next);
+
+          return old+','
+        },'');
+
+        console.log('o.fileAccessory',o.fileAccessory);
+
         o.articleTitle = o.articleTitle.trim();
         o.articleSource = o.articleSource.trim();
 
@@ -418,6 +445,8 @@ export default {
       console.log('dataList',dataList);
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
+
+return;
 
       // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
       const httpAxiosOUrl = (()=>{
@@ -454,9 +483,10 @@ export default {
           type: 'success',
           plain: true,
         });
-        //跳到 我的投稿 界面
+        
+        //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿 
         router.push({
-          path:'/MyContribute'
+          path:articleStatusP?'/MyContribute':'/Drafts'
         });
 
 
@@ -506,8 +536,11 @@ export default {
       addData,
       deleteData,
 
-      auditingUploadFilesPostUrl,
+      //为了迁就 element-ui 附件上传组件bug（所以，一个el-upload组件对应一个数组）
       auditingUploadFilesArrays,
+      getAuditingUploadFilesArraysFn,
+
+      auditingUploadFilesPostUrl,
       handleAuditingUploadChangeFn,
       handleAuditingUploadErrorFn,
       handleAuditingUploadBeforeRemoveFn,

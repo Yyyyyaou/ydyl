@@ -256,6 +256,14 @@ export default {
           break;
       }
 
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.startTime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD']+' 00:00:00' //起始时间
+        paramsO.endTime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD']+' 23:59:59' //结束时间
+      }
+
 
       httpAxiosO({
         method:'get',

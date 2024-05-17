@@ -48,13 +48,26 @@
               />
             </div>
             <div class="marl10">
-              <el-autocomplete
-                v-model="originInput"
+              <el-select
+                v-model="originSelect"
+                placeholder="稿件来源"
+                style="width: 140px"
+                class="marl10"
+              >
+                <el-option
+                  v-for="item in langOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+              <!-- <el-autocomplete
+                v-model="originSelect"
                 style="width: 190px"
                 :fetch-suggestions="querySearch"
                 clearable
                 placeholder="稿件来源"
-              />
+              /> -->
             </div>
 
             <el-select
@@ -74,8 +87,8 @@
               <el-date-picker
                 v-model="dateDefaultTime"
                 type="daterange"
-                start-placeholder="创建起始日期"
-                end-placeholder="创建结束日期"
+                start-placeholder="提交起始日期"
+                end-placeholder="提交结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
               />
@@ -706,8 +719,10 @@ export default {
     const popoverShowFlag = ref(false);
 
 
-    //联想输入框
-    const originInput = ref("");
+
+    const originSelect = ref("");//来源
+    const originSelectOption = ref([]);originSelectOption
+
     const restaurants = ref([]);
     const querySearch = (queryString, cb) => {
       const results = queryString
@@ -716,17 +731,17 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-    const loadAll = () => {
-      return [
-        { value: "vue", link: "https://github.com/vuejs/vue" },
-        { value: "element", link: "https://github.com/ElemeFE/element" },
-        { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
-        { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
-        { value: "vuex", link: "https://github.com/vuejs/vuex" },
-        { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
-        { value: "babel", link: "https://github.com/babel/babel" },
-      ];
-    };
+    // const loadAll = () => {
+    //   return [
+    //     { value: "vue", link: "https://github.com/vuejs/vue" },
+    //     { value: "element", link: "https://github.com/ElemeFE/element" },
+    //     { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
+    //     { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
+    //     { value: "vuex", link: "https://github.com/vuejs/vuex" },
+    //     { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
+    //     { value: "babel", link: "https://github.com/babel/babel" },
+    //   ];
+    // };
     const createFilter = (queryString) => {
       return (restaurant) => {
         return (
@@ -1158,7 +1173,7 @@ export default {
     //end of externalAuditArticleRecordListAjaxFn
 
     onMounted(() => {
-      restaurants.value = loadAll();
+      // restaurants.value = loadAll();
       getNeedAuditCountAjaxFn();//待审核
       getNeedAuditCountAjaxFn1();//已处理
     });
@@ -1181,7 +1196,7 @@ export default {
       isClickedArr,
 
       popoverShowFlag,
-      originInput,
+      originSelect,
       querySearch,
       
       statusRadio,

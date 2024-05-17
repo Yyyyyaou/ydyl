@@ -95,7 +95,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="crtimeFormat" label="时间" width="140" />
+            <el-table-column prop="crtimeFormat" label="时间" width="240" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination
@@ -197,12 +197,21 @@ export default {
 
       switch(searchSelectValue.value){
         case 0:
-        paramsO.title = searchInput.value;//检索关键词，模糊检索标题
+        paramsO.noticeTitle = searchInput.value;//检索关键词，模糊检索标题
           break;
         case 1:
-        paramsO.content = searchInput.value;//检索关键词，模糊检索正文
+        paramsO.noticeContent = searchInput.value;//检索关键词，模糊检索正文
           break;
       }
+
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      }
+
 
 
       httpAxiosO({
@@ -229,6 +238,7 @@ export default {
         //   plain: true,
         // })
 
+        tableData.splice(0,data.ldata.length);
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.crtimeFormat = timeFormatFn(o.pubTime)['YYYY-MM-DD hh:mm:ss']//时间格式化

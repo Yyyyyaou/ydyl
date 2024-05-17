@@ -252,7 +252,9 @@ export default {
     const auditingUploadFilesPostUrl = ref('');
     process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
 
-    
+    //附件id集合，袁冰写的代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds
+    const auditingUploadFilesFileIds = reactive([]);
+
     //审核单附件列表
     const auditingUploadFilesArray = ref([]);//fileText=0
     //普通附件列表
@@ -263,7 +265,25 @@ export default {
     // const postAddEditAjaxFormData = new FormData();
     function handleAuditingUploadChangeFn(file,files){file,files
 
+
+    }
+    // end of handleAuditingUploadChange
+
+    /**
+     * 附件上传成功
+     */
+    function handleAuditingUploadSuccessFn(response, uploadFile, files){uploadFile, files
+
+      if(response.success){
+        ElMessage({
+          message: '附件上传成功',
+          type: 'success',
+          plain: true,
+        })
+      }
+      
       files.forEach((o)=>{
+
         switch(o.fileText){
           case 0://审核单附件
           auditingUploadFilesArray.value.push(o);
@@ -279,23 +299,6 @@ export default {
       });
 
     }
-    // end of handleAuditingUploadChange
-
-    /**
-     * 附件上传成功
-     */
-    function handleAuditingUploadSuccessFn(response, uploadFile, uploadFiles){uploadFile, uploadFiles
-
-      if(response.success){
-        ElMessage({
-          message: '附件上传成功',
-          type: 'success',
-          plain: true,
-        })
-      }
-
-
-    }
     // end of handleAuditingUploadSuccessFn
 
     /**
@@ -308,9 +311,6 @@ export default {
       console.log('handleAuditingUploadErrorFn error',error);
       console.log('handleAuditingUploadErrorFn uploadFile',uploadFile);
       console.log('handleAuditingUploadErrorFn uploadFiles',uploadFiles);
-      // auditingUploadFilesArray.value.forEach((o)=>{
-      //   console.log('o',o);
-      // });
 
     }
 
@@ -319,13 +319,13 @@ export default {
      */
     function handleAuditingUploadBeforeRemoveFn(uploadFile, uploadFiles){uploadFiles
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
-      const {fileName} = uploadFile.response.data[0];
+      const {id} = uploadFile.response.data[0];
 
       return httpAxiosO({
         url: '/web/article/delFileObj',
         method: 'delete',
         params: {
-          fileName
+          fileIds:String(id),
         }
       })
       .finally(()=>{
@@ -515,6 +515,8 @@ export default {
      *  
      */
     function postAddEditAjaxFn(articleStatusP){
+      //为原创稿件继续采用单独写的
+      const datasOArr = []
       const datasO = {
         articleTitle:formData.articleTitle.trim(),//稿件标题
         articleSource:formData.articleSource.trim(),//稿件来源
@@ -528,9 +530,18 @@ export default {
 
       datasO.articleContent = editorTEXTContent.value||'';//稿件文本内容
 
+      //清空 auditingUploadFilesFileIds 附件id集合
+      auditingUploadFilesFileIds.splice(0,auditingUploadFilesFileIds.length);
+
+
       //审核附件列表
       const _fileUnit = auditingUploadFilesArray.value.map((o)=>{
         if(o.response){
+
+          //收集附件id
+          if(!auditingUploadFilesFileIds.includes(o.response.id)){
+            auditingUploadFilesFileIds.push(o.response.id);
+          }
           return o.response?.data[0].fileName
         }else{
           return;
@@ -542,6 +553,10 @@ export default {
       //普通附件列表
       const _fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
         if(o.response){
+          //收集附件id
+          if(!auditingUploadFilesFileIds.includes(o.response.id)){
+            auditingUploadFilesFileIds.push(o.response.id);
+          }
           return o.response?.data[0].fileName
         }else{
           return;
@@ -550,39 +565,45 @@ export default {
       //接口接受字符串
       datasO.fileAccessory =  _fileAccessory.toString();
 
+      //附件id 接口 接收字符串
+      datasO.fileIds = auditingUploadFilesFileIds.toString();
+
+
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       const _regExp1 = /\n$/;
       datasO.articleContent = datasO.articleContent.replace(_regExp1, '');
-
 
       if(!checkFieldValueFn(datasO)){//验证各个字段
         return;
       }
 
       //接口代码接收流
-      const datasOFormData = new FormData();
-      for(let key in datasO){
-        datasOFormData.append(key,datasO[key]); 
-      }
+      // const datasOFormData = new FormData();
+      // for(let key in datasO){
+      //   datasOFormData.append(key,datasO[key]); 
+      // }
+
 
       // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
       const httpAxiosOUrl = (()=>{
         let _url = '';
         if(forPropsGetFindByIdAjaxFnReturnO.value.id){
           _url = '/web/article/update.do';
-          datasOFormData.append('id',forPropsGetFindByIdAjaxFnReturnO.value.id);//父组件传下来的id
-
+          // datasOFormData.append('id',forPropsGetFindByIdAjaxFnReturnO.value.id);//父组件传下来的id
+          datasO.id = forPropsGetFindByIdAjaxFnReturnO.value.id;
+          datasOArr.push(datasO) //
         }else{
           _url = '/web/article/addEdit.do';
         }
         return _url
       })();
 
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       httpAxiosO({
         url:httpAxiosOUrl,
         method:'post',
-        data:datasOFormData,
+        data:forPropsGetFindByIdAjaxFnReturnO.value.id?datasOArr:datasO,
       })
       .then((D)=>{
         console.log('原创稿件提交 D',D);
@@ -595,17 +616,20 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '原创稿件提交成功',
-          type: 'success',
-          plain: true,
-        });
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '原创稿件提交成功',
+        //   type: 'success',
+        //   plain: true,
+        // });
 
         dialogNoticeDetailVisible.value = false;//关闭详情预览弹窗
         
-        //跳到 我的投稿 界面
+        
+        //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿 
         router.push({
-          path:'/MyContribute'
+          path:articleStatusP?'/MyContribute':'/Drafts'
         });
 
       })
@@ -635,7 +659,7 @@ export default {
 
         formData.articleContent = editorTEXTContent.value||'';//稿件文本内容
 
-
+        
         //审核附件列表
         formData.fileUnit = auditingUploadFilesArray.value.map((o)=>{
           return o.response?.data[0].fileName || ''

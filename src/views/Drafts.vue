@@ -264,11 +264,13 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '草稿箱数据请求成功',
-          type: 'success',
-          plain: true,
-        });
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '草稿箱数据请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // });
 
         tableData.splice(0,tableData.length);   //清空tableData
         data.ldata.forEach((o)=>{

@@ -100,7 +100,7 @@ export default {
   },
   setup(props,ctx) {
 
-    const URL_IS_API = process.env.NODE_ENV === 'development'?'/api':'';
+    const URL_IS_API = process.env.NODE_ENV === 'development'?'/api/tougaoadmin':'/tougaoadmin';
 
     const { propsArticleO,propsId } = toRefs(props);
 
