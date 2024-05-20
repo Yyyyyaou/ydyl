@@ -93,7 +93,6 @@
           'font-size': '16px',
         }"
         :cell-style="{
-          'text-align': 'center',
           'color': '#727789',
           'font-size': '16px',
         }"
@@ -106,14 +105,13 @@
             {{ scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="articleTitle" label="稿件标题">
+        <el-table-column prop="articleTitle" label="稿件标题"
+          header-align="center"
+        >
           <template #default="scope">
             <span
-              style="
-                display: flex;
-                justify-content: left;
-                text-align: left;
-              "
+              style="cursor: pointer;"
+              @click="getFindByIdAjaxFn(scope)"
             >
               {{ scope.row.articleTitle }}
             </span>
@@ -172,7 +170,24 @@
                 @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)"
               >编辑</div>
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span> -->
-              <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFn(scope)">删除</div>
+              
+              <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
+                <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFn(scope)">删除</div> 
+              -->
+              <el-popconfirm
+                v-if="scope.row.articleUseStatus === 0"
+                data-desc="待处理"
+                title="确定删除吗？"
+                confirm-button-text="删除"
+                cancel-button-text="取消"
+                @confirm="triggerDeleteLogicDeleteFn(scope)"
+              >
+                <template #reference>
+                  <div>删除</div>
+                </template>
+              </el-popconfirm>
+
+
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
             </div>
           </template>

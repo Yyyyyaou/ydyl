@@ -83,4 +83,18 @@ export async function getNoticeFindByIdFn(ctx,idP){
   })
 }
 
+/**
+ * 来源模糊查询列表接口
+ */
+export function getSearchFindSourceListFn(ctx,sourceNameP){
+  ctx
+
+  return httpAxiosO({
+    method:'get',
+    url:'/web/source/findSourceList',
+    params:{
+      sourceName:String(sourceNameP),
+    }
+  });
+}
 

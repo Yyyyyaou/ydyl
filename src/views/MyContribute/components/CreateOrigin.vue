@@ -7,8 +7,15 @@
       </el-form-item>
       <el-row style="justify-content: space-between">
         <el-col :span="11">
-          <el-form-item label="稿件来源" prop="articleSource">
-            <el-input v-model="formData.articleSource" clearable></el-input>
+          <el-form-item label="稿件来源" prop="articleSourceName">
+            <el-autocomplete
+              v-model="formData.articleSourceName"
+              :fetch-suggestions="articleSourceQuerySearchFn"
+              clearable
+              style="width:100%;"
+              placeholder="请输入来源"
+              @select="articleSourceHandleSelectFn"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="11">
@@ -186,7 +193,11 @@ export default {
 
     const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
 
-    const formData = reactive({});//表单数据
+    const formData = reactive({
+      articleSource:0,//保存 已有来源（即来源列表接口能查到），则把列表里该来源的 sourceId 赋值给它
+      sourceName:'',//如有新增来源（即来源列表接口查不到），则把articleSourceName 赋值给它
+      articleSourceName:'',//记录用户输入、显示来源名字的字段
+    });//表单数据
     const rules = reactive({
       articleTitle: [//文章标题
         {
@@ -195,9 +206,23 @@ export default {
           trigger: "blur",
         },
       ],
-      articleSource: [//文章来源
+      articleSourceName:[//稿件来源名字，用来显示
         {
           required: true,
+          message: "必填项",
+          trigger: "blur",
+        },
+      ],
+      articleSource: [//稿件来源id，用来储存来源id，Number类型
+        {
+          required: false,
+          message: "必填项",
+          trigger: "blur",
+        },
+      ],
+      sourceName: [//稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
+        {
+          required: false,
           message: "必填项",
           trigger: "blur",
         },
@@ -232,6 +257,60 @@ export default {
       ]
     });
 
+
+    /**
+     * 选中已有来源
+     * @param {*} itemP 在来源列表中选中的对象
+     */
+    function articleSourceHandleSelectFn(itemP){
+      formData['articleSource'] = itemP.id;
+      formData['sourceName'] = '';
+    }
+    // end of articleSourceHandleSelectFn
+
+    //保存来源搜索后的结果
+    const articleSourceQuerySearchResultsArr = reactive([]);
+  
+    /**
+     * 已有来源查询
+     * @param {*} sourceNameP 来源检索词
+     */
+    async function articleSourceQuerySearchFn(sourceNameP){
+
+      await store.dispatch('getSearchFindSourceListFn',sourceNameP)
+      .then((D)=>{
+
+        console.log('D',D);
+        
+        articleSourceQuerySearchResultsArr.splice(0,articleSourceQuerySearchResultsArr.length);
+
+        if(
+          Array.isArray(D.data)
+          &&D.data.length>0
+        ){
+          console.log('D.length>0');
+          D.data.forEach((o)=>{
+            let _o = o;
+            _o.value = o.sourceName;
+            articleSourceQuerySearchResultsArr.push(_o);
+          });
+          console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
+        }else{//没查到结果，说明该检索字符串为新字符串
+          formData['sourceName'] = sourceNameP.trim();
+          formData['articleSource'] = 0;//把来源id字段设成0，与袁冰 协商后 传0代表没有id
+
+        }
+
+      })
+      .catch((error)=>{
+        console.log('error',error);
+      })
+      ;
+      return articleSourceQuerySearchResultsArr
+    }
+    // end of articleSourceQuerySearchFn
+
+
     const langOptions = reactive([]);
     store.state.GLOBAL_LANGUAGE_LIST.forEach((o,i)=>{
       //∵ 这个界面不需要全部
@@ -246,6 +325,7 @@ export default {
         label: o.desc,
       })
     });
+
 
 
     //附件上传接口地址
@@ -453,7 +533,11 @@ export default {
      * @param {*} datasOP 
      */
     function checkFieldValueFn(datasOP){
-      const { articleTitle,articleSource,language,articleHtmlCon } = datasOP;
+      const { articleTitle,articleSource,language,articleHtmlCon,sourceName } = datasOP;
+
+      // console.log('sourceName',sourceName);
+      // console.log('articleSource',articleSource);
+      // console.log('articleTitle',articleTitle);
 
       let checkResult = true;
       if(
@@ -468,8 +552,15 @@ export default {
         checkResult = false;
       }
       if(
-        !articleSource
-        ||(articleSource&&articleSource.trim() === '')
+        (
+          !articleSource
+          && articleSource === 0
+        )
+        &&
+        (
+          !sourceName
+          ||(sourceName&&sourceName.trim() === '')
+        )
       ){
         ElMessage({
           message: '请重新填写稿件来源',
@@ -515,16 +606,29 @@ export default {
      *  
      */
     function postAddEditAjaxFn(articleStatusP){
+
+      //这里针对稿件来源
+      //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
+      articleSourceQuerySearchResultsArr.forEach((o)=>{
+        if(formData.articleSourceName === o.sourceName){
+          formData.articleSource = o.sourceId;//表示用的已有来源
+          formData.sourceName = '';//表示不是新来源
+        }
+      });
+
+
       //为原创稿件继续采用单独写的
       const datasOArr = []
       const datasO = {
         articleTitle:formData.articleTitle.trim(),//稿件标题
-        articleSource:formData.articleSource.trim(),//稿件来源
+        articleSource:formData.articleSource,//稿件来源
         language:formData.language,//语种
         remark:formData.remark,//备注
         articleType:0,//稿件类型 0原创稿件 1转载稿件
         articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
+        sourceName:formData.sourceName,//稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
       };
+
 
       datasO.articleHtmlCon = editorHTMLContent.value||'';//稿件HTML内容
 
@@ -603,14 +707,18 @@ export default {
       httpAxiosO({
         url:httpAxiosOUrl,
         method:'post',
-        data:forPropsGetFindByIdAjaxFnReturnO.value.id?datasOArr:datasO,
+        headers:{
+          //这个接口不写 这行会报错
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        data:forPropsGetFindByIdAjaxFnReturnO.value.id?datasOArr:JSON.stringify(datasO),
       })
       .then((D)=>{
         console.log('原创稿件提交 D',D);
         const { data,success } = D.data;data
         if(!success){
           ElMessage({
-            message: '原创稿件提交 接口传参可能有误',
+            message: '操作失败 接口传参可能有误',
             type: 'error',
             plain: true,
           })
@@ -669,7 +777,6 @@ export default {
         formData.fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
           return o.response?.data[0].fileName || ''
         });
-
 
         if(!checkFieldValueFn(formData)){//验证各个字段
           return;
@@ -798,6 +905,10 @@ export default {
       formData,
       rules,
       langOptions,
+
+      articleSourceQuerySearchResultsArr,
+      articleSourceHandleSelectFn,
+      articleSourceQuerySearchFn,
 
       dialogNoticeDetailVisible,
       NoticeDetailRef,

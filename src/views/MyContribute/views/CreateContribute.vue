@@ -100,14 +100,23 @@ export default {
           })
           return;
         }
-        ElMessage({
-          message: '我的投稿-查看数据请求成功',
-          type: 'success',
-          plain: true,
-        })
+
+        //注释于 20240515.1530 jira YDYL-5 建议删除
+        // ElMessage({
+        //   message: '我的投稿-查看数据请求成功',
+        //   type: 'success',
+        //   plain: true,
+        // })
 
         for(let key in data){
-          propsGetFindByIdAjaxFnReturnO[key] = data[key]
+          if(
+            data[key]
+            &&data[key] !== 'undefined'
+          ){
+            propsGetFindByIdAjaxFnReturnO[key] = data[key];
+          }else{
+            propsGetFindByIdAjaxFnReturnO[key] = '';
+          }
         }
 
         // propsGetFindByIdAjaxFnReturnO.articleTitle = data.articleTitle;//稿件标题
@@ -119,6 +128,8 @@ export default {
 
         // propsGetFindByIdAjaxFnReturnO.language = data.language||'';//语种
         // propsGetFindByIdAjaxFnReturnO.remark = data.remark||'';//备注
+
+        console.log('propsGetFindByIdAjaxFnReturnO',propsGetFindByIdAjaxFnReturnO);
 
         //data.articleType = 0  “原创稿件”
         //data.articleType = 1  “转载稿件”

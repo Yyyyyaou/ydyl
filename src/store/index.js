@@ -20,6 +20,7 @@ import {
   getUpdateFn,
   getArticleFindByIdFn,
   getNoticeFindByIdFn,
+  getSearchFindSourceListFn,
 } from './actionSubmission.js';
 
 import {
@@ -110,6 +111,7 @@ export default createStore({
     getUpdateFn,
     getArticleFindByIdFn,
     getNoticeFindByIdFn,
+    getSearchFindSourceListFn,
 
     externalAuditArticleFindByIdFn,
 

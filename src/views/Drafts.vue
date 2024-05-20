@@ -57,6 +57,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
+            empty-text="暂无数据"
             :data="tableData"
             border
             style="width: 100%"
@@ -90,7 +91,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="articleSource" label="稿件来源" width="125"
+            <el-table-column prop="sourceName" label="稿件来源" width="125"
               header-align="center"
               align="center" 
             />
@@ -107,9 +108,24 @@
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div :title="scope.row.articleTitle"  @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">编辑</div>
                   <span></span>
+                  
+                  
+                  <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
                   <div
                     @click="deleteArticleAjaxFn(scope.row.id)"
-                  >删除</div>
+                  >删除</div> 
+                  -->
+                  <el-popconfirm
+                    title="确定删除吗？"
+                    confirm-button-text="删除"
+                    cancel-button-text="取消"
+                    @confirm="deleteArticleAjaxFn(scope.row.id)"
+                  >
+                    <template #reference>
+                      <div>删除</div>
+                    </template>
+                  </el-popconfirm>
+
                   <span></span>
                 </div>
               </template>

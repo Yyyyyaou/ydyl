@@ -68,6 +68,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
+            empty-text="暂无数据"
             :data="tableData"
             border
             style="width: 100%"

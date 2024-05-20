@@ -495,7 +495,7 @@ export default {
           //   plain: true,
           // });
 
-          activities.push(...data.ldata );
+          activities.push(...data.ldata.slice(0,3) );
         })
         .catch((error) => {
           console.log("通知公告 接口请求 error", error);

@@ -74,8 +74,8 @@
               <el-date-picker
                 v-model="dateDefaultTime"
                 type="daterange"
-                start-placeholder="创建起始日期"
-                end-placeholder="创建结束日期"
+                start-placeholder="起始日期"
+                end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
               />
@@ -90,6 +90,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
+            empty-text="暂无数据"
             :data="tableData"
             @selection-change="handleSelectionTableDataFn"
             border
@@ -394,6 +395,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
+            empty-text="暂无数据"
             :data="tableData1"
             border
             style="width: 100%"

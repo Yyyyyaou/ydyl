@@ -57,6 +57,7 @@
         </div>
         <div class="mid-content-mycontribute-table-tabledata">
           <el-table
+            empty-text="暂无数据"
             :data="tableData"
             border
             style="width: 100%"
@@ -238,11 +239,11 @@ export default {
         //   plain: true,
         // })
 
-        tableData.splice(0,data.ldata.length);
+        tableData.splice(0,tableData.length);
         data.ldata.forEach((o)=>{
           let _o = o;
           _o.crtimeFormat = timeFormatFn(o.pubTime)['YYYY-MM-DD hh:mm:ss']//时间格式化
-          tableData.push(_o);  
+          tableData.push(_o);
         });
         pageTotal.value = data.totalResults;
       })

@@ -39,11 +39,17 @@
             </el-form-item>
             <el-row style="justify-content: space-between">
               <el-col :span="11">
-                <el-form-item label="稿件来源" prop="articleSource">
-                  <el-input
-                    v-model="dataList[index].articleSource"
+                <el-form-item label="稿件来源" prop="articleSourceName">
+
+                  <el-autocomplete
+                    v-model="dataList[index].articleSourceName"
+                    :fetch-suggestions="articleSourceQuerySearchFn.bind(this,index)"
                     clearable
-                  ></el-input>
+                    style="width:100%;"
+                    placeholder="请输入来源"
+                    @select="articleSourceHandleSelectFn.bind(this,index)"
+                  />
+
                 </el-form-item>
               </el-col>
               <el-col :span="11">
@@ -149,7 +155,10 @@ export default {
 
     const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
 
-    const dataList = ref([{}]);
+    const dataList = ref([{
+      articleSource:0,
+      sourceName:'',
+    }]);
     const rules = reactive({
       articleTitle: [//稿件标题
         {
@@ -158,9 +167,23 @@ export default {
           trigger: "blur",
         },
       ],
-      articleSource: [//稿件来源
+      articleSourceName:[//稿件来源名字，用来显示
         {
           required: true,
+          message: "必填项",
+          trigger: "blur",
+        },
+      ],
+      articleSource: [//稿件来源id，用来储存来源id，Number类型
+        {
+          required: false,
+          message: "必填项",
+          trigger: "blur",
+        },
+      ],
+      sourceName: [//稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
+        {
+          required: false,
           message: "必填项",
           trigger: "blur",
         },
@@ -201,7 +224,72 @@ export default {
           trigger:'change',
         }
       ],
+      fileIds:[
+        {
+          required:false,
+          message:'非必填项',
+          trigger:'blur',
+        }
+      ],
     });
+
+
+    /**
+     * 选中已有来源
+     * @param {*} indexP dataList 数组索引
+     * @param {*} itemP 在来源列表中选中的对象
+     */
+    function articleSourceHandleSelectFn(indexP,itemP){
+      dataList.value[indexP]['articleSource'] = itemP.id;
+      dataList.value[indexP]['sourceName'] = '';
+    }
+    // end of articleSourceHandleSelectFn
+
+    //保存来源搜索后的结果
+    const articleSourceQuerySearchResultsArr = reactive([]);
+  
+    /**
+     * 已有来源查询
+     * @param {*} indexP dataList 数组索引
+     * @param {*} sourceNameP 来源检索词
+     */
+    async function articleSourceQuerySearchFn(indexP,sourceNameP){
+
+      await store.dispatch('getSearchFindSourceListFn',sourceNameP)
+      .then((D)=>{
+
+        console.log('D',D);
+        
+        articleSourceQuerySearchResultsArr.splice(0,articleSourceQuerySearchResultsArr.length);
+
+        if(
+          Array.isArray(D.data)
+          &&D.data.length>0
+        ){
+          console.log('D.length>0');
+          D.data.forEach((o)=>{
+            let _o = o;
+            _o.value = o.sourceName;
+            articleSourceQuerySearchResultsArr.push(_o);
+          });
+          console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
+        }else{//没查到结果，说明该检索字符串为新字符串
+          console.log('else');
+          dataList.value[indexP]['sourceName'] = sourceNameP.trim();
+          dataList.value[indexP]['articleSource'] = 0;//把来源id字段设成0，与袁冰 协商后 传0代表没有id
+
+        }
+
+      })
+      .catch((error)=>{
+        console.log('error',error);
+      })
+      ;
+      return articleSourceQuerySearchResultsArr
+    }
+    // end of articleSourceQuerySearchFn
+
+
 
     const langOptions = reactive([]);
     store.state.GLOBAL_LANGUAGE_LIST.forEach((o,i)=>{
@@ -275,20 +363,34 @@ export default {
     /**
      * 删除附件文件之前
      */
-     function handleAuditingUploadBeforeRemoveFn(uploadFile, uploadFiles){uploadFiles
-      // const loadingInstance1 = ElLoading.service({ fullscreen: true });
-      // const {fileName} = uploadFile.response.data[0];
+     function handleAuditingUploadBeforeRemoveFn(indexP,uploadFile, uploadFiles){indexP,uploadFiles
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+      console.log('uploadFile',uploadFile)
+      const {fileName} = uploadFile.response.data[0];
 
-      // return httpAxiosO({
-      //   url: '/web/article/delFileObj',
-      //   method: 'delete',
-      //   params: {
-      //     fileName
-      //   }
-      // })
-      // .finally(()=>{
-      //   loadingInstance1.close();
-      // });
+      return httpAxiosO({
+        url: '/web/article/delFileObj',
+        method: 'delete',
+        params: {
+          fileName
+        }
+      })
+      .then((D)=>{
+        console.log('D',D);
+        console.log('D.success',D.success);
+        console.log('D.message',D.message);
+        const { data } = D;
+        if(!data.success){
+          ElMessage({
+            message: '附件上传失败，接口提示：'+data.message,
+            type: 'error',
+            plain: true,
+          })
+        }
+      })
+      .finally(()=>{
+        loadingInstance1.close();
+      });
     }
     //end of handleAuditingUploadBeforeRemoveFn
     /**
@@ -329,6 +431,8 @@ export default {
       dataList.value.push({ 
         fold: false,
         language: 1,
+        articleSource:0,
+        sourceName:'',
       });
     }
     function deleteData(index) {
@@ -347,7 +451,8 @@ export default {
      function checkFieldValueFn(datasOP){
       const { 
         articleTitle,//稿件标题
-        articleSource,//稿件来源
+        articleSource,//稿件来源id
+        sourceName,//稿件来源 名字（来源模糊查询不到的）
         srcUrl, //稿件原地址
       } = datasOP;
 
@@ -357,18 +462,25 @@ export default {
         ||(articleTitle&&articleTitle.trim() === '')
       ){
         ElMessage({
-          message: '请重新填写稿件标题',
+          message: '请填写稿件标题',
           type: 'warning',
           plain: true,
         })
         checkResult = false;
       }
       if(
-        !articleSource
-        ||(articleSource&&articleSource.trim() === '')
+        (
+          !articleSource
+          && articleSource === 0
+        )
+        &&
+        (
+          !sourceName
+          ||(sourceName&&sourceName.trim() === '')
+        )
       ){
         ElMessage({
-          message: '请重新填写稿件来源',
+          message: '请填写稿件来源',
           type: 'warning',
           plain: true,
         })
@@ -411,25 +523,21 @@ export default {
 
       dataList.value.forEach((o,i)=>{
 
-        // o.fileAccessory = auditingUploadFilesArrays[i].fileAccessory.reduce((old,next)=>{
-        //   if(!next.response){
-        //     return '';
-        //   }
-        //   let _str = old===''?next.response?.data[0].fileName:old+','+next.response?.data[0].fileName;
-        //   return _str
-        // },'');
-
         o.fileAccessory = auditingUploadFilesArrays[i].reduce((old,next)=>{
-          // let _str = ''
-          console.log('next',next);
-
-          return old+','
+          const { fileName } = next.response.data[0];
+          let _str = old===''?fileName:old+','+fileName;
+          return _str;
+        },'');
+        o.fileIds = auditingUploadFilesArrays[i].reduce((old,next)=>{
+          const { id } = next.response.data[0];
+          let _str = old===''?id:old+','+id;
+          return _str;
         },'');
 
         console.log('o.fileAccessory',o.fileAccessory);
+        console.log('o.fileIds',o.fileIds);
 
         o.articleTitle = o.articleTitle.trim();
-        o.articleSource = o.articleSource.trim();
 
         o.articleStatus = articleStatusP;
         checkFieldValueFnResult = checkFieldValueFn(o);
@@ -446,7 +554,6 @@ export default {
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
 
-return;
 
       // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
       const httpAxiosOUrl = (()=>{
@@ -535,6 +642,10 @@ return;
       foldClick,
       addData,
       deleteData,
+
+      articleSourceHandleSelectFn,
+      articleSourceQuerySearchFn,
+
 
       //为了迁就 element-ui 附件上传组件bug（所以，一个el-upload组件对应一个数组）
       auditingUploadFilesArrays,
