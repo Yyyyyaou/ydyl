@@ -6,6 +6,20 @@
         class="mid-content-statistics-table-btngroup-search flexcenter"
         data-desc="已发投稿组件-检索区"
       >
+        <el-select
+          v-model="paperSelectValue"
+          placeholder="全部"
+          style="width: 140px"
+          class="marl10"
+        >
+          <el-option
+            v-for="item in paperOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+            :title="item.title"
+          />
+        </el-select>
         <div class="mid-content-statistics-table-btngroup-search-keyword">
           <el-select
             v-model="searchSelectValue1"
@@ -88,9 +102,11 @@
           'font-size': '16px',
         }"
       >
-        <el-table-column label="序号" width="100"
+        <el-table-column
+          label="序号"
+          width="100"
           header-align="center"
-          align="center" 
+          align="center"
         >
           <template #default="scope">
             {{ scope.$index + 1 }}
@@ -124,17 +140,26 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="articleSource" label="稿件来源" width="125"
+        <el-table-column
+          prop="articleSource"
+          label="稿件来源"
+          width="125"
           header-align="center"
-          align="center" 
+          align="center"
         />
-        <el-table-column prop="languageName" label="语种" width="120"
+        <el-table-column
+          prop="languageName"
+          label="语种"
+          width="120"
           header-align="center"
-          align="center" 
+          align="center"
         />
-        <el-table-column prop="crtimeFormat" label="创建日期" width="140"
+        <el-table-column
+          prop="crtimeFormat"
+          label="创建日期"
+          width="140"
           header-align="center"
-          align="center" 
+          align="center"
         />
       </el-table>
     </div>
@@ -216,7 +241,12 @@ export default {
         label: o.desc,
       });
     });
-
+    const paperSelectValue = ref("");
+    const paperOptions = reactive([
+      { label: "全部", value: 0 },
+      { label: "我的投稿", value: 1 },
+      { label: "相关稿件", value: 2, title:'中国一带一路网发布与我相关稿件' },
+    ]);
     //日期选择 数据
     const dateDefaultTime1 = ref([]);
 
@@ -360,6 +390,9 @@ export default {
 
       langSelectValue1,
       langOptions1,
+
+      paperSelectValue,
+      paperOptions,
 
       dateDefaultTime1,
       locale: zhCn, //date-range 语言设置
