@@ -85,6 +85,7 @@
 
     <div class="mid-content-statistics-table-tabledata" data-desc="我的投稿组件-列表区">
       <el-table
+        empty-text="暂无数据"
         :data="tableData"
         border
         style="width: 100%"
@@ -118,7 +119,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="articleSource"
+          prop="sourceName"
           label="稿件来源"
           header-align="center"
           align="center"

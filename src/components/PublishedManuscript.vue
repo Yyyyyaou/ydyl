@@ -88,6 +88,7 @@
       data-desc="已发投稿组件-列表区"
     >
       <el-table
+        empty-text="暂无数据"
         :data="tableData1"
         border
         style="width: 100%"

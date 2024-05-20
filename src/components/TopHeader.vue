@@ -1,25 +1,15 @@
 <template>
   <div class="head-style">
-    <div class="head-left flexcenter">
+    <div class="head-left flexcenter"
+      @click="router.replace({ path: '/' })"
+    >
       <div
         class="head-logo"
-        style="
-          height: 40px;
-          width: 40px;
-          background: #409eff;
-          line-height: 40px;
-          text-align: center;
-          border-radius: 5px;
-          color: #fff;
-          font-size: 14px;
-          margin: 0 15px 0 15px;
-        "
       >
         logo
       </div>
       <div
         class="head-name"
-        style="font-size: 20px; color: #4c4d62; font-weight: 700"
       >
         中国一带一路网投稿平台
       </div>
@@ -56,6 +46,8 @@ export default {
     }
 
     return {
+      router,
+
       loginUser,
       logoutFn,
     };
@@ -64,9 +56,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.head-logo{
+  height: 40px; width: 40px; background: #409eff; line-height: 40px; text-align: center; border-radius: 5px; color: #fff; font-size: 14px; margin: 0 15px 0 15px;
+}
+.head-name{font-size: 20px; color: #4c4d62; font-weight: 700;}
 .head-style {
   height: 58px;
-  .head-left {
+  .head-left {cursor: pointer;
     height: 100%;
     border: 1px solid #e9e7f4;
   }

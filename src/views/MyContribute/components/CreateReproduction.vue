@@ -743,7 +743,7 @@ export default {
 }
 
 .auditingUploadFilesArraysOuterC{position:relative; }
-.auditingUploadC{position:relative;z-index:5;margin-top:-46px;width:100%;cursor:pointer;
+.auditingUploadC{position:relative;z-index:5;margin-top:-46px;width:100%;cursor:pointer;width:100%;
   .u{position:absolute;left:0;right:0;top:0;height:46px;width:100%;opacity: 0;}
   
 }

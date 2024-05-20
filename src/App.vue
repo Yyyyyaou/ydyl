@@ -62,12 +62,14 @@ export default {
     watch(
       () => router.currentRoute.value,
       (newValue) => {
-        //console.log("newValue", newValue);
+        
         if (
-          newValue.fullPath.indexOf("/NoticeDetail") != -1
-          || newValue.fullPath.indexOf("/PubDetail") != -1
+          newValue.path  === '/NoticeDetail'
+          || newValue.path === '/PubDetail'
         ) {
           showNoticeDetail.value = true;
+        }else{
+          showNoticeDetail.value = false;
         }
       },
       { immediate: true }

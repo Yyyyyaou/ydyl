@@ -6,10 +6,10 @@
       </div>
       <div class="noticedetail-content-info flexcenter">
         <!-- <span v-if="postUser">作者：{{ postUser }}</span>
-        <span v-if="articleSource" class="sx"></span>
-        <span v-if="articleSource">稿件来源：{{ articleSource }}</span>
-        <span v-if="pubTime" class="sx"></span> -->
-        <span v-if="pubTime">发布时间：{{ pubTime }}</span>
+        <span v-if="sourceName" class="sx"></span>
+        <span v-if="sourceName">稿件来源：{{ sourceName }}</span>
+        <span v-if="crTime" class="sx"></span> -->
+        <span v-if="crTime">创建时间：{{ crTime }}</span>
       </div>
       <div class="mid-divider"></div>
       <div class="noticedetail-content-word flexcenter">
@@ -112,10 +112,10 @@ export default {
     const store = useStore();
 
     const noticeTitle = ref(""); //稿件标题
-    const articleSource = ref(""); //稿件来源
+    const sourceName = ref(""); //稿件来源
     const noticeContent = ref(""); //稿件HTML正文
     const postUser = ref(""); //投稿人
-    const pubTime = ref(""); //发布时间
+    const crTime = ref(""); //创建时间
     const remark = ref("");//备注
     const fileUnit = reactive([]);//审核单附件
     const fileAccessory = reactive([]);//普通附件
@@ -127,14 +127,14 @@ export default {
       console.log('propsArticleO',propsArticleO);
 
       noticeTitle.value = propsArticleO.value.noticeTitle||'';
-      articleSource.value = propsArticleO.value.articleSource||'';
+      sourceName.value = propsArticleO.value.sourceName||'';
       noticeContent.value = propsArticleO.value.noticeContent||'';
       
       //这个字段为投稿人，但‘web/user/getLoginUser.do’接口暂时没返回 postUser，所以暂用 userName 顶替
       postUser.value = store.state.StroeLoginO.loginUser.postUser||store.state.StroeLoginO.loginUser.userName;
       
       
-      pubTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD hh:mm:ss'];
+      crTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD hh:mm:ss'];
       remark.value = propsArticleO.value.remark||'';
 
 
@@ -226,10 +226,10 @@ export default {
           // });
 
           noticeTitle.value = data.noticeTitle;
-          articleSource.value = data.articleSource;
+          sourceName.value = data.sourceName;
           noticeContent.value = data.noticeContent;
           postUser.value = data.postUser;
-          pubTime.value = data.pubTime;
+          crTime.value = timeFormatFn(data.crtime)["YYYY-MM-DD hh:mm:ss"];
           remark.value = data.remark;
 
           //为 fileUnit 赋值
@@ -360,10 +360,10 @@ export default {
 
     return {
       noticeTitle,
-      articleSource,
+      sourceName,
       noticeContent,
       postUser,
-      pubTime,
+      crTime,
       remark,
       fileUnit,
       fileAccessory,
@@ -419,8 +419,12 @@ export default {
 .noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
   .noticedetail-bottom-content-img {
     display: flex;flex-wrap:wrap;
-    >div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
-    img{width:100%;height:100%;}
+    >div{
+      width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;justify-content: center;box-shadow: 0 0 1px 1px #ccc;
+    }
+    img{
+      max-width:100%;max-height:100%;
+    }
   }
 }
 

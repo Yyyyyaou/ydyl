@@ -6,10 +6,10 @@
       </div>
       <div class="noticedetail-content-info flexcenter">
         <span v-if="postUser">作者：{{ postUser }}</span>
-        <span v-if="articleSource" class="sx"></span>
-        <span v-if="articleSource">稿件来源：{{ articleSource }}</span>
-        <span v-if="postTime" class="sx"></span>
-        <span v-if="postTime">发布时间：{{ postTime }}</span>
+        <span v-if="sourceName" class="sx"></span>
+        <span v-if="sourceName">稿件来源：{{ sourceName }}</span>
+        <span v-if="crTime" class="sx"></span>
+        <span v-if="crTime">创建时间：{{ crTime }}</span>
       </div>
       <div class="mid-divider"></div>
       <div class="noticedetail-content-word flexcenter">
@@ -52,7 +52,7 @@
                     title="点击下载"
                   >
                     <span v-if="!o.isPicture" data-desc="文件">{{ o.fileName }}</span>
-                    <div v-if="o.isPicture" data-desc="图片"><img :src="o.fileUrl" alt="" /></div>
+                    <img v-if="o.isPicture" :src="o.fileUrl" alt="" />
                   </div>
                 </div>
               </td>
@@ -112,10 +112,10 @@ export default {
 
     const articleType = ref(0);//稿件类型 0 原创稿件 1 转载稿件
     const articleTitle = ref(""); //稿件标题
-    const articleSource = ref(""); //稿件来源
+    const sourceName = ref(""); //稿件来源
     const articleHtmlCon = ref(""); //稿件HTML正文
     const postUser = ref(""); //投稿人
-    const postTime = ref(""); //发布时间
+    const crTime = ref(""); //创建时间
     const remark = ref("");//备注
     const fileUnit = reactive([]);//审核单附件
     const fileAccessory = reactive([]);//普通附件
@@ -127,15 +127,16 @@ export default {
       console.log('propsArticleO',propsArticleO);
 
       articleTitle.value = propsArticleO.value.articleTitle||'';
-      articleSource.value = propsArticleO.value.articleSource||'';
+      sourceName.value = propsArticleO.value.sourceName||'';
       articleHtmlCon.value = propsArticleO.value.articleHtmlCon||'';
       
       //这个字段为投稿人，但‘web/user/getLoginUser.do’接口暂时没返回 postUser，所以暂用 userName 顶替
       postUser.value = store.state.StroeLoginO.loginUser.postUser||store.state.StroeLoginO.loginUser.userName;
       
       
-      postTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD hh:mm:ss'];
+      crTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD hh:mm:ss'];
       remark.value = propsArticleO.value.remark||'';
+
 
 
       //审核附件列表
@@ -230,7 +231,7 @@ export default {
 
           articleType.value = data.articleType;
           articleTitle.value = data.articleTitle;
-          articleSource.value = data.articleSource;
+          sourceName.value = data.sourceName;
           
           //如果是转载稿件
           if(articleType.value){
@@ -239,8 +240,10 @@ export default {
             articleHtmlCon.value = data.articleHtmlCon;
           }
 
+
+
           postUser.value = data.postUser;
-          postTime.value = data.postTime;
+          crTime.value = timeFormatFn(data.crtime)["YYYY-MM-DD hh:mm:ss"];
           remark.value = data.remark;
 
           //为 fileUnit 赋值
@@ -372,10 +375,10 @@ export default {
     return {
       articleType,
       articleTitle,
-      articleSource,
+      sourceName,
       articleHtmlCon,
       postUser,
-      postTime,
+      crTime,
       remark,
       fileUnit,
       fileAccessory,
@@ -431,8 +434,12 @@ export default {
 .noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
   .noticedetail-bottom-content-img {
     display: flex;flex-wrap:wrap;
-    >div{width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;}
-    img{width:100%;height:100%;}
+    >div{
+      width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;justify-content: center;    box-shadow: 0 0 1px 1px #ccc;
+    }
+    img{
+      max-width:100%;max-height:100%;
+    }
   }
 }
 
