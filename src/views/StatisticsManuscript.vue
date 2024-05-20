@@ -323,12 +323,14 @@ export default {
           searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
           endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
+          dateType:timeSelectValue.value
         };
       } else {
         param = {
           searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
+          dateType:timeSelectValue.value
         };
       }
       httpAxiosO({
@@ -383,8 +385,8 @@ export default {
       getArticleCountAjaxFn();
     }
     //时间范围选择器change（7天 30天）
-    let startTime = new Date();
     let endTime = new Date();
+    let startTime = timeForMat(29);
     function timeSelectChange(val) {
       if (val == 0) {
         startTime = timeForMat(6);
