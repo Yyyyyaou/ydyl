@@ -36,7 +36,7 @@
             :value="item.value"
           />
         </el-select>
-        <el-config-provider :locale="locale">
+        <el-config-provider :locale="locale" v-if="timeSelectValue == 3">
           <el-date-picker
             v-model="dateDefaultTime"
             type="daterange"
@@ -297,6 +297,7 @@ export default {
       { label: "近7天", value: 0 },
       { label: "近30天", value: 1 },
       { label: "近3个月", value: 2 },
+      { label: "自定义时间段", value: 3 },
     ]);
     //日期选择 数据
     const dateDefaultTime = ref([]);
