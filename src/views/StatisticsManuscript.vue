@@ -65,7 +65,7 @@
             <img src="../assets/contributenum.png" alt="" />
           </div>
           <div class="mid-content-statistics-left-content-num">
-            <p>247</p>
+            <p>{{ num1 }}</p>
             <p>联络员投稿总数</p>
           </div>
         </div>
@@ -80,8 +80,8 @@
                 <img src="../assets/contributenum.png" alt="" />
               </div>
               <div class="mid-content-statistics-left-content-num">
-                <p>247</p>
-                <p>联络员投稿总数</p>
+                <p>{{ num2 }}</p>
+                <p>联络员发布总数</p>
               </div>
             </div>
             <div class="divmid-divide"></div>
@@ -90,7 +90,7 @@
                 <img src="../assets/papernum.png" alt="" />
               </div>
               <div class="mid-content-statistics-left-content-num">
-                <p>154</p>
+                <p>{{ num3 }}</p>
                 <p>联络员原创稿件</p>
               </div>
             </div>
@@ -100,7 +100,7 @@
                 <img src="../assets/statisticsnum3.png" alt="" />
               </div>
               <div class="mid-content-statistics-left-content-num">
-                <p>50</p>
+                <p>{{ num4 }}</p>
                 <p>联络员转载稿件</p>
               </div>
             </div>
@@ -115,7 +115,7 @@
             <img src="../assets/fgwnum3.png" alt="" />
           </div>
           <div class="mid-content-statistics-left-content-num">
-            <p>82.6%</p>
+            <p>{{ num6 }}</p>
             <p>采用率</p>
           </div>
           <el-icon title="采用率=发布总数+投稿总数x100%"
@@ -291,8 +291,9 @@ export default {
     const createFilter = (queryString) => {
       return (restaurant) => {
         return (
-          restaurant.sourceName.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
+          restaurant.sourceName
+            .toLowerCase()
+            .indexOf(queryString.toLowerCase()) === 0
         );
       };
     };
@@ -328,7 +329,8 @@ export default {
           startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
           endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
           dateType: timeSelectValue.value,
-          articleSource:userAuthority.value == "国家发改委用户" ? articleSource: 0
+          articleSource:
+            userAuthority.value == "国家发改委用户" ? articleSource : 0,
         };
       } else {
         param = {
@@ -336,7 +338,8 @@ export default {
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
           dateType: timeSelectValue.value,
-          articleSource:userAuthority.value == "国家发改委用户" ? articleSource: 0
+          articleSource:
+            userAuthority.value == "国家发改委用户" ? articleSource : 0,
         };
       }
       httpAxiosO({
@@ -354,7 +357,7 @@ export default {
             });
             return;
           } else {
-            let data = D.data
+            let data = D.data;
             if (trendEcharts.value) {
               trendEcharts.value.initEcharts(
                 data.dateList,
@@ -409,16 +412,16 @@ export default {
         endTime.getTime() - 24 * 60 * 60 * 1000 * count
       );
     }
-    let articleSource = 0
+    let articleSource = 0;
     //稿件单位选择后调用接口
-    function autocompleteSelect(item){
-      console.log(item)
-      articleSource = item.id?item.id:0
+    function autocompleteSelect(item) {
+      console.log(item);
+      articleSource = item.id ? item.id : 0;
       getArticleCountAjaxFn();
     }
     //清除稿件单位
-    function autocompleteClear(){
-      articleSource = 0
+    function autocompleteClear() {
+      articleSource = 0;
       getArticleCountAjaxFn();
     }
     //获取稿件单位list
@@ -437,7 +440,7 @@ export default {
             });
             return;
           } else {
-            restaurants.value = D.data
+            restaurants.value = D.data;
           }
         })
         .catch(() => {
@@ -447,12 +450,11 @@ export default {
             plain: true,
           });
         })
-        .finally(() => {
-        });
+        .finally(() => {});
     }
     onMounted(() => {
       //restaurants.value = loadAll(); //联想输入框赋值
-      findSourceNameAjaxFn()
+      findSourceNameAjaxFn();
       dateDefaultTime.value = [timeForMat(29), new Date()]; //日期范围选择初始化
       getArticleCountAjaxFn(); //外部用户 稿件统计
     });
