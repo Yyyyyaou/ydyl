@@ -16,6 +16,7 @@
           />
         </el-select> -->
         <el-autocomplete
+          v-if="userAuthority == '国家发改委用户'"
           v-model="companySelectValue"
           style="width: 140px"
           :fetch-suggestions="querySearch"
@@ -327,7 +328,7 @@ export default {
           startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
           endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
           dateType: timeSelectValue.value,
-          articleSource:articleSource
+          articleSource:userAuthority.value == "国家发改委用户" ? articleSource: 0
         };
       } else {
         param = {
@@ -335,7 +336,7 @@ export default {
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
           dateType: timeSelectValue.value,
-          articleSource:articleSource
+          articleSource:userAuthority.value == "国家发改委用户" ? articleSource: 0
         };
       }
       httpAxiosO({
