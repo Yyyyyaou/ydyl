@@ -19,8 +19,11 @@
           v-model="companySelectValue"
           style="width: 140px"
           :fetch-suggestions="querySearch"
+          :value-key="'sourceName'"
           clearable
           placeholder="投稿单位"
+          @select="autocompleteSelect"
+          @clear="autocompleteClear"
         />
         <el-select
           v-model="timeSelectValue"
@@ -276,18 +279,18 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-    const loadAll = () => {
-      return [
-        { value: "a单位", link: "https://github.com/vuejs/vue" },
-        { value: "b单位", link: "https://github.com/ElemeFE/element" },
-        { value: "c单位", link: "https://github.com/ElemeFE/cooking" },
-        { value: "db单位", link: "https://github.com/ElemeFE/mint-ui" },
-      ];
-    };
+    // const loadAll = () => {
+    //   return [
+    //     { value: "a单位", link: "https://github.com/vuejs/vue",id:456 },
+    //     { value: "b单位", link: "https://github.com/ElemeFE/element" },
+    //     { value: "c单位", link: "https://github.com/ElemeFE/cooking" },
+    //     { value: "db单位", link: "https://github.com/ElemeFE/mint-ui" },
+    //   ];
+    // };
     const createFilter = (queryString) => {
       return (restaurant) => {
         return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          restaurant.sourceName.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
         );
       };
@@ -323,14 +326,16 @@ export default {
           searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(startTime)["YYYY-MM-DD"],
           endTime: timeFormatFn(endTime)["YYYY-MM-DD"],
-          dateType:timeSelectValue.value
+          dateType: timeSelectValue.value,
+          articleSource:articleSource
         };
       } else {
         param = {
           searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
           startTime: timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"],
           endTime: timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"],
-          dateType:timeSelectValue.value
+          dateType: timeSelectValue.value,
+          articleSource:articleSource
         };
       }
       httpAxiosO({
@@ -340,8 +345,7 @@ export default {
       })
         .then((D) => {
           console.log("稿件统计 D", D);
-          const { data, success } = D.data;
-          if (!success) {
+          if (D.status != 200) {
             ElMessage({
               message: "稿件统计数据请求失败",
               type: "error",
@@ -349,6 +353,7 @@ export default {
             });
             return;
           } else {
+            let data = D.data
             if (trendEcharts.value) {
               trendEcharts.value.initEcharts(
                 data.dateList,
@@ -403,15 +408,59 @@ export default {
         endTime.getTime() - 24 * 60 * 60 * 1000 * count
       );
     }
+    let articleSource = 0
+    //稿件单位选择后调用接口
+    function autocompleteSelect(item){
+      console.log(item)
+      articleSource = item.id?item.id:0
+      getArticleCountAjaxFn();
+    }
+    //清除稿件单位
+    function autocompleteClear(){
+      articleSource = 0
+      getArticleCountAjaxFn();
+    }
+    //获取稿件单位list
+    function findSourceNameAjaxFn() {
+      httpAxiosO({
+        method: "get",
+        url: "/web/source/findSourceName",
+      })
+        .then((D) => {
+          console.log("投稿单位", D);
+          if (D.status != 200) {
+            ElMessage({
+              message: "投稿单位数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            restaurants.value = D.data
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "投稿单位接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+        });
+    }
     onMounted(() => {
-      restaurants.value = loadAll(); //联想输入框赋值
+      //restaurants.value = loadAll(); //联想输入框赋值
+      findSourceNameAjaxFn()
       dateDefaultTime.value = [timeForMat(29), new Date()]; //日期范围选择初始化
-      getArticleCountAjaxFn(); //外部用户 稿件统计 
+      getArticleCountAjaxFn(); //外部用户 稿件统计
     });
     return {
       userAuthority,
       companySelectValue,
       querySearch,
+      autocompleteSelect,
+      autocompleteClear,
       // companyOptions,
       timeSelectValue,
       timeOptions,
