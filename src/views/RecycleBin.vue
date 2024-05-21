@@ -85,7 +85,6 @@
               'font-size': '16px',
             }"
             :cell-style="{
-              'text-align': 'center',
               'color': '#727789',
               'font-size': '16px',
             }"
@@ -103,7 +102,8 @@
             <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
                 <span
-                  style="display: flex; justify-content: left; text-align: left"
+                  style="cursor: pointer;"
+                  @click="getFindByIdAjaxFn(scope)"
                 >
                   {{ scope.row.articleTitle }}
                 </span>
@@ -352,45 +352,7 @@ export default {
       })
     };
 
-    /**
-     * 继续采用 ，实际上是“查看稿件”即跳转到 “创建稿件/原创稿件”界面
-     * @param {*} scopeP 
-     */
-    const continueUsingFn = (scopeP) => {
-      scopeP
-      // const {
-      //   id,articleTitle,articleHtmlCon,articleContent,language,remark,articleStatus,aritleSource
-      // } = scopeP.row;
-      // store.dispatch('',{
-      //   params:{
-      //     // id,articleTitle,articleHtmlCon,articleContent,language,remark,
-      //     // articleStatus:1,aritleSource
-      //   },
-      // }).then((D)=>{
-      //   if(
-      //     D.data.success === false
-      //   ){
-      //     ElMessage({
-      //       message: '接口请求成功 但采用失败',
-      //       type: 'error',
-      //       plain: true,
-      //     })
-      //     return;
-      //   }
-      //   ElMessage({
-      //     message: '采用成功',
-      //     type: 'success',
-      //     plain: true,
-      //   })
-      // })
-      // .catch(()=>{
-      //   ElMessage({
-      //     message: '采用失败',
-      //     type: 'error',
-      //     plain: true,
-      //   })
-      // });
-    };
+
 
     /**
      * 回收站列表删除接口，真正的删除
@@ -423,6 +385,22 @@ export default {
     }
     // end of deleteArticleAjaxFn
 
+    /**
+     * 跳转到细览页，需要传递 稿件id
+     */
+     function getFindByIdAjaxFn(scopeP){
+      const c = router.resolve({
+        path: "/PubDetail",
+        query: {
+          id: scopeP.row.id,
+        },
+      });
+
+      window.open(c.href, "_blank");
+      return;
+    }
+
+
     onMounted(() => {
       getArticleDraftListAjaxFn();
     });
@@ -448,8 +426,10 @@ export default {
 
       getArticleDraftListAjaxFn,
       clearRecyclebinFn,
-      continueUsingFn,
+
       deleteArticleAjaxFn,
+      getFindByIdAjaxFn,
+      
     };
   },
 };

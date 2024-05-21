@@ -390,6 +390,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+ul,ol,li{list-style:auto;}
+</style>
 <style scoped lang='less'>
 .mid-content {
   padding: 15px 34px;
@@ -427,9 +430,16 @@ export default {
     }
   }
 }
-.htmlContentC{font-size:18px;line-height:2.6em;padding:20px;overflow:hidden;
-  &>*{padding:10px 0;}
+.htmlContentC{font-size:18px;line-height:2.6em;padding:20px 50px;overflow:hidden;
+  >*{padding:10px 0;word-break: break-all;}
+  :deep(ul){display: block; list-style-type: disc; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
+    li{list-style: initial;}
+  }
+  :deep(ol){display: block; list-style-type: decimal; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
+    li{list-style-type: decimal;}
+  }
 }
+
 
 .noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
   .noticedetail-bottom-content-img {

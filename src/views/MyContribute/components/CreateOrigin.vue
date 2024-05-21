@@ -288,13 +288,21 @@ export default {
           Array.isArray(D.data)
           &&D.data.length>0
         ){
-          console.log('D.length>0');
           D.data.forEach((o)=>{
             let _o = o;
             _o.value = o.sourceName;
             articleSourceQuerySearchResultsArr.push(_o);
+
+            //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
+            if(formData.articleSourceName === o.sourceName){//检索词 与 来源名称 精准相同时候
+              formData.articleSource = o.sourceId;//表示用的已有来源
+              formData.sourceName = '';//清空它，表示不是新来源
+            }
+
           });
+
           console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
+
         }else{//没查到结果，说明该检索字符串为新字符串
           formData['sourceName'] = sourceNameP.trim();
           formData['articleSource'] = 0;//把来源id字段设成0，与袁冰 协商后 传0代表没有id
@@ -607,16 +615,6 @@ export default {
      */
     function postAddEditAjaxFn(articleStatusP){
 
-      //这里针对稿件来源
-      //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
-      articleSourceQuerySearchResultsArr.forEach((o)=>{
-        if(formData.articleSourceName === o.sourceName){
-          formData.articleSource = o.sourceId;//表示用的已有来源
-          formData.sourceName = '';//表示不是新来源
-        }
-      });
-
-
       //为原创稿件继续采用单独写的
       const datasOArr = []
       const datasO = {
@@ -734,7 +732,6 @@ export default {
 
         dialogNoticeDetailVisible.value = false;//关闭详情预览弹窗
         
-        
         //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿 
         router.push({
           path:articleStatusP?'/MyContribute':'/Drafts'
@@ -838,10 +835,13 @@ export default {
       for(let key in forPropsGetFindByIdAjaxFnReturnO.value){
         formData[key] = forPropsGetFindByIdAjaxFnReturnO.value[key];
       }
+      formData.articleSourceName = formData.sourceName;
+
 
       editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
 
       editorTEXTContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
+
 
     }
 

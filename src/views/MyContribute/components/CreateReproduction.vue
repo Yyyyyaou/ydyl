@@ -157,7 +157,9 @@ export default {
 
     const dataList = ref([{
       articleSource:0,
+      articleSourceName:'',
       sourceName:'',
+      fileAccessory:'',
     }]);
     const rules = reactive({
       articleTitle: [//稿件标题
@@ -266,15 +268,22 @@ export default {
           Array.isArray(D.data)
           &&D.data.length>0
         ){
-          console.log('D.length>0');
+
           D.data.forEach((o)=>{
             let _o = o;
             _o.value = o.sourceName;
             articleSourceQuerySearchResultsArr.push(_o);
+            
+            //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
+            if(dataList.value[indexP].articleSourceName === o.sourceName){//检索词 与 来源名称 精准相同时候
+              dataList.value[indexP].articleSource = o.sourceId;//表示用的已有来源
+              dataList.value[indexP].sourceName = '';//清空它，表示不是新来源
+            }
+
           });
           console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
+
         }else{//没查到结果，说明该检索字符串为新字符串
-          console.log('else');
           dataList.value[indexP]['sourceName'] = sourceNameP.trim();
           dataList.value[indexP]['articleSource'] = 0;//把来源id字段设成0，与袁冰 协商后 传0代表没有id
 
@@ -312,9 +321,6 @@ export default {
 
     //普通附件列表
     const auditingUploadFilesArrays = reactive([]);
-    function getAuditingUploadFilesArraysFn(indexP){
-      return eval('auditingUploadFilesArrays_'+indexP)
-    }
 
     /**
      * 转载稿件的附件上传 element plus 有问题，
@@ -432,6 +438,7 @@ export default {
         fold: false,
         language: 1,
         articleSource:0,
+        articleSourceName:'',
         sourceName:'',
       });
     }
@@ -452,7 +459,7 @@ export default {
       const { 
         articleTitle,//稿件标题
         articleSource,//稿件来源id
-        sourceName,//稿件来源 名字（来源模糊查询不到的）
+        sourceName,//稿件来源 名字（来源模糊查询不到的，新的 来源）
         srcUrl, //稿件原地址
       } = datasOP;
 
@@ -616,15 +623,37 @@ export default {
         return;
       }
 
-
       const o = {
         articleTitle : forPropsGetFindByIdAjaxFnReturnO.value.articleTitle,//稿件标题
         articleSource : forPropsGetFindByIdAjaxFnReturnO.value.articleSource||'',//稿件来源
+        articleSourceName:forPropsGetFindByIdAjaxFnReturnO.value.sourceName,//用来显示在页面上的来源名字
         language : forPropsGetFindByIdAjaxFnReturnO.value.language||'',//语种
         remark : forPropsGetFindByIdAjaxFnReturnO.value.remark||'',//备注
         srcUrl:forPropsGetFindByIdAjaxFnReturnO.value.srcUrl||'',//稿件原地址
         articleType:1,//稿件类型 0原创稿件 1转载稿件
       }
+      
+      //回显附件列表，因为附件列表是单独的变量
+      console.log('forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory',forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory);
+      
+      if(!Array.isArray(auditingUploadFilesArrays[0])){
+        auditingUploadFilesArrays[0] = [];
+      }
+
+      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory.split(',').forEach((o)=>{
+        auditingUploadFilesArrays[0].push({
+          name: o,
+          url: '',
+          id: '',
+          response: {
+            data: {
+              fileName: o,
+            },
+          },
+        });
+      });
+
+
       dataList.value.splice(0,dataList.value.length);
       dataList.value.push(o);//回显详情各个字段
 
@@ -649,7 +678,6 @@ export default {
 
       //为了迁就 element-ui 附件上传组件bug（所以，一个el-upload组件对应一个数组）
       auditingUploadFilesArrays,
-      getAuditingUploadFilesArraysFn,
 
       auditingUploadFilesPostUrl,
       handleAuditingUploadChangeFn,

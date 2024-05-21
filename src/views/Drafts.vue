@@ -67,7 +67,6 @@
               'font-size': '16px',
             }"
             :cell-style="{
-              'text-align': 'center',
               'color': '#727789',
               'font-size': '16px',
             }"
@@ -85,7 +84,8 @@
             <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
                 <span
-                  style="display: flex; justify-content: left; text-align: left"
+                  @click="getFindByIdAjaxFn(scope)"
+                  style="cursor: pointer;"
                 >
                   {{ scope.row.articleTitle }}
                 </span>
@@ -341,6 +341,20 @@ export default {
     }
     // end of deleteArticleAjaxFn
 
+    /**
+     * 跳转到细览页，需要传递 稿件id
+     */
+     function getFindByIdAjaxFn(scopeP){
+      const c = router.resolve({
+        path: "/PubDetail",
+        query: {
+          id: scopeP.row.id,
+        },
+      });
+
+      window.open(c.href, "_blank");
+      return;
+    }
 
     onMounted(() => {
       getArticleDraftListAjaxFn();
@@ -364,6 +378,7 @@ export default {
 
       getArticleDraftListAjaxFn,
       deleteArticleAjaxFn,
+      getFindByIdAjaxFn,
 
     };
   },
