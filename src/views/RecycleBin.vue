@@ -339,6 +339,7 @@ export default {
         //   type: 'success',
         //   plain: true,
         // })
+        getArticleDraftListAjaxFn();//更新列表
       })
       .catch(()=>{
         ElMessage({

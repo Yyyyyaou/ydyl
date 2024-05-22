@@ -572,20 +572,24 @@ export default {
         url: "/web/article/articleCount",
         params: {
           searchUser: searchUserP, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
-          dateType:3,//0(1天),1(1周),2(1月),3(1年)
+          dateType:1,//0(7天),1(30天),2(3个月),3(自定义),
         },
       })
         .then((D) => {
           console.log("稿件统计 D", D);
-          const { data, success } = D.data;
-          if (!success) {
-            ElMessage({
-              message: "稿件统计数据请求失败",
-              type: "error",
-              plain: true,
-            });
-            return;
-          }
+          const { 
+            data, 
+            // success 
+          } = D;
+          // if (!success) {//这个接口 袁冰把success删除了
+          //   ElMessage({
+          //     message: "稿件统计数据请求失败",
+          //     type: "error",
+          //     plain: true,
+          //   });
+          //   return;
+          // }
+          console.log('data',data);
 
           //投稿总数
           statisticsData[0].num = data.articleCount;
@@ -594,7 +598,7 @@ export default {
           //待处理稿件
           statisticsData[2].num = data.waitArticle;
 
-          console.log('data',data);
+          
 
           //国家发改委用户 稿件统计
           statisticsGJFGWData.articleCount = data.articleCount;//投稿总数

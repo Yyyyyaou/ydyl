@@ -133,7 +133,7 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="crtimeFormat" label="时间" width="240" />
+            <el-table-column prop="crtimeFormat" label="发送时间" width="240" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination

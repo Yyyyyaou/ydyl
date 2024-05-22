@@ -263,6 +263,7 @@ export default {
      * @param {*} itemP 在来源列表中选中的对象
      */
     function articleSourceHandleSelectFn(itemP){
+      console.log('articleSourceHandleSelectFn itemP',itemP);
       formData['articleSource'] = itemP.id;
       formData['sourceName'] = '';
     }
@@ -340,7 +341,7 @@ export default {
     const auditingUploadFilesPostUrl = ref('');
     process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
 
-    //附件id集合，袁冰写的代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds
+    //附件id集合，袁冰写的代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds，提交使用
     const auditingUploadFilesFileIds = reactive([]);
 
     //审核单附件列表
@@ -407,13 +408,13 @@ export default {
      */
     function handleAuditingUploadBeforeRemoveFn(uploadFile, uploadFiles){uploadFiles
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
-      const {id} = uploadFile.response.data[0];
+      const {fileName} = uploadFile.response.data[0];
 
       return httpAxiosO({
         url: '/web/article/delFileObj',
         method: 'delete',
         params: {
-          fileIds:String(id),
+          fileName
         }
       })
       .finally(()=>{
@@ -553,7 +554,7 @@ export default {
         ||(articleTitle&&articleTitle.trim() === '')
       ){
         ElMessage({
-          message: '请重新填写稿件标题',
+          message: '请填写稿件标题',
           type: 'warning',
           plain: true,
         })
@@ -571,7 +572,7 @@ export default {
         )
       ){
         ElMessage({
-          message: '请重新填写稿件来源',
+          message: '请填写稿件来源',
           type: 'warning',
           plain: true,
         })
@@ -619,9 +620,9 @@ export default {
       const datasOArr = []
       const datasO = {
         articleTitle:formData.articleTitle.trim(),//稿件标题
-        articleSource:formData.articleSource,//稿件来源
+        articleSource:formData.articleSource||0,//稿件来源
         language:formData.language,//语种
-        remark:formData.remark,//备注
+        remark:formData.remark||'',//备注
         articleType:0,//稿件类型 0原创稿件 1转载稿件
         articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
         sourceName:formData.sourceName,//稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
@@ -632,17 +633,18 @@ export default {
 
       datasO.articleContent = editorTEXTContent.value||'';//稿件文本内容
 
-      //清空 auditingUploadFilesFileIds 附件id集合
-      auditingUploadFilesFileIds.splice(0,auditingUploadFilesFileIds.length);
 
 
       //审核附件列表
       const _fileUnit = auditingUploadFilesArray.value.map((o)=>{
         if(o.response){
 
-          //收集附件id
-          if(!auditingUploadFilesFileIds.includes(o.response.id)){
-            auditingUploadFilesFileIds.push(o.response.id);
+          //收集附件id，只管保存id就好（即便是对附件做了删除操作，也不用删除附件id），不用做清空id操作
+          if(
+            !auditingUploadFilesFileIds.includes(o.response.data[0].id)
+            && o.response.data[0].id !== ''  
+          ){
+            auditingUploadFilesFileIds.push(o.response.data[0].id);
           }
           return o.response?.data[0].fileName
         }else{
@@ -656,8 +658,11 @@ export default {
       const _fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
         if(o.response){
           //收集附件id
-          if(!auditingUploadFilesFileIds.includes(o.response.id)){
-            auditingUploadFilesFileIds.push(o.response.id);
+          if(
+            !auditingUploadFilesFileIds.includes(o.response.data[0].id)
+            && o.response.data[0].id !== '' 
+          ){
+            auditingUploadFilesFileIds.push(o.response.data[0].id);
           }
           return o.response?.data[0].fileName
         }else{
@@ -700,8 +705,8 @@ export default {
         return _url
       })();
 
-
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
+
       httpAxiosO({
         url:httpAxiosOUrl,
         method:'post',
@@ -832,15 +837,62 @@ export default {
         return;
       }
 
+      console.log('forPropsGetFindByIdAjaxFnReturnO',forPropsGetFindByIdAjaxFnReturnO);
+      
       for(let key in forPropsGetFindByIdAjaxFnReturnO.value){
         formData[key] = forPropsGetFindByIdAjaxFnReturnO.value[key];
       }
+      //回显来源名字
       formData.articleSourceName = formData.sourceName;
+      //保存附件ids 集合
+      formData.fileIds.split(',').forEach((o)=>{
+        auditingUploadFilesFileIds.push(o);
+      });
 
 
       editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
 
       editorTEXTContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
+
+      //回显附件列表，因为附件列表是单独的变量 开始
+      
+      if(!Array.isArray(auditingUploadFilesArray)){
+        auditingUploadFilesArray.value = [];
+      }
+      if(!Array.isArray(auditingUploadFilesArray1)){
+        auditingUploadFilesArray1.value = [];
+      }
+
+      forPropsGetFindByIdAjaxFnReturnO.value.fileUnit.split(',').forEach((o)=>{
+        auditingUploadFilesArray.value.push({
+          name: o,
+          url: '',
+          id: '',
+          response: {
+            data: [
+              {
+                fileName: o,
+              }
+            ],
+          },
+        });
+      });
+
+      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory.split(',').forEach((o)=>{
+        auditingUploadFilesArray1.value.push({
+          name: o,
+          url: '',
+          id: '',
+          response: {
+            data: [
+              {
+                fileName: o,
+              }
+            ],
+          },
+        });
+      });
+      //回显附件列表，因为附件列表是单独的变量 结束
 
 
     }
@@ -886,8 +938,6 @@ export default {
         return;
       }
       // end of if
-
-      
 
 
     }

@@ -53,7 +53,7 @@
             <div class="submin_btn" @click="postUserLoginConstFn">登&nbsp;&nbsp;录</div>
           </li>
 
-          <li class="fontsizesmall1"><a href="https://www.trs.com.cn">其它登录方式:&nbsp;<span class="_color1">统一认证登录</span></a></li>
+          <li class="fontsizesmall1"><a href="https://www.yidaiyilu.gov.cn/">其它登录方式:&nbsp;<span class="_color1">统一认证登录</span></a></li>
 
         </ul>
 

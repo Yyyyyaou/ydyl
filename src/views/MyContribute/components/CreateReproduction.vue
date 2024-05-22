@@ -203,11 +203,11 @@ export default {
           trigger: "blur",
           validator:(rule, value, callback)=>{rule
             if(!value){
-              return callback(new Error('请输入稿件原地址 例：https://www.trs.com.cn'))
+              return callback(new Error('请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/'))
             }
             const regExp = /^https?:\/\/[a-zA-Z0-9]+\.*/
             if(!regExp.test(value)){
-              return callback(new Error('请输入稿件原地址 例：https://www.trs.com.cn'))
+              return callback(new Error('请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/'))
             }
           }
         },
@@ -382,13 +382,11 @@ export default {
         }
       })
       .then((D)=>{
-        console.log('D',D);
-        console.log('D.success',D.success);
-        console.log('D.message',D.message);
+
         const { data } = D;
         if(!data.success){
           ElMessage({
-            message: '附件上传失败，接口提示：'+data.message,
+            message: '附件删除失败，接口提示：'+data.message,
             type: 'error',
             plain: true,
           })
@@ -646,9 +644,11 @@ export default {
           url: '',
           id: '',
           response: {
-            data: {
-              fileName: o,
-            },
+            data: [
+              {
+                fileName: o,
+              },
+            ]
           },
         });
       });

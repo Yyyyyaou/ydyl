@@ -127,7 +127,7 @@ export default {
       console.log('propsArticleO',propsArticleO);
 
       articleTitle.value = propsArticleO.value.articleTitle||'';
-      sourceName.value = propsArticleO.value.sourceName||'';
+      sourceName.value = propsArticleO.value.sourceName||propsArticleO.value.articleSourceName||'';
       articleHtmlCon.value = propsArticleO.value.articleHtmlCon||'';
       
       //这个字段为投稿人，但‘web/user/getLoginUser.do’接口暂时没返回 postUser，所以暂用 userName 顶替

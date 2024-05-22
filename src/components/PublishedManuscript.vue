@@ -22,22 +22,23 @@
         </el-select>
         <div class="mid-content-statistics-table-btngroup-search-keyword">
           <el-select
-            v-model="searchSelectValue1"
+            v-model="searchSelectValue"
             placeholder=""
             style="width: 80px"
             class="marl10"
           >
             <el-option
-              v-for="item in searchOptions1"
+              v-for="item in searchOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             />
           </el-select>
           <el-input
-            v-model="searchInput1"
+            v-model="searchInput"
             style="width: 190px"
             placeholder="请输入关键词"
+            @keydown.enter="getBrokeListAjaxFn"
           />
         </div>
         <div class="marl10">
@@ -50,13 +51,13 @@
           />
         </div>
         <el-select
-          v-model="langSelectValue1"
+          v-model="langSelectValue"
           placeholder="语种"
           style="width: 140px"
           class="marl10"
         >
           <el-option
-            v-for="item in langOptions1"
+            v-for="item in langOptions"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -64,11 +65,10 @@
         </el-select>
         <el-config-provider :locale="locale">
           <el-date-picker
-            v-model="dateDefaultTime1"
+            v-model="dateDefaultTime"
             type="daterange"
             start-placeholder="创建起始日期"
             end-placeholder="创建结束日期"
-            :locale="locale"
             style="margin-left: 10px; width: 270px"
           />
         </el-config-provider>
@@ -89,17 +89,16 @@
     >
       <el-table
         empty-text="暂无数据"
-        :data="tableData1"
+        :data="tableData"
         border
         style="width: 100%"
         :header-cell-style="{
           'text-align': 'center',
-          color: '#6a6d74',
+          'color': '#6a6d74',
           'font-size': '16px',
         }"
         :cell-style="{
-          'text-align': 'center',
-          color: '#727789',
+          'color': '#727789',
           'font-size': '16px',
         }"
       >
@@ -108,6 +107,7 @@
           width="100"
           header-align="center"
           align="center"
+          :data-desc="userAuthority"
         >
           <template #default="scope">
             {{ scope.$index + 1 }}
@@ -116,20 +116,21 @@
         <el-table-column
           prop="title"
           label="稿件标题"
-          v-if="userAuthority == '外部用户_发改委'"
+
+          :data-title="userAuthority"
+          v-if="userAuthority === '国家发改委用户'"
         >
           <template #default="scope">
-            <span
-              style="
-                display: flex;
-                justify-content: left;
-                text-align: left;
-                cursor: pointer;
-              "
-              @click="rowTitleClick(scope)"
+            <div
+              :style="((scope)=>{
+                let _styleStr1 = 'cursor: pointer;'
+                let _styleStr2 = 'cursor: pointer;direction: rtl;text-align:auto;text-align:-webkit-auto;'
+                return (scope.row.languageName==='阿文'||scope.row.languageName==='阿语')?_styleStr2: _styleStr1
+              })(scope)"
+              @click="getFindByIdAjaxFn(scope)"
             >
               {{ scope.row.articleTitle }}
-            </span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="articleTitle" label="稿件标题" v-else>
@@ -142,7 +143,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="articleSource"
+          prop="sourceName"
           label="稿件来源"
           width="125"
           header-align="center"
@@ -194,7 +195,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted,computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
@@ -204,14 +205,17 @@ import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 
 export default {
   setup() {
-    //用户权限
-    const userAuthority = "外部用户_发改委"; //外部用户  外部用户_信息中心  外部用户_发改委
-    //vuex实例
     const store = useStore();
 
-    const searchInput1 = ref("");
-    const searchSelectValue1 = ref(0);
-    const searchOptions1 = [
+    //用户角色名字
+    const userAuthority = computed(() => {
+      return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
+    });
+    
+
+    const searchInput = ref("");
+    const searchSelectValue = ref(0);
+    const searchOptions = [
       {
         value: 0,
         label: "标题",
@@ -234,10 +238,11 @@ export default {
       },
     ];
 
-    const langSelectValue1 = ref("");
-    const langOptions1 = reactive([]);
+    //语种select数据
+    const langSelectValue = ref("");
+    const langOptions = reactive([]);
     store.state.GLOBAL_LANGUAGE_LIST.forEach((o) => {
-      langOptions1.push({
+      langOptions.push({
         value: o.id,
         label: o.desc,
       });
@@ -248,11 +253,35 @@ export default {
       { label: "我的投稿", value: 1 },
       { label: "相关稿件", value: 2, title:'中国一带一路网发布与我相关稿件' },
     ]);
+
+
+
+    //状态select数据
+    const statusSelectValue = ref("");
+    const statusOptions = [
+      {
+        value: 0,
+        label: "待处理",
+      },
+      {
+        value: 1,
+        label: "审核中",
+      },
+      {
+        value: 2,
+        label: "已发布",
+      },
+      {
+        value: 3,
+        label: "未采用",
+      },
+    ];
+
     //日期选择 数据
-    const dateDefaultTime1 = ref([]);
+    const dateDefaultTime = ref('');
 
     //表格数据
-    const tableData1 = reactive([]);
+    const tableData = reactive([]);
 
     //分页器
     let limit1 = ref(15);
@@ -280,18 +309,45 @@ export default {
      */
 
     function getBrokeListAjaxFn() {
-      const languageNameArr = ["中文", "英文", "阿语", "俄语", "西语", "法语"];
-      languageNameArr;
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
+        return o.desc
+      });
+
       const articleUseStatusNameArr = ["待处理", "审核中", "已发布", "未采用"];
-      articleUseStatusNameArr;
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
+
+      const paramsO = {
+        language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
+        currPage:page1.value,//当前页
+        pageSize:limit1.value,//每页条数
+      }
+
+      statusSelectValue.value&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
+      
+      switch(searchSelectValue.value){
+        case 0:
+        paramsO.articleTitle = searchInput.value;//按标题搜索
+          break;
+        case 1:
+        paramsO.articleContent = searchInput.value;//按正文搜索
+          break;
+      }
+
+      //时间段
+      if(
+        dateDefaultTime.value
+      ){
+        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
+        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      }
+      
+
 
       httpAxiosO({
         method: "get",
         url: "/web/article/brokeList.do",
-        params: {
-          language: 0, //0 可能代表 所有语种，文档里有提示 写 0
-        },
+        params: paramsO,
       })
         .then((D) => {
           console.log("已发稿件 D", D);
@@ -313,13 +369,16 @@ export default {
           //   plain: true,
           // });
 
-          tableData1.value = []; //清空tableData1
+          tableData.splice(0,tableData.length); //清空tableData
           data.ldata.forEach((o) => {
             let _o = o;
             _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            _o.articleUseStatusName = articleUseStatusNameArr[o.articleUseStatus]//状态名字，接口只提供了状态对应的 编号
             _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
-            tableData1.push(_o);
+            tableData.push(_o);
           });
+          pageTotal.value = data.totalResults;
+
         })
         .catch((error) => {
           console.log("已发稿件 接口请求 error", error);
@@ -341,15 +400,19 @@ export default {
       restaurants.value = loadAll(); //联想输入框赋值
     });
     const router = useRouter();
-    function rowTitleClick(scope) {
+    /**
+     * 跳转到细览页，需要传递 稿件id
+     */
+     function getFindByIdAjaxFn(scopeP){
       const c = router.resolve({
         path: "/PubDetail",
         query: {
-          title: scope.row.title,
-          time: scope.row.date,
+          id: scopeP.row.id,
         },
       });
+
       window.open(c.href, "_blank");
+      return;
     }
 
     //联想输入框
@@ -383,21 +446,24 @@ export default {
     };
     return {
       userAuthority,
-      searchInput1,
-      searchSelectValue1,
-      searchOptions1,
+      searchInput,
+      searchSelectValue,
+      searchOptions,
       originSelectValue,
       originOptions,
 
-      langSelectValue1,
-      langOptions1,
+      statusSelectValue,
+      statusOptions,
+
+      langSelectValue,
+      langOptions,
 
       paperSelectValue,
       paperOptions,
 
-      dateDefaultTime1,
+      dateDefaultTime,
       locale: zhCn, //date-range 语言设置
-      tableData1,
+      tableData,
       limit1,
       pageTotal,
       page1,
@@ -406,7 +472,7 @@ export default {
 
       getBrokeListAjaxFn,
 
-      rowTitleClick,
+      getFindByIdAjaxFn,
       originInput,
       querySearch,
     };

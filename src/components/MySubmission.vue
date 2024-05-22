@@ -110,12 +110,16 @@
           header-align="center"
         >
           <template #default="scope">
-            <span
-              style="cursor: pointer;"
+            <div
+              :style="((scope)=>{
+                let _styleStr1 = 'cursor: pointer;'
+                let _styleStr2 = 'cursor: pointer;direction: rtl;text-align:auto;text-align:-webkit-auto;'
+                return (scope.row.languageName==='阿文'||scope.row.languageName==='阿语')?_styleStr2: _styleStr1
+              })(scope)"
               @click="getFindByIdAjaxFn(scope)"
             >
               {{ scope.row.articleTitle }}
-            </span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column
