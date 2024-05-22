@@ -528,19 +528,25 @@ export default {
 
       dataList.value.forEach((o,i)=>{
 
-        o.fileAccessory = auditingUploadFilesArrays[i].reduce((old,next)=>{
-          const { fileName } = next.response.data[0];
-          let _str = old===''?fileName:old+','+fileName;
-          return _str;
-        },'');
-        o.fileIds = auditingUploadFilesArrays[i].reduce((old,next)=>{
-          const { id } = next.response.data[0];
-          let _str = old===''?id:old+','+id;
-          return _str;
-        },'');
+        if(
+          auditingUploadFilesArrays[i]
+          &&auditingUploadFilesArrays[i].length
+        ){
+          o.fileAccessory = auditingUploadFilesArrays[i].reduce((old,next)=>{
+            const { fileName } = next.response.data[0];
+            let _str = old===''?fileName:old+','+fileName;
+            return _str;
+          },'');
+          o.fileIds = auditingUploadFilesArrays[i].reduce((old,next)=>{
+            const { id } = next.response.data[0];
+            let _str = old===''?id:old+','+id;
+            return _str;
+          },'');
 
-        console.log('o.fileAccessory',o.fileAccessory);
-        console.log('o.fileIds',o.fileIds);
+          console.log('o.fileAccessory',o.fileAccessory);
+          console.log('o.fileIds',o.fileIds);
+        }
+
 
         o.articleTitle = o.articleTitle.trim();
 
@@ -577,7 +583,11 @@ export default {
       httpAxiosO({
         url:httpAxiosOUrl,
         method:'post',
-        data:dataList.value
+        headers:{
+          //这个接口不写 这行会报错
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        data:JSON.stringify(dataList.value),
       })
       .then((D)=>{
         console.log('转载稿件提交 D',D);
