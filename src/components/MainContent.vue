@@ -2,7 +2,7 @@
   <div class="main-style">
     <div class="main-header flexcenter">
       <el-icon><Location /></el-icon>
-      <span>您当前的位置：</span>
+      <span v-if="!showNoticeDetail">您当前的位置：</span>
       <!-- 面包屑（放到你想要放的template中的位置） -->
       <el-breadcrumb separator="/">
         <!-- <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item> -->
@@ -24,8 +24,9 @@
 </template>
 
 <script>
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import router from '@/router';
 export default {
   name: "MainContent",
   setup() {
@@ -34,17 +35,27 @@ export default {
     const breadList = computed(() => {
       return route.matched.filter((item) => item.meta && item.meta.title);
     });
-    // watch(
-    //   () => route.path,
-    //   () => {
-    //     //监听路由路径是否发生变化，之后更改面包屑
-    //     breadList.value = route.matched.filter(
-    //       (item) => item.meta && item.meta.title
-    //     );
-    //   }
-    // );
+
+    const showNoticeDetail  = ref(false)
+    // 监听当前路由
+    watch(
+      () => router.currentRoute.value,
+      (newValue) => {
+        
+        if (
+          newValue.path  === '/NoticeDetail'
+          || newValue.path === '/PubDetail'
+        ) {
+          showNoticeDetail.value = true;
+        }else{
+          showNoticeDetail.value = false;
+        }
+      },
+      { immediate: true }
+    );
     return {
       breadList,
+      showNoticeDetail
     };
   },
 };

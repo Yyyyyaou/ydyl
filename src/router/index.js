@@ -66,7 +66,7 @@ const routes = [
     component: function () {
       return import('../views/Notice/views/PubDetail.vue')
     },
-    meta: { title: '通用详情' }
+    meta: { title: '稿件详情' }
   },
   {
     path: '/NoticeDetail',

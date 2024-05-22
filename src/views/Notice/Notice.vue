@@ -41,8 +41,8 @@
               <el-date-picker
                 v-model="dateDefaultTime"
                 type="daterange"
-                start-placeholder="创建起始日期"
-                end-placeholder="创建结束日期"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
               />
@@ -96,7 +96,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="crtimeFormat" label="时间" width="240" />
+            <el-table-column prop="pubTime" label="发布时间" width="240" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination

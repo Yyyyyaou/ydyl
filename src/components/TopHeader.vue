@@ -19,7 +19,7 @@
         <!-- <el-avatar shape="square" src="../assets/avatar.png" key="0"/> -->
         <img src="../assets/avatar.png" alt="" srcset="" />
         <span>{{ loginUser.userName }}</span>
-        <a href="javascript:;" @click="logoutFn">退出</a>
+        <a href="javascript:;" @click="logoutFn" v-if="!showNoticeDetail">退出</a>
         <i class="iconfont icon-goit" />
       </div>
     </div>
@@ -28,6 +28,7 @@
 <script>
 import router from '@/router';
 import { useStore } from "vuex";
+import { ref, watch } from 'vue';
 
 export default {
   name: "TopHeader",
@@ -44,12 +45,30 @@ export default {
         router.push({ path: '/' })
       })
     }
-
+    const showNoticeDetail = ref(false)
+    // 监听当前路由
+    watch(
+      () => router.currentRoute.value,
+      (newValue) => {
+        
+        if (
+          newValue.path  === '/NoticeDetail'
+          || newValue.path === '/PubDetail'
+        ) {
+          showNoticeDetail.value = true;
+        }else{
+          showNoticeDetail.value = false;
+        }
+      },
+      { immediate: true }
+    );
     return {
       router,
 
       loginUser,
       logoutFn,
+
+      showNoticeDetail
     };
   },
 };
