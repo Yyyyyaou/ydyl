@@ -321,6 +321,7 @@ export default {
         language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
         currPage:page1.value,//当前页
         pageSize:limit1.value,//每页条数
+        searchUser: userAuthority.value == "国家发改委用户" ? 1 : 0, //	0(个人),1(全部)，这里是投稿平台，和袁冰讨论后暂时传0
       }
 
       statusSelectValue.value&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态

@@ -20,7 +20,7 @@
         </el-col>
         <el-col :span="11">
           <el-form-item label="语种" prop="language">
-            <el-select v-model="formData.language" placeholder="">
+            <el-select v-model="formData.language" placeholder="" @change="langSelectChange">
               <el-option
                 v-for="item in langOptions"
                 :key="item.value"
@@ -194,6 +194,20 @@ export default {
     const store = useStore();
 
     const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
+
+    function langSelectChange(val){
+      let domtext =document.getElementsByClassName("tox-edit-area__iframe")[0].contentWindow.document.getElementById('tinymce')
+      if(domtext == undefined || domtext == null){
+        return
+      }
+      if(val == 3){
+        domtext.style.textAlign = 'right'
+      }
+      else{
+        domtext.style.textAlign = 'left'
+      }
+
+    }
 
     const formData = reactive({
       articleSource:0,//保存 已有来源（即来源列表接口能查到），则把列表里该来源的 sourceId 赋值给它
@@ -966,6 +980,7 @@ export default {
       formData,
       rules,
       langOptions,
+      langSelectChange,
 
       articleSourceQuerySearchResultsArr,
       articleSourceHandleSelectFn,

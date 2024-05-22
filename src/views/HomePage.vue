@@ -592,11 +592,11 @@ export default {
           console.log('data',data);
 
           //投稿总数
-          statisticsData[0].num = data.articleCount;
+          statisticsData[0].num = data.data.articleCount;
           //发布总数
-          statisticsData[1].num = data.pubCount;
+          statisticsData[1].num = data.data.pubCount;
           //待处理稿件
-          statisticsData[2].num = data.waitArticle;
+          statisticsData[2].num = data.data.waitArticle;
 
           
 
