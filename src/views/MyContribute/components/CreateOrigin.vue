@@ -770,7 +770,6 @@ export default {
       })
       .catch((error)=>{
         console.log('原创稿件提交 error',error);
-        
       })
       .finally(()=>{
         loadingInstance1.close();

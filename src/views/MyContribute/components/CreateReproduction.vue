@@ -649,9 +649,13 @@ export default {
       })();
 
       httpAxiosO({
-        url: httpAxiosOUrl,
-        method: "post",
-        data: dataList.value,
+        url:httpAxiosOUrl,
+        method:'post',
+        headers:{
+          //这个接口不写 这行会报错
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        data:JSON.stringify(dataList.value),
       })
         .then((D) => {
           console.log("转载稿件提交 D", D);
