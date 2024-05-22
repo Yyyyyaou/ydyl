@@ -357,7 +357,7 @@ export default {
             });
             return;
           } else {
-            let data = D.data;
+            let data = D.data.data;
             if (trendEcharts.value) {
               trendEcharts.value.initEcharts(
                 data.dateList,

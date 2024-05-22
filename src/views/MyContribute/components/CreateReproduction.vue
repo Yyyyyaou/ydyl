@@ -3,8 +3,8 @@
     <div
       class="createreproduction-content flexcenter"
       v-for="(item, index) in dataList"
-      :key="item+index"
-    >                                 
+      :key="item + index"
+    >
       <div
         class="createreproduction-content-list"
         :class="{ listfold: dataList[index].fold }"
@@ -40,16 +40,16 @@
             <el-row style="justify-content: space-between">
               <el-col :span="11">
                 <el-form-item label="稿件来源" prop="articleSourceName">
-
                   <el-autocomplete
                     v-model="dataList[index].articleSourceName"
-                    :fetch-suggestions="articleSourceQuerySearchFn.bind(this,index)"
+                    :fetch-suggestions="
+                      articleSourceQuerySearchFn.bind(this, index)
+                    "
                     clearable
-                    style="width:100%;"
+                    style="width: 100%"
                     placeholder="请输入来源"
-                    @select="articleSourceHandleSelectFn.bind(this,index)"
+                    @select="articleSourceHandleSelectFn.bind(this, index)"
                   />
-
                 </el-form-item>
               </el-col>
               <el-col :span="11">
@@ -68,7 +68,10 @@
             <el-form-item label="稿件原地址" prop="srcUrl">
               <el-input v-model="dataList[index].srcUrl" clearable />
             </el-form-item>
-            <el-form-item label="上传附件" prop="fileAccessory" class="auditingUploadFilesArraysOuterC"
+            <el-form-item
+              label="上传附件"
+              prop="fileAccessory"
+              class="auditingUploadFilesArraysOuterC"
             >
               <el-input
                 v-model="dataList[index].fileAccessory"
@@ -78,24 +81,24 @@
               />
               <el-upload
                 class="auditingUploadC"
-                :id="'auditingUploadID_'+index"
+                :id="'auditingUploadID_' + index"
                 :action="auditingUploadFilesPostUrl"
                 multiple
                 show-file-list
                 :file-list="auditingUploadFilesArrays[index]"
-
-                :on-change="handleAuditingUploadChangeFn.bind(this,index)"
-                :on-error="handleAuditingUploadErrorFn.bind(this,index)"
-                :before-remove="handleAuditingUploadBeforeRemoveFn.bind(this,index)"
-                :on-success="handleAuditingUploadSuccessFn.bind(this,index)"
+                :on-change="handleAuditingUploadChangeFn.bind(this, index)"
+                :on-error="handleAuditingUploadErrorFn.bind(this, index)"
+                :before-remove="
+                  handleAuditingUploadBeforeRemoveFn.bind(this, index)
+                "
+                :on-success="handleAuditingUploadSuccessFn.bind(this, index)"
                 name="files"
                 :data="{
-                  fileText:1,//	0审核单,1附件,2正文
+                  fileText: 1, //	0审核单,1附件,2正文
                 }"
               >
                 <el-button class="u">上传</el-button>
               </el-upload>
-
             </el-form-item>
             <el-form-item label="备注" prop="remark">
               <el-input
@@ -128,25 +131,34 @@
       </div>
     </div>
     <div class="createreproduction-btngroup flexcenter">
-      <el-button class="createreproduction-btngroup-save" @click="postAddEditReprintAjaxFn(0)">保存到草稿箱</el-button>
-      <el-button class="createreproduction-btngroup-submit" @click="postAddEditReprintAjaxFn(1)">提 交</el-button>
+      <el-button
+        class="createreproduction-btngroup-save"
+        @click="postAddEditReprintAjaxFn(0)"
+        >保存到草稿箱</el-button
+      >
+      <el-button
+        class="createreproduction-btngroup-submit"
+        @click="postAddEditReprintAjaxFn(1)"
+        >提 交</el-button
+      >
       <el-button class="createreproduction-btngroup-reset">重 置</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, ref,toRefs,onMounted, } from "vue";
-import { useRouter } from 'vue-router';
+import { reactive, ref, toRefs, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 
 export default {
-  props:{
-    forPropsGetFindByIdAjaxFnReturnO:Object,
+  props: {
+    forPropsGetFindByIdAjaxFnReturnO: Object,
   },
-  setup(props,ctx) {ctx;
+  setup(props, ctx) {
+    ctx;
     //vuex实例
     const store = useStore();
 
@@ -155,186 +167,198 @@ export default {
 
     const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
 
-    const dataList = ref([{
-      articleSource:0,
-      articleSourceName:'',
-      sourceName:'',
-      fileAccessory:'',
-    }]);
+    const dataList = ref([
+      {
+        articleSource: 0,
+        articleSourceName: "",
+        sourceName: "",
+        fileAccessory: "",
+      },
+    ]);
     const rules = reactive({
-      articleTitle: [//稿件标题
+      articleTitle: [
+        //稿件标题
         {
           required: true,
           message: "必填项",
           trigger: "blur",
         },
       ],
-      articleSourceName:[//稿件来源名字，用来显示
+      articleSourceName: [
+        //稿件来源名字，用来显示
         {
           required: true,
           message: "必填项",
           trigger: "blur",
         },
       ],
-      articleSource: [//稿件来源id，用来储存来源id，Number类型
+      articleSource: [
+        //稿件来源id，用来储存来源id，Number类型
         {
           required: false,
           message: "必填项",
           trigger: "blur",
         },
       ],
-      sourceName: [//稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
+      sourceName: [
+        //稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
         {
           required: false,
           message: "必填项",
           trigger: "blur",
         },
       ],
-      language: [//语种
+      language: [
+        //语种
         {
           required: true,
           message: "必填项",
           trigger: "change",
         },
       ],
-      srcUrl: [//稿件原地址
+      srcUrl: [
+        //稿件原地址
         {
           required: true,
           trigger: "blur",
-          validator:(rule, value, callback)=>{rule
-            if(!value){
-              return callback(new Error('请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/'))
+          validator: (rule, value, callback) => {
+            rule;
+            if (!value) {
+              return callback(
+                new Error("请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/")
+              );
             }
-            const regExp = /^https?:\/\/[a-zA-Z0-9]+\.*/
-            if(!regExp.test(value)){
-              return callback(new Error('请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/'))
+            const regExp = /^https?:\/\/[a-zA-Z0-9]+\.*/;
+            if (!regExp.test(value)) {
+              return callback(
+                new Error("请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/")
+              );
             }
-          }
+          },
         },
       ],
-      fileAccessory:[
+      fileAccessory: [
         {
-          required:false,
-          message:'非必填项',
-          trigger:'change',
-        }
+          required: false,
+          message: "非必填项",
+          trigger: "change",
+        },
       ],
-      remark:[
+      remark: [
         {
-          required:false,
-          message:'非必填项',
-          trigger:'change',
-        }
+          required: false,
+          message: "非必填项",
+          trigger: "change",
+        },
       ],
-      fileIds:[
+      fileIds: [
         {
-          required:false,
-          message:'非必填项',
-          trigger:'blur',
-        }
+          required: false,
+          message: "非必填项",
+          trigger: "blur",
+        },
       ],
     });
-
 
     /**
      * 选中已有来源
      * @param {*} indexP dataList 数组索引
      * @param {*} itemP 在来源列表中选中的对象
      */
-    function articleSourceHandleSelectFn(indexP,itemP){
-      dataList.value[indexP]['articleSource'] = itemP.id;
-      dataList.value[indexP]['sourceName'] = '';
+    function articleSourceHandleSelectFn(indexP, itemP) {
+      dataList.value[indexP]["articleSource"] = itemP.id;
+      dataList.value[indexP]["sourceName"] = "";
     }
     // end of articleSourceHandleSelectFn
 
     //保存来源搜索后的结果
     const articleSourceQuerySearchResultsArr = reactive([]);
-  
+
     /**
      * 已有来源查询
      * @param {*} indexP dataList 数组索引
      * @param {*} sourceNameP 来源检索词
      */
-    async function articleSourceQuerySearchFn(indexP,sourceNameP){
+    async function articleSourceQuerySearchFn(indexP, sourceNameP) {
+      await store
+        .dispatch("getSearchFindSourceListFn", sourceNameP)
+        .then((D) => {
+          console.log("D", D);
 
-      await store.dispatch('getSearchFindSourceListFn',sourceNameP)
-      .then((D)=>{
+          articleSourceQuerySearchResultsArr.splice(
+            0,
+            articleSourceQuerySearchResultsArr.length
+          );
 
-        console.log('D',D);
-        
-        articleSourceQuerySearchResultsArr.splice(0,articleSourceQuerySearchResultsArr.length);
+          if (Array.isArray(D.data) && D.data.length > 0) {
+            D.data.forEach((o) => {
+              let _o = o;
+              _o.value = o.sourceName;
+              articleSourceQuerySearchResultsArr.push(_o);
 
-        if(
-          Array.isArray(D.data)
-          &&D.data.length>0
-        ){
-
-          D.data.forEach((o)=>{
-            let _o = o;
-            _o.value = o.sourceName;
-            articleSourceQuerySearchResultsArr.push(_o);
-            
-            //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
-            if(dataList.value[indexP].articleSourceName === o.sourceName){//检索词 与 来源名称 精准相同时候
-              dataList.value[indexP].articleSource = o.sourceId;//表示用的已有来源
-              dataList.value[indexP].sourceName = '';//清空它，表示不是新来源
-            }
-
-          });
-          console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
-
-        }else{//没查到结果，说明该检索字符串为新字符串
-          dataList.value[indexP]['sourceName'] = sourceNameP.trim();
-          dataList.value[indexP]['articleSource'] = 0;//把来源id字段设成0，与袁冰 协商后 传0代表没有id
-
-        }
-
-      })
-      .catch((error)=>{
-        console.log('error',error);
-      })
-      ;
-      return articleSourceQuerySearchResultsArr
+              //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
+              if (dataList.value[indexP].articleSourceName === o.sourceName) {
+                //检索词 与 来源名称 精准相同时候
+                dataList.value[indexP].articleSource = o.sourceId; //表示用的已有来源
+                dataList.value[indexP].sourceName = ""; //清空它，表示不是新来源
+              }
+            });
+            console.log(
+              "articleSourceQuerySearchResultsArr",
+              articleSourceQuerySearchResultsArr
+            );
+          } else {
+            //没查到结果，说明该检索字符串为新字符串
+            dataList.value[indexP]["sourceName"] = sourceNameP.trim();
+            dataList.value[indexP]["articleSource"] = 0; //把来源id字段设成0，与袁冰 协商后 传0代表没有id
+          }
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+      return articleSourceQuerySearchResultsArr;
     }
     // end of articleSourceQuerySearchFn
 
-
-
     const langOptions = reactive([]);
-    store.state.GLOBAL_LANGUAGE_LIST.forEach((o,i)=>{
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o, i) => {
       //∵ 这个界面不需要全部
-      if(o.desc === '全部'){
+      if (o.desc === "全部") {
         return;
       }
-      if(i===1){
+      if (i === 1) {
         dataList.value[0].language = o.id;
       }
       langOptions.push({
         value: o.id,
         label: o.desc,
-      })
+      });
     });
 
     //附件上传接口地址
-    const auditingUploadFilesPostUrl = ref('');    
-    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
+    const auditingUploadFilesPostUrl = ref("");
+    process.env.NODE_ENV === "development"
+      ? (auditingUploadFilesPostUrl.value =
+          "api/tougaoadmin/web/article/upload")
+      : (auditingUploadFilesPostUrl.value = "/web/article/upload");
 
     //普通附件列表
     const auditingUploadFilesArrays = reactive([]);
 
     /**
      * 转载稿件的附件上传 element plus 有问题，
-     * 如果 附件列表 变量 为 嵌套复杂对象 
+     * 如果 附件列表 变量 为 嵌套复杂对象
      * 如：reactive([[]])/ref([[]])
      * reactive({[]})/ref({[]})
-     * 
+     *
      * 用于监听 change 函数 里为 auditingUploadFilesArrays[index] 赋值时 会条目错乱
-     * 
+     *
      * 如：上传一个文件，会显示两个，上传两个会显示8个，上传3个文件会显示24个
-     * 
+     *
      * 所以暂时搁置 上传附件开发
      */
-    function handleAuditingUploadChangeFn(indexP,file,files){indexP,file,files;
+    function handleAuditingUploadChangeFn(indexP, file, files) {
+      indexP, file, files;
       // if(
       //   !Array.isArray(auditingUploadFilesArrays[indexP])
       // ){
@@ -347,80 +371,85 @@ export default {
       //   console.log(document.querySelector('#auditingUploadID_'+indexP+' input[type=file]'));
       //   // auditingUploadFilesArrays[indexP].push(o);
       // });
-
     }
     // end of handleAuditingUploadChange
 
     /**
      * 上传文件报错
-     * @param {*} error 
-     * @param {*} uploadFile 
-     * @param {*} uploadFiles 
+     * @param {*} error
+     * @param {*} uploadFile
+     * @param {*} uploadFiles
      */
-     function handleAuditingUploadErrorFn(error, uploadFile, uploadFiles){
-      console.log('handleAuditingUploadErrorFn error',error);
-      console.log('handleAuditingUploadErrorFn uploadFile',uploadFile);
-      console.log('handleAuditingUploadErrorFn uploadFiles',uploadFiles);
+    function handleAuditingUploadErrorFn(error, uploadFile, uploadFiles) {
+      console.log("handleAuditingUploadErrorFn error", error);
+      console.log("handleAuditingUploadErrorFn uploadFile", uploadFile);
+      console.log("handleAuditingUploadErrorFn uploadFiles", uploadFiles);
       // auditingUploadFilesArray.value.forEach((o)=>{
       //   console.log('o',o);
       // });
-
     }
     /**
      * 删除附件文件之前
      */
-     function handleAuditingUploadBeforeRemoveFn(indexP,uploadFile, uploadFiles){indexP,uploadFiles
+    function handleAuditingUploadBeforeRemoveFn(
+      indexP,
+      uploadFile,
+      uploadFiles
+    ) {
+      indexP, uploadFiles;
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
-      console.log('uploadFile',uploadFile)
-      const {fileName} = uploadFile.response.data[0];
+      console.log("uploadFile", uploadFile);
+      const { fileName } = uploadFile.response.data[0];
 
       return httpAxiosO({
-        url: '/web/article/delFileObj',
-        method: 'delete',
+        url: "/web/article/delFileObj",
+        method: "delete",
         params: {
-          fileName
-        }
+          fileName,
+        },
       })
-      .then((D)=>{
-
-        const { data } = D;
-        if(!data.success){
-          ElMessage({
-            message: '附件删除失败，接口提示：'+data.message,
-            type: 'error',
-            plain: true,
-          })
-        }
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      });
+        .then((D) => {
+          const { data } = D;
+          if (!data.success) {
+            ElMessage({
+              message: "附件删除失败，接口提示：" + data.message,
+              type: "error",
+              plain: true,
+            });
+          }
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
     }
     //end of handleAuditingUploadBeforeRemoveFn
     /**
      * 附件上传成功
      */
-    function handleAuditingUploadSuccessFn(indexP,responseP, uploadFile, uploadFiles){uploadFile, uploadFiles
+    function handleAuditingUploadSuccessFn(
+      indexP,
+      responseP,
+      uploadFile,
+      uploadFiles
+    ) {
+      uploadFile, uploadFiles;
 
-      if(responseP.success){
+      if (responseP.success) {
         ElMessage({
-          message: '附件上传成功',
-          type: 'success',
+          message: "附件上传成功",
+          type: "success",
           plain: true,
-        })
+        });
       }
-      
-      if(
-        !Array.isArray(auditingUploadFilesArrays[indexP])
-      ){
+
+      if (!Array.isArray(auditingUploadFilesArrays[indexP])) {
         auditingUploadFilesArrays[indexP] = [];
       }
 
-      console.log('uploadFiles',uploadFiles);
-      console.log('responseP',responseP);
+      console.log("uploadFiles", uploadFiles);
+      console.log("responseP", responseP);
 
       auditingUploadFilesArrays[indexP] = uploadFiles;
-
     }
     // end of handleAuditingUploadSuccessFn
 
@@ -432,12 +461,12 @@ export default {
       dataList.value.forEach((element) => {
         element.fold = true;
       });
-      dataList.value.push({ 
+      dataList.value.push({
         fold: false,
         language: 1,
-        articleSource:0,
-        articleSourceName:'',
-        sourceName:'',
+        articleSource: 0,
+        articleSourceName: "",
+        sourceName: "",
       });
     }
     function deleteData(index) {
@@ -447,62 +476,78 @@ export default {
       });
       dataList.value[dataList.value.length - 1].fold = false;
     }
+    function checkLang(datasOP) {
+      //查看 中文 字段值 是多少，∵语种列表是不断变化的，中文字段值不一定是 1
+      const zhCNValue = langOptions.filter((o) => {
+        return o.label == "中文";
+      })[0]["value"];
 
-
+      //非要判断 稿件标题是否含有中文，如果不含有中文则  字段 language === 1 时提醒....
+      if (
+        !/[\u4e00-\u9fa5]/g.test(datasOP.articleTitle) &&
+        typeof datasOP.articleTitle !== undefined &&
+        datasOP.articleTitle &&
+        datasOP.articleTitle.trim() !== "" &&
+        datasOP.language === zhCNValue
+      ) {
+        //预览前要先 检测一下 标题语种，非中文要给提示
+        ElMessageBox.alert(
+          "您输入的“稿件标题”语种不是中文，请修改语种",
+          "提示",
+          {
+            confirmButtonText: "取消，去修改",
+          }
+        )
+          .then(() => {})
+          .catch(() => {});
+        return false;
+      } else {
+        return true;
+      }
+    }
     /**
      * 校验 转载稿件 用户所填表单 各个字段 合法性
-     * @param {*} datasOP 
+     * @param {*} datasOP
      */
-     function checkFieldValueFn(datasOP){
-      const { 
-        articleTitle,//稿件标题
-        articleSource,//稿件来源id
-        sourceName,//稿件来源 名字（来源模糊查询不到的，新的 来源）
+    function checkFieldValueFn(datasOP) {
+      const {
+        articleTitle, //稿件标题
+        articleSource, //稿件来源id
+        sourceName, //稿件来源 名字（来源模糊查询不到的，新的 来源）
         srcUrl, //稿件原地址
       } = datasOP;
 
       let checkResult = true;
-      if(
-        !articleTitle
-        ||(articleTitle&&articleTitle.trim() === '')
-      ){
+      if (!articleTitle || (articleTitle && articleTitle.trim() === "")) {
         ElMessage({
-          message: '请填写稿件标题',
-          type: 'warning',
+          message: "请填写稿件标题",
+          type: "warning",
           plain: true,
-        })
+        });
         checkResult = false;
       }
-      if(
-        (
-          !articleSource
-          && articleSource === 0
-        )
-        &&
-        (
-          !sourceName
-          ||(sourceName&&sourceName.trim() === '')
-        )
-      ){
+      if (
+        !articleSource &&
+        articleSource === 0 &&
+        (!sourceName || (sourceName && sourceName.trim() === ""))
+      ) {
         ElMessage({
-          message: '请填写稿件来源',
-          type: 'warning',
+          message: "请填写稿件来源",
+          type: "warning",
           plain: true,
-        })
+        });
         checkResult = false;
       }
 
-      if(
-        !srcUrl
-      ){
+      if (!srcUrl) {
         ElMessage({
-          message: '请输入稿件原地址',
-          type: 'warning',
+          message: "请输入稿件原地址",
+          type: "warning",
           plain: true,
-        })
+        });
         checkResult = false;
       }
-      return checkResult
+      return checkResult;
     }
 
     /**
@@ -510,157 +555,187 @@ export default {
      * 提交稿件到 “草稿箱”列表里
      * articleStatus:1 时
      * 提交稿件到 “我的投稿”列表里
-     * 
+     *
      */
-    function postAddEditReprintAjaxFn(articleStatusP){
+    function postAddEditReprintAjaxFn(articleStatusP) {
+      // articleTitle 稿件标题
+      // articleSource 稿件来源
+      // language 语种
+      // remark 备注
 
-        // articleTitle 稿件标题
-        // articleSource 稿件来源
-        // language 语种
-        // remark 备注
+      // articleStatus 稿件状态 （-1：已删除，0：草稿，1：已投稿）
 
-        // articleStatus 稿件状态 （-1：已删除，0：草稿，1：已投稿）
-
-      let checkFieldValueFnResult = true;//true为校验通过
+      let checkFieldValueFnResult = true; //true为校验通过
 
       // console.log('auditingUploadFilesArrays',auditingUploadFilesArrays);
 
+      for (let num = 0; num < dataList.value.length; num++) {
+        let o = dataList.value[num],
+          i = num;
+        if (auditingUploadFilesArrays.length != 0) {
+          o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
+            const { fileName } = next.response.data[0];
+            let _str = old === "" ? fileName : old + "," + fileName;
+            return _str;
+          }, "");
+          o.fileIds = auditingUploadFilesArrays[i].reduce((old, next) => {
+            const { id } = next.response.data[0];
+            let _str = old === "" ? id : old + "," + id;
+            return _str;
+          }, "");
+        }
 
-      dataList.value.forEach((o,i)=>{
+        console.log("o.fileAccessory", o.fileAccessory);
+        console.log("o.fileIds", o.fileIds);
 
-        o.fileAccessory = auditingUploadFilesArrays[i].reduce((old,next)=>{
-          const { fileName } = next.response.data[0];
-          let _str = old===''?fileName:old+','+fileName;
-          return _str;
-        },'');
-        o.fileIds = auditingUploadFilesArrays[i].reduce((old,next)=>{
-          const { id } = next.response.data[0];
-          let _str = old===''?id:old+','+id;
-          return _str;
-        },'');
-
-        console.log('o.fileAccessory',o.fileAccessory);
-        console.log('o.fileIds',o.fileIds);
-
-        o.articleTitle = o.articleTitle.trim();
+        o.articleTitle = o.articleTitle?.trim();
 
         o.articleStatus = articleStatusP;
-        checkFieldValueFnResult = checkFieldValueFn(o);
-      });
+        if (!checkFieldValueFn(o)) {
+          return;
+        }
+        if (!checkLang(o)) {
+          return;
+        }
+      }
+      // dataList.value.forEach((o, i) => {
+      //   if (auditingUploadFilesArrays.length != 0) {
+      //     o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
+      //       const { fileName } = next.response.data[0];
+      //       let _str = old === "" ? fileName : old + "," + fileName;
+      //       return _str;
+      //     }, "");
+      //     o.fileIds = auditingUploadFilesArrays[i].reduce((old, next) => {
+      //       const { id } = next.response.data[0];
+      //       let _str = old === "" ? id : old + "," + id;
+      //       return _str;
+      //     }, "");
+      //   }
+
+      //   console.log("o.fileAccessory", o.fileAccessory);
+      //   console.log("o.fileIds", o.fileIds);
+
+      //   o.articleTitle = o.articleTitle?.trim();
+
+      //   o.articleStatus = articleStatusP;
+      //   checkFieldValueFnResult = checkFieldValueFn(o);
+      //   checkLang(o)
+      // });
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       // const _regExp1 = /\n$/;
       // datasO.articleContent = datasO.articleContent.replace(_regExp1, '');
 
-      if(!checkFieldValueFnResult){//验证各个字段
+      if (!checkFieldValueFnResult) {
+        //验证各个字段
         return;
       }
-      console.log('dataList',dataList);
+      console.log("dataList", dataList);
 
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
-      const httpAxiosOUrl = (()=>{
-        let _url = '';
-        if(forPropsGetFindByIdAjaxFnReturnO.value.id){
-          _url = '/web/article/update.do';
-          dataList.value.forEach((o)=>{
-            o.id = forPropsGetFindByIdAjaxFnReturnO.value.id;//父组件传下来的id
+      const httpAxiosOUrl = (() => {
+        let _url = "";
+        if (forPropsGetFindByIdAjaxFnReturnO.value.id) {
+          _url = "/web/article/update.do";
+          dataList.value.forEach((o) => {
+            o.id = forPropsGetFindByIdAjaxFnReturnO.value.id; //父组件传下来的id
           });
-        }else{
-          _url = '/web/article/addEditReprint.do';
+        } else {
+          _url = "/web/article/addEditReprint.do";
         }
-        return _url
+        return _url;
       })();
 
       httpAxiosO({
-        url:httpAxiosOUrl,
-        method:'post',
-        data:dataList.value
+        url: httpAxiosOUrl,
+        method: "post",
+        data: dataList.value,
       })
-      .then((D)=>{
-        console.log('转载稿件提交 D',D);
-        const { data,success } = D.data;data
-        if(!success){
+        .then((D) => {
+          console.log("转载稿件提交 D", D);
+          const { data, success } = D.data;
+          data;
+          if (!success) {
+            ElMessage({
+              message: "转载稿件提交 接口传参可能有误",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
           ElMessage({
-            message: '转载稿件提交 接口传参可能有误',
-            type: 'error',
+            message: "转载稿件提交成功",
+            type: "success",
             plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '转载稿件提交成功',
-          type: 'success',
-          plain: true,
-        });
-        
-        //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿 
-        router.push({
-          path:articleStatusP?'/MyContribute':'/Drafts'
-        });
+          });
 
-
-      })
-      .catch((error)=>{
-        console.log('转载稿件提交 error',error);
-        
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
+          //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿
+          router.push({
+            path: articleStatusP ? "/MyContribute" : "/Drafts",
+          });
+        })
+        .catch((error) => {
+          console.log("转载稿件提交 error", error);
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
     }
     // end of postAddEditReprintAjaxFn
 
     //获取来自父组件的 稿件详情的数据
-    function getPropsFn(){
-
+    function getPropsFn() {
       //没有id就退出
-      if(!forPropsGetFindByIdAjaxFnReturnO.value.id){
+      if (!forPropsGetFindByIdAjaxFnReturnO.value.id) {
         return;
       }
 
       const o = {
-        articleTitle : forPropsGetFindByIdAjaxFnReturnO.value.articleTitle,//稿件标题
-        articleSource : forPropsGetFindByIdAjaxFnReturnO.value.articleSource||'',//稿件来源
-        articleSourceName:forPropsGetFindByIdAjaxFnReturnO.value.sourceName,//用来显示在页面上的来源名字
-        language : forPropsGetFindByIdAjaxFnReturnO.value.language||'',//语种
-        remark : forPropsGetFindByIdAjaxFnReturnO.value.remark||'',//备注
-        srcUrl:forPropsGetFindByIdAjaxFnReturnO.value.srcUrl||'',//稿件原地址
-        articleType:1,//稿件类型 0原创稿件 1转载稿件
-      }
-      
+        articleTitle: forPropsGetFindByIdAjaxFnReturnO.value.articleTitle, //稿件标题
+        articleSource:
+          forPropsGetFindByIdAjaxFnReturnO.value.articleSource || "", //稿件来源
+        articleSourceName: forPropsGetFindByIdAjaxFnReturnO.value.sourceName, //用来显示在页面上的来源名字
+        language: forPropsGetFindByIdAjaxFnReturnO.value.language || "", //语种
+        remark: forPropsGetFindByIdAjaxFnReturnO.value.remark || "", //备注
+        srcUrl: forPropsGetFindByIdAjaxFnReturnO.value.srcUrl || "", //稿件原地址
+        articleType: 1, //稿件类型 0原创稿件 1转载稿件
+      };
+
       //回显附件列表，因为附件列表是单独的变量
-      console.log('forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory',forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory);
-      
-      if(!Array.isArray(auditingUploadFilesArrays[0])){
+      console.log(
+        "forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory",
+        forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory
+      );
+
+      if (!Array.isArray(auditingUploadFilesArrays[0])) {
         auditingUploadFilesArrays[0] = [];
       }
 
-      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory.split(',').forEach((o)=>{
-        auditingUploadFilesArrays[0].push({
-          name: o,
-          url: '',
-          id: '',
-          response: {
-            data: [
-              {
-                fileName: o,
-              },
-            ]
-          },
+      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory
+        .split(",")
+        .forEach((o) => {
+          auditingUploadFilesArrays[0].push({
+            name: o,
+            url: "",
+            id: "",
+            response: {
+              data: [
+                {
+                  fileName: o,
+                },
+              ],
+            },
+          });
         });
-      });
 
-
-      dataList.value.splice(0,dataList.value.length);
-      dataList.value.push(o);//回显详情各个字段
-
+      dataList.value.splice(0, dataList.value.length);
+      dataList.value.push(o); //回显详情各个字段
     }
     // end of getPropsFn
-    
-    onMounted(()=>{
+
+    onMounted(() => {
       getPropsFn();
     });
 
@@ -675,7 +750,6 @@ export default {
       articleSourceHandleSelectFn,
       articleSourceQuerySearchFn,
 
-
       //为了迁就 element-ui 附件上传组件bug（所以，一个el-upload组件对应一个数组）
       auditingUploadFilesArrays,
 
@@ -686,7 +760,6 @@ export default {
       handleAuditingUploadSuccessFn,
 
       postAddEditReprintAjaxFn,
-
     };
   },
 };
@@ -770,10 +843,25 @@ export default {
   }
 }
 
-.auditingUploadFilesArraysOuterC{position:relative; }
-.auditingUploadC{position:relative;z-index:5;margin-top:-46px;width:100%;cursor:pointer;width:100%;
-  .u{position:absolute;left:0;right:0;top:0;height:46px;width:100%;opacity: 0;}
-  
+.auditingUploadFilesArraysOuterC {
+  position: relative;
+}
+.auditingUploadC {
+  position: relative;
+  z-index: 5;
+  margin-top: -46px;
+  width: 100%;
+  cursor: pointer;
+  width: 100%;
+  .u {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 46px;
+    width: 100%;
+    opacity: 0;
+  }
 }
 
 .createreproduction-btngroup {
@@ -785,15 +873,15 @@ export default {
     border-radius: 5px;
     font-size: 20px;
   }
-  .createreproduction-btngroup-save{
+  .createreproduction-btngroup-save {
     color: #2c90ff;
     background-color: #e8f4ff;
   }
-  .createreproduction-btngroup-submit{
+  .createreproduction-btngroup-submit {
     color: #fff;
     background-color: #1890ff;
   }
-  .createreproduction-btngroup-reset{
+  .createreproduction-btngroup-reset {
     color: #49455c;
     background-color: #e2e3e4;
   }

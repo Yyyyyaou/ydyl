@@ -12,8 +12,7 @@
       <div class="mid-divider"></div>
       <div class="mid-content-mycontribute-table-content">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
-          <div>
-          </div>
+          <div></div>
           <div
             class="mid-content-mycontribute-table-btngroup-search flexcenter"
           >
@@ -47,7 +46,10 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px"
+            <el-button
+              type="primary"
+              class="marl10"
+              style="width: 78px"
               @click="getArticleDraftListAjaxFn"
             >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
@@ -63,19 +65,21 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              'color': '#6a6d74',
+              color: '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
-              'color': '#727789',
+              color: '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="序号" width="100"
+            <el-table-column
+              label="序号"
+              width="100"
               header-align="center"
-              align="center" 
+              align="center"
             >
               <template #default="scope">
                 {{ scope.$index + 1 }}
@@ -85,31 +89,58 @@
               <template #default="scope">
                 <span
                   @click="getFindByIdAjaxFn(scope)"
-                  style="cursor: pointer;"
+                  style="cursor: pointer"
+                  :style="
+                    ((scope) => {
+                      let _styleStr1 = 'cursor: pointer;';
+                      let _styleStr2 =
+                        'cursor: pointer;direction: rtl;text-align:auto;text-align:-webkit-auto;';
+                      return scope.row.languageName === '阿文' ||
+                        scope.row.languageName === '阿语'
+                        ? _styleStr2
+                        : _styleStr1;
+                    })(scope)
+                  "
                 >
                   {{ scope.row.articleTitle }}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="sourceName" label="稿件来源" width="125"
+            <el-table-column
+              prop="sourceName"
+              label="稿件来源"
+              width="125"
               header-align="center"
-              align="center" 
+              align="center"
             />
-            <el-table-column prop="languageName" label="语种" width="120"
+            <el-table-column
+              prop="languageName"
+              label="语种"
+              width="120"
               header-align="center"
-              align="center" 
+              align="center"
             />
-            <el-table-column prop="crtimeFormat" label="创建日期" width="140"
+            <el-table-column
+              prop="crtimeFormat"
+              label="创建日期"
+              width="140"
               header-align="center"
-              align="center" 
+              align="center"
             />
             <el-table-column prop="articleUseStatus" label="操作" width="200">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div :title="scope.row.articleTitle"  @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)">编辑</div>
+                  <div
+                    @click="
+                      router.push(
+                        '/MyContribute/CreateContribute?id=' + scope.row.id
+                      )
+                    "
+                  >
+                    编辑
+                  </div>
                   <span></span>
-                  
-                  
+
                   <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
                   <div
                     @click="deleteArticleAjaxFn(scope.row.id)"
@@ -167,10 +198,10 @@
 
 <script>
 import { ref, reactive, onMounted } from "vue";
-import { useStore } from "vuex"
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
@@ -194,7 +225,7 @@ export default {
       },
     ];
     //日期选择 数据
-    const dateDefaultTime = ref('');
+    const dateDefaultTime = ref("");
     //表格数据
     const tableData = reactive([]);
 
@@ -211,8 +242,8 @@ export default {
       getArticleDraftListAjaxFn();
     }
 
-    function tableSelectionChange(val){
-        console.log(val)
+    function tableSelectionChange(val) {
+      console.log(val);
     }
 
     /**
@@ -226,125 +257,121 @@ export default {
      * endtime 非必填 结束时间
      * currPage 非必填 开始页数
      * pageSize 非必填 页面条数
-     * 
+     *
      * 接口返回数据字段，线上文档有写，很详细
-    */
-    function getArticleDraftListAjaxFn(){
-
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
-        return o.desc
+     */
+    function getArticleDraftListAjaxFn() {
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o) => {
+        return o.desc;
       });
 
-      console.log('languageNameArr',languageNameArr);
+      console.log("languageNameArr", languageNameArr);
 
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
-        articleStatus:0,//0 代表草稿
-        currPage:page.value,//当前页
-        pageSize:limit.value,//每页条数
-      }
+        articleStatus: 0, //0 代表草稿
+        currPage: page.value, //当前页
+        pageSize: limit.value, //每页条数
+      };
 
       // statusSelectValue.value&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
 
-      switch(searchSelectValue.value){
+      switch (searchSelectValue.value) {
         case 0:
-        paramsO.articleTitle = searchInput.value;//按标题搜索
+          paramsO.articleTitle = searchInput.value; //按标题搜索
           break;
         case 1:
-        paramsO.articleContent = searchInput.value;//按正文搜索
+          paramsO.articleContent = searchInput.value; //按正文搜索
           break;
       }
 
       //时间段
-      if(
-        dateDefaultTime.value
-      ){
-        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      if (dateDefaultTime.value) {
+        paramsO.crtime = timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"]; //起始时间
+        paramsO.endtime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"]; //结束时间
       }
 
-
       httpAxiosO({
-        method: 'get',
-        url: '/web/article/draftList.do',
-        params:paramsO,
+        method: "get",
+        url: "/web/article/draftList.do",
+        params: paramsO,
       })
-      .then((D)=>{
-        console.log('草稿箱 D',D);
-        const { data,success } = D?.data
-        if(!success){
-          ElMessage({
-            message: '草稿箱数据请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
+        .then((D) => {
+          console.log("草稿箱 D", D);
+          const { data, success } = D?.data;
+          if (!success) {
+            ElMessage({
+              message: "草稿箱数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
 
-        //注释于 20240515.1530 jira YDYL-5 建议删除
-        // ElMessage({
-        //   message: '草稿箱数据请求成功',
-        //   type: 'success',
-        //   plain: true,
-        // });
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: '草稿箱数据请求成功',
+          //   type: 'success',
+          //   plain: true,
+          // });
 
-        tableData.splice(0,tableData.length);   //清空tableData
-        data.ldata.forEach((o)=>{
-          let _o = o;
-          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
-          tableData.push(_o);
-        });
-        pageTotal.value = data.totalResults;
-
-      })
-      .catch((error)=>{
-        console.log('草稿箱 接口请求 error',error);
-        ElMessage({
-          message: '草稿箱接口请求失败',
-          type: 'error',
-          plain: true,
+          tableData.splice(0, tableData.length); //清空tableData
+          data.ldata.forEach((o) => {
+            let _o = o;
+            _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
+            tableData.push(_o);
+          });
+          pageTotal.value = data.totalResults;
         })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+        .catch((error) => {
+          console.log("草稿箱 接口请求 error", error);
+          ElMessage({
+            message: "草稿箱接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
       return;
     }
     // end of getArticleDraftListAjaxFn
 
     //草稿箱的删除，应该删除到回收站
-    function deleteArticleAjaxFn(idP){
+    function deleteArticleAjaxFn(idP) {
       httpAxiosO({
-        url:'/web/article/delete.do',
-        method:'delete',
-        params:{
-          ids:idP
-        }
+        url: "/web/article/delete.do",
+        method: "delete",
+        params: {
+          ids: idP,
+        },
       })
-      .then((D)=>{D
-        ElMessage({
-          message: '删除成功',
-          type: 'success',
-          plain: true,
+        .then((D) => {
+          D;
+          ElMessage({
+            message: "删除成功",
+            type: "success",
+            plain: true,
+          });
+          getArticleDraftListAjaxFn();
         })
-        getArticleDraftListAjaxFn();
-      })
-      .catch((error)=>{error
-        ElMessage({
-          message: '删除失败',
-          type: 'error',
-          plain: true,
-        })
-      });
+        .catch((error) => {
+          error;
+          ElMessage({
+            message: "删除失败",
+            type: "error",
+            plain: true,
+          });
+        });
     }
     // end of deleteArticleAjaxFn
 
     /**
      * 跳转到细览页，需要传递 稿件id
      */
-     function getFindByIdAjaxFn(scopeP){
+    function getFindByIdAjaxFn(scopeP) {
       const c = router.resolve({
         path: "/PubDetail",
         query: {
@@ -379,7 +406,6 @@ export default {
       getArticleDraftListAjaxFn,
       deleteArticleAjaxFn,
       getFindByIdAjaxFn,
-
     };
   },
 };

@@ -249,7 +249,7 @@
                       :class="{
                         isClicked: isClickedArr.includes(scope.$index),
                       }"
-                      @click="externalAuditArticleFindByIdFn(scope)"
+                      @click="getFindByIdAjaxFn(scope)"
                     >
                       {{ scope.row.articleTitle }}
                     </span>
@@ -547,7 +547,7 @@
                       :class="{
                         isClicked: isClickedArr.includes(scope.$index),
                       }"
-                      @click="externalAuditArticleFindByIdFn(scope)"
+                      @click="getFindByIdAjaxFn(scope)"
                     >
                       {{ scope.row.articleTitle }}
                     </span>
@@ -864,7 +864,20 @@ export default {
     const timelineData = reactive([]);
     
   
+    /**
+     * 跳转到细览页，需要传递 稿件id
+     */
+    function getFindByIdAjaxFn(scopeP){
+      const c = router.resolve({
+        path: "/NoticeDetail",
+        query: {
+          id: scopeP.row.externalAuditArticleId,
+        },
+      });
 
+      window.open(c.href, "_blank");
+      return;
+    }
     /**
      * 查询 稿件详情
      */
@@ -1235,6 +1248,7 @@ export default {
 
       getNeedAuditCountAjaxFn,
       getNeedAuditCountAjaxFn1,
+      getFindByIdAjaxFn,
       externalAuditArticleFindByIdFn,
       externalAuditArticleRecordListAjaxFn,
 

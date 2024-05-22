@@ -2,7 +2,7 @@
   <section>
   <div class="createorigin-content">
     <el-form :model="formData" :rules="rules">
-      <el-form-item label="稿件标题" prop="articleTitle">
+      <el-form-item label="稿件标题" prop="articleTitle" :class="{ langAyu: formData.language == 3 }">
         <el-input v-model="formData.articleTitle" clearable />
       </el-form-item>
       <el-row style="justify-content: space-between">
@@ -35,6 +35,7 @@
         label="稿件正文"
         prop="articleHtmlCon"
         class="createorigin-content-editor"
+        :class="{ langAyu: formData.language == 3 }"
       >
         <!-- <section id="QuillEditorEleID"></section> -->
         <!-- <textarea id="tinymceEditorEleID" placeholder="编辑正文"></textarea> -->
@@ -49,12 +50,13 @@
             video_template_callback: editorVideoTemplateCallbackFn,
             file_picker_callback:editorFilePickerCallbackFn,
 
-            directionality: 'ltr rtl',
+            directionality: 'ltr',
             toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | link image media | code language',
             branding:false,//底部logo
             menubar:false,//顶部菜单栏
             resize:false,
-            placeholder:'请编辑正文',
+            statusbar: false,
+            
           }" 
           v-model="editorHTMLContent"
           model-events="change keydown blur focus paste"
@@ -243,9 +245,9 @@ export default {
       ],
       auditing: [//司局级审核单
         {
-          required: false,
-          // message: "必填项",
-          message: "非必填项",
+          required: true,
+          message: "必填项",
+          //message: "非必填项",
           trigger: "change",
         },
       ],
@@ -542,7 +544,7 @@ export default {
      * @param {*} datasOP 
      */
     function checkFieldValueFn(datasOP){
-      const { articleTitle,articleSource,language,articleHtmlCon,sourceName } = datasOP;
+      const { articleTitle,articleSource,language,articleHtmlCon,sourceName,auditing } = datasOP;
 
       // console.log('sourceName',sourceName);
       // console.log('articleSource',articleSource);
@@ -599,6 +601,15 @@ export default {
       ){
         ElMessage({
           message: '请编辑正文内容',
+          type: 'warning',
+          plain: true,
+        })
+        checkResult = false;
+      }      
+      console.log(auditing)
+      if(auditing == undefined){
+        ElMessage({
+          message: '请上传司局级审核单',
           type: 'warning',
           plain: true,
         })
@@ -1063,6 +1074,11 @@ export default {
   .createorigin-btngroup-reset {
     color: #49455c;
     background-color: #e2e3e4;
+  }
+}
+.langAyu{
+  :deep(input){
+    text-align: right;
   }
 }
 </style>

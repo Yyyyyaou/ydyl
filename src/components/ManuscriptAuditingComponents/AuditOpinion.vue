@@ -24,6 +24,7 @@
     </div>
     <div class="elpopover-comment-header-btn flexcenter">
       <el-button @click="postExternalAuditArticleAjaxFn">提交</el-button>
+      <el-button @click="closeElpopover">取消</el-button>
     </div>
   </div>
 </template>
@@ -72,7 +73,9 @@ export default {
       
     }
     // end of for...in...
-
+ function closeElpopover(){
+  ctx.emit('TriggerCloseElpopoverCommentFn');
+ }
     //详情页提交审核
     function postExternalAuditArticleAjaxFn(){
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
@@ -153,6 +156,7 @@ export default {
       commentRadioData,
 
       postExternalAuditArticleAjaxFn,
+      closeElpopover
     }
   }
 }
@@ -188,7 +192,7 @@ export default {
       margin-top: 15px;
       justify-content: center;
       .el-button {
-        width: 240px;
+        width: 200px;
         height: 45px;
         border-radius: 5px;
         background-color: #1890ff;
