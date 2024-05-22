@@ -67,8 +67,8 @@
           <el-date-picker
             v-model="dateDefaultTime"
             type="daterange"
-            start-placeholder="创建起始日期"
-            end-placeholder="创建结束日期"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
             style="margin-left: 10px; width: 270px"
           />
         </el-config-provider>

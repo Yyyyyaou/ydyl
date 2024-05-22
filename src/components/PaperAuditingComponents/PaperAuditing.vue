@@ -379,8 +379,8 @@
               <el-date-picker
                 v-model="dateDefaultTime1"
                 type="daterange"
-                start-placeholder="创建起始日期"
-                end-placeholder="创建结束日期"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
               />
