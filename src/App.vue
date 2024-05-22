@@ -77,21 +77,21 @@ export default {
     );
 
     //websocket 开始
-    const SOCKET = new WebSocket("/webSocket/tougaoadmin/web/websocket/1");
-    console.log('SOCKET',SOCKET);
-    SOCKET.addEventListener("open", function (event) {
-      console.log("连接成功 event",event);
-      SOCKET.send("Hello Server!");
-    });
-    // Listen for messages
-    SOCKET.addEventListener("message", function (event) {
-      console.log("Message from server ", event.data);
-    });
+    // const SOCKET = new WebSocket("/webSocket/tougaoadmin/web/websocket/1");
+    // console.log('SOCKET',SOCKET);
+    // SOCKET.addEventListener("open", function (event) {
+    //   console.log("连接成功 event",event);
+    //   SOCKET.send("Hello Server!");
+    // });
+    // // Listen for messages
+    // SOCKET.addEventListener("message", function (event) {
+    //   console.log("Message from server ", event.data);
+    // });
 
 
     onUnmounted(()=>{
       //关闭 SOCKET
-      SOCKET.close();
+      // SOCKET.close();
     })
 
     return {
