@@ -42,6 +42,7 @@
         </el-select>
         <el-config-provider :locale="locale" v-if="timeSelectValue == 3">
           <el-date-picker
+            :disabled-date="disabledDate"
             v-model="dateDefaultTime"
             type="daterange"
             start-placeholder="起始日期"
@@ -49,7 +50,6 @@
             :locale="locale"
             style="margin-left: 10px; width: 270px"
             @change="handleChange"
-            :disabled-date="disabledDate"
           />
         </el-config-provider>
       </div>

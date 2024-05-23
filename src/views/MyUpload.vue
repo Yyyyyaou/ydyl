@@ -47,6 +47,7 @@
 
             <el-config-provider :locale="locale">
               <el-date-picker
+            :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
                 start-placeholder="开始日期"
@@ -84,7 +85,7 @@
             }"
             @selection-change="tableSelectionChange"
           >
-            <el-table-column type="selection" width="55" />
+            <!-- <el-table-column type="selection" width="55" /> -->
             <el-table-column label="序号" width="100"
               header-align="center"
               align="center" 
@@ -211,6 +212,9 @@ export default {
     ];
     //日期选择 数据
     const dateDefaultTime = ref("");
+    const disabledDate = (time) => {
+      return time.getTime() > Date.now();
+    };
     //表格数据
     const tableData = reactive([]);
 
@@ -370,6 +374,7 @@ export default {
       console.log(val);
     }
     return {
+      disabledDate,
       router,
 
       searchInput,

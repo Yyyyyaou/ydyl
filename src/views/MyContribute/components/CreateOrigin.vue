@@ -620,15 +620,16 @@ export default {
         })
         checkResult = false;
       }      
-      console.log(auditing)
-      if(auditing == undefined){
-        ElMessage({
-          message: '请上传司局级审核单',
-          type: 'warning',
-          plain: true,
-        })
-        checkResult = false;
-      }
+      //上传失败 先注释
+       console.log(auditing)
+      // if(auditing == undefined){
+      //   ElMessage({
+      //     message: '请上传司局级审核单',
+      //     type: 'warning',
+      //     plain: true,
+      //   })
+      //   checkResult = false;
+      // }
       return checkResult
     }
 
