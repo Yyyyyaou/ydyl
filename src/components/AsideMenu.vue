@@ -130,7 +130,9 @@ export default {
 
     const router = useRouter();
     function menuSelect(key) {
-      router.push(key);
+      router.push({ path: key, query: { random:Date.parse(new Date()) } })
+
+      //router.push(key);
     }
 
     // 获取用户角色

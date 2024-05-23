@@ -33,6 +33,7 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                clearable
                 @keydown.enter="getArticleRecordListAjaxFn"
               />
             </div>
@@ -113,7 +114,7 @@
                         scope.row.visible = false;
                         popoverShowFlag = false;
                       "
-                      >取消
+                      >关闭
                     </el-button>
                   </div>
                   <template #reference>

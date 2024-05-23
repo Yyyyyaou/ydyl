@@ -158,6 +158,7 @@ before-remove 在附件列表删除文件钩子
     <PubDetail ref="NoticeDetailRef" :propsArticleO="formData" :propsId="forPropsGetFindByIdAjaxFnReturnO.id" />
     <div class="createorigin-btngroup flexcenter">
       <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
+      <el-button class="createorigin-btngroup-close" @click="dialogNoticeDetailVisible=false">关 闭</el-button>
     </div>
   </el-dialog>
   </section>
@@ -1086,7 +1087,7 @@ export default {
     color: #fff;
     background-color: #1890ff;
   }
-  .createorigin-btngroup-reset {
+  .createorigin-btngroup-reset, .createorigin-btngroup-close {
     color: #49455c;
     background-color: #e2e3e4;
   }

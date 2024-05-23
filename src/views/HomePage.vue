@@ -175,7 +175,8 @@
                       :key="index"
                       :hollow="true"
                       class="hoverpointer"
-                      :class="{ isClicked: isClickedArr.includes(index) }"
+                      :class="{ isClicked: activity.noticeRead == 1 }"
+                      :title="activity.noticeTitle"   
                       @click="getNoticeDetailFn(activity)"
                     >
                       {{ activity.noticeTitle }}
@@ -877,7 +878,7 @@ export default {
         }
         .isClicked {
           :deep(.el-timeline-item__content) {
-            color: #bdbfc5;
+            font-weight: 400;
           }
         }
         .el-timeline-item {

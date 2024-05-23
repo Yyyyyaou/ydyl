@@ -77,7 +77,7 @@
           <div class="divmid-bg flexcenter">
             <div class="flexcenter mid-content-statistics-left-content-div">
               <div class="flexcenter mid-content-statistics-left-content-img">
-                <img src="../assets/contributenum.png" alt="" />
+                <img src="../assets/papernum.png" alt="" />
               </div>
               <div class="mid-content-statistics-left-content-num">
                 <p>{{ num2 }}</p>
@@ -87,7 +87,7 @@
             <div class="divmid-divide"></div>
             <div class="flexcenter mid-content-statistics-left-content-div">
               <div class="flexcenter mid-content-statistics-left-content-img">
-                <img src="../assets/papernum.png" alt="" />
+                <img src="../assets/fgwnum2.png" alt="" />
               </div>
               <div class="mid-content-statistics-left-content-num">
                 <p>{{ num3 }}</p>

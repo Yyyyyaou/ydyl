@@ -34,6 +34,7 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                clearable
                 @keydown.enter="getNoticeListAjaxFn"
               />
             </div>
@@ -78,7 +79,7 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="noticeTitle" label="稿件标题">
+            <el-table-column prop="noticeTitle" label="公告标题">
               <template #default="scope">
                 <span
                   style="
@@ -87,17 +88,16 @@
                     text-align: left;
                     cursor: pointer;
                   "
-                  :class="{
-                    isClicked: isClickedArr.includes(scope.$index),
-                  }"
+                  :class="{ isClicked: scope.row.noticeRead == 1 }"
                   @click="rowTitleClick(scope)"
+                  :title="scope.row.noticeTitle"
                 >
                   <!-- <a href="https://www.ceis.cn/" target="_blank"></a> -->
                   {{ scope.row.noticeTitle }}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="pubTime" label="发布时间" width="240" />
+            <el-table-column prop="pubTime" label="创建时间" width="240" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination
@@ -381,6 +381,6 @@ export default {
   }
 }
 .isClicked {
-  color: #a7a9b2;
+  font-weight: 400;
 }
 </style>

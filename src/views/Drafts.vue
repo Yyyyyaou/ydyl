@@ -33,6 +33,7 @@
                 v-model="searchInput"
                 style="width: 190px"
                 placeholder="请输入关键词"
+                clearable
                 @keydown.enter="getArticleDraftListAjaxFn"
               />
             </div>

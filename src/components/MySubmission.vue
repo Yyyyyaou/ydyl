@@ -32,6 +32,7 @@
             v-model="searchInput"
             style="width: 190px"
             placeholder="请输入关键词"
+            clearable
             @keydown.enter="getArticleListAjaxFn"
           />
         </div>
@@ -277,6 +278,10 @@ export default {
     //状态select数据
     const statusSelectValue = ref("");
     const statusOptions = [
+      {
+        value: 4,
+        label: "全部",
+      },
       {
         value: 0,
         label: "待处理",

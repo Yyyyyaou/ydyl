@@ -13,7 +13,7 @@
         </template>
       </el-breadcrumb>
     </div>
-    <router-view></router-view>
+    <router-view :key="$router.currentRoute.value.fullPath"></router-view>
     <div class="main-footer flexcenter">
       <span>地址：北京市西城区宣武门外大街甲1号新华社三工作区</span>
       <span>邮编：100052</span>

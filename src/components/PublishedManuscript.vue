@@ -38,6 +38,7 @@
             v-model="searchInput"
             style="width: 190px"
             placeholder="请输入关键词"
+                clearable
             @keydown.enter="getBrokeListAjaxFn"
           />
         </div>
@@ -45,6 +46,7 @@
           <el-autocomplete
             v-model="originInput"
             style="width: 190px"
+            :value-key="'sourceName'"
             :fetch-suggestions="querySearch"
             clearable
             placeholder="稿件来源"
@@ -161,7 +163,7 @@
         />
         <el-table-column
           prop="crtimeFormat"
-          label="创建日期"
+          label="发布日期"
           width="140"
           header-align="center"
           align="center"
