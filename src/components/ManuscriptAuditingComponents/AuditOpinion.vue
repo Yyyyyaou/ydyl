@@ -24,7 +24,7 @@
     </div>
     <div class="elpopover-comment-header-btn flexcenter">
       <el-button @click="postExternalAuditArticleAjaxFn">提交</el-button>
-      <el-button @click="closeElpopover">取消</el-button>
+      <el-button @click="closeElpopover" style="color: #49455c;background-color: #e2e3e4;">取消</el-button>
     </div>
   </div>
 </template>
