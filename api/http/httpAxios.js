@@ -2,7 +2,9 @@ import store from '@/store';
 import axios from 'axios';
 import router from '@/router'
 import { ElMessage } from "element-plus";
-
+import {
+  setPageViewProportionFn
+} from "ROOT_URL/initialization/initSomeValue.js"
 
 
 
@@ -37,6 +39,9 @@ httpAxiosO.interceptors.request.use(
 // 响应拦截器  
 httpAxiosO.interceptors.response.use(
   response => {
+
+    setPageViewProportionFn();
+
     // 对响应数据做点什么
     const { data } = response;
     if(

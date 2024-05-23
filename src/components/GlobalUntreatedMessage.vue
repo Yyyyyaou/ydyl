@@ -59,11 +59,11 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.GlobalPopupsOuter{width:332px;height:110px;background:url(@/assets/bell1_1.png) no-repeat center center;background-size:cover;position:fixed;right:34px;bottom:20px;z-index:1000;border-radius:15px;border:2px solid #ccc;transition:1s all;transform:translateY(160px);
+.GlobalPopupsOuter{width:332px;height:110px;background:url(@/assets/bell1_1.png) no-repeat center center;background-size:cover;position:fixed;right:34px;bottom:20px;z-index:1000;border-radius:15px;border:2px solid #ccc;transition:1s all;transform:translateX(calc(100vw + 160px));
   .bell{width:65px;height:65px;background:url(@/assets/bell1.png) no-repeat center center;position:absolute;left:50%;margin-left:-32.5px;margin-top:-32.5px;}
   .l {width:294px;height:50px;line-height:50px;background:#daeefd;border-radius:15px;font-family:'微软雅黑';font-size:16px;font-weight:bold;color:#e85502;text-align: center;margin:45px auto 0;cursor:pointer;}
   a{color:#e85502}
   .close{width:25px;height:25px;color:#fff;position:absolute;right:0;top:0;cursor:pointer;z-index:10;}
-  &.on{transform: translateY(0);}
+  &.on{transform: translateX(0);}
 }
 </style>

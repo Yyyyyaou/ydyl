@@ -122,3 +122,45 @@ export function initLanguageListFn(){
     console.log('error',error);
   });
 }
+
+
+/**
+ * 设置页面视图比例
+ */
+export function setPageViewProportionFn(){
+  const targetWidth = 1920;
+  const htmlEleO =  document.querySelector('html');
+  const bodyEleO =  document.querySelector('body');
+  
+  htmlEleO.attributeStyleMap.set('height','100%');
+  bodyEleO.attributeStyleMap.set('height','100%');
+  bodyEleO.attributeStyleMap.set('width','100%');
+  bodyEleO.attributeStyleMap.set('transform','scale(1)');
+
+  const proportion = window.innerWidth/targetWidth;
+  const differenceValue = 1 - proportion;
+
+  bodyEleO.attributeStyleMap.set('width',targetWidth + 'px');
+  bodyEleO.attributeStyleMap.set('transform','scale('+proportion+')');
+  bodyEleO.attributeStyleMap.set('transform-origin','left top');
+  bodyEleO.attributeStyleMap.set('overflow-x','hidden');
+
+  if(
+    window.innerHeight >= bodyEleO.clientHeight
+  ){
+    console.log('if');
+    // htmlEleO.attributeStyleMap.set('height',(window.outerHeight)+'px');
+    bodyEleO.attributeStyleMap.set('height',(window.innerHeight+window.innerHeight* differenceValue/2)+'px');
+  }else{
+    console.log('else');
+    htmlEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
+    bodyEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
+  }
+  
+}
+
+setPageViewProportionFn();
+
+window.addEventListener('resize',setPageViewProportionFn);
+
+

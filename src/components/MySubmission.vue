@@ -220,6 +220,7 @@
             :total="pageTotal"
             :page-sizes="[15, 20, 30, 40, 50]"
             :page-size="limit"
+            popper-class="D_DD"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             class="el-pagination-style-rightpagination"

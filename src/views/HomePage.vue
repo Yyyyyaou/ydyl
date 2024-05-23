@@ -579,24 +579,23 @@ export default {
           console.log("稿件统计 D", D);
           const { 
             data, 
-            // success 
-          } = D;
-          // if (!success) {//这个接口 袁冰把success删除了
-          //   ElMessage({
-          //     message: "稿件统计数据请求失败",
-          //     type: "error",
-          //     plain: true,
-          //   });
-          //   return;
-          // }
-          console.log('data',data);
+            success 
+          } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "稿件统计数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
 
           //投稿总数
-          statisticsData[0].num = data.data.articleCount;
+          statisticsData[0].num = data.articleCount;
           //发布总数
-          statisticsData[1].num = data.data.pubCount;
+          statisticsData[1].num = data.pubCount;
           //待处理稿件
-          statisticsData[2].num = data.data.waitArticle;
+          statisticsData[2].num = data.waitArticle;
 
           
 
