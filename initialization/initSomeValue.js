@@ -128,7 +128,7 @@ export function initLanguageListFn(){
  * 设置页面视图比例
  */
 export function setPageViewProportionFn(){
-  return;
+return;
   const targetWidth = 1920;
   const htmlEleO =  document.querySelector('html');
   const bodyEleO =  document.querySelector('body');
@@ -147,11 +147,11 @@ export function setPageViewProportionFn(){
   bodyEleO.attributeStyleMap.set('overflow-x','hidden');
 
   if(
-    window.innerHeight >= bodyEleO.clientHeight
+    window.outerHeight >= bodyEleO.clientHeight
   ){
     console.log('if');
     // htmlEleO.attributeStyleMap.set('height',(window.outerHeight)+'px');
-    bodyEleO.attributeStyleMap.set('height',(window.innerHeight+window.innerHeight* differenceValue/2)+'px');
+    bodyEleO.attributeStyleMap.set('height',(window.outerHeight+window.outerHeight* differenceValue)+'px');
   }else{
     console.log('else');
     htmlEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
@@ -160,7 +160,7 @@ export function setPageViewProportionFn(){
   
 }
 
-// setPageViewProportionFn();
+setPageViewProportionFn();
 
 window.addEventListener('resize',setPageViewProportionFn);
 

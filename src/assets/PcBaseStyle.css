@@ -10,6 +10,7 @@ a {text-decoration:none;}
 a:hover { text-decoration:underline;}
 .boxcenter { margin:0 auto;}
 
+html,body{height:100%;}
 body{font-size:14px;color:#666;height:100%;position:relative;}
 
 .fixclear::after{content:'';display: block;clear:both;height:0px;line-height:0px;font-size:0px;}

@@ -321,7 +321,7 @@ export default {
           console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
 
         }else{//没查到结果，说明该检索字符串为新字符串
-          formData['sourceName'] = sourceNameP.trim();
+          formData['sourceName'] = sourceNameP?.trim();
           formData['articleSource'] = 0;//把来源id字段设成0，与袁冰 协商后 传0代表没有id
 
         }
@@ -560,14 +560,15 @@ export default {
     function checkFieldValueFn(datasOP){
       const { articleTitle,articleSource,language,articleHtmlCon,sourceName,auditing } = datasOP;
 
-      // console.log('sourceName',sourceName);
-      // console.log('articleSource',articleSource);
+      console.log('sourceName',sourceName);
+      console.log('articleSource',articleSource);
       // console.log('articleTitle',articleTitle);
+
 
       let checkResult = true;
       if(
         !articleTitle
-        ||(articleTitle&&articleTitle.trim() === '')
+        ||(articleTitle&&articleTitle?.trim() === '')
       ){
         ElMessage({
           message: '请填写稿件标题',
@@ -584,7 +585,7 @@ export default {
         &&
         (
           !sourceName
-          ||(sourceName&&sourceName.trim() === '')
+          ||(sourceName&&sourceName?.trim() === '')
         )
       ){
         ElMessage({
@@ -645,7 +646,7 @@ export default {
       //为原创稿件继续采用单独写的
       const datasOArr = []
       const datasO = {
-        articleTitle:formData.articleTitle.trim(),//稿件标题
+        articleTitle:formData.articleTitle?.trim(),//稿件标题
         articleSource:formData.articleSource||0,//稿件来源
         language:formData.language,//语种
         remark:formData.remark||'',//备注
@@ -827,7 +828,7 @@ export default {
       if(
         !/[\u4e00-\u9fa5]/g.test(formData.articleTitle)
         &&typeof formData.articleTitle !== undefined
-        &&(formData.articleTitle&&formData.articleTitle.trim() !== '')
+        &&(formData.articleTitle&&formData.articleTitle?.trim() !== '')
         &&formData.language === zhCNValue
       ){
         //预览前要先 检测一下 标题语种，非中文要给提示
