@@ -48,7 +48,7 @@
               />
             </div>
             <div class="marl10">
-              <el-select
+              <!-- <el-select
                 v-model="originSelect"
                 placeholder="稿件来源"
                 style="width: 140px"
@@ -60,14 +60,14 @@
                   :label="item.label"
                   :value="item.value"
                 />
-              </el-select>
-              <!-- <el-autocomplete
+              </el-select> -->
+              <el-autocomplete
                 v-model="originSelect"
                 style="width: 190px"
                 :fetch-suggestions="querySearch"
                 clearable
                 placeholder="稿件来源"
-              /> -->
+              />
             </div>
 
             <el-select
