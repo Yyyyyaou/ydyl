@@ -276,10 +276,10 @@ export default {
 
 
     //状态select数据
-    const statusSelectValue = ref("");
+    const statusSelectValue = ref(null);
     const statusOptions = [
       {
-        value: 4,
+        value: '',
         label: "全部",
       },
       {
@@ -351,7 +351,7 @@ export default {
 
       
       statusSelectValue.value!= undefined&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
-      console.log('123')
+
       switch(searchSelectValue.value){
         case 0:
         paramsO.articleTitle = searchInput.value;//按标题搜索
