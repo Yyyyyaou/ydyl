@@ -22,8 +22,7 @@ export default {
       tooltip: {
         trigger: "axis",
         // formatter: '{a0}: {c0}<br/>'+'{a1}: {c1}'
-        formatter: function (params, index) {
-          console.log(index)
+        formatter: function (params) {
           var num1 = params[0]==undefined?0:params[0]?.value;
           var num2 = params[1]==undefined?0:params[1]?.value;
           var num = num1+num2;

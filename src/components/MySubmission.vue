@@ -343,13 +343,15 @@ export default {
       const articleUseStatusNameArr = ['待处理','审核中','已发布','未采用'];
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
       const paramsO = {
+        articleUseStatus:"",
         language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
         currPage:page.value,//当前页
         pageSize:limit.value,//每页条数
       }
 
-      statusSelectValue.value&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
       
+      statusSelectValue.value!= undefined&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
+      console.log('123')
       switch(searchSelectValue.value){
         case 0:
         paramsO.articleTitle = searchInput.value;//按标题搜索

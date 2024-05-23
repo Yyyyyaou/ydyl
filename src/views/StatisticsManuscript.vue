@@ -27,6 +27,7 @@
           @clear="autocompleteClear"
         />
         <el-select
+        ref="dateRef1"
           v-model="timeSelectValue"
           placeholder="时间范围"
           style="width: 140px"
@@ -42,6 +43,7 @@
         </el-select>
         <el-config-provider :locale="locale" v-if="timeSelectValue == 3">
           <el-date-picker
+            ref="dateRef"
             :disabled-date="disabledDate"
             v-model="dateDefaultTime"
             type="daterange"
@@ -245,7 +247,7 @@
 </template>
 
 <script>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, getCurrentInstance, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import PublishedManuscript from "@/components/PublishedManuscript.vue";
@@ -396,6 +398,7 @@ export default {
     //时间范围选择器change（7天 30天）
     let endTime = new Date();
     let startTime = timeForMat(29);
+    const { proxy } = getCurrentInstance()
     function timeSelectChange(val) {
       if (val == 0) {
         startTime = timeForMat(6);
@@ -406,6 +409,12 @@ export default {
       }
       dateDefaultTime.value = [startTime, new Date()]; //日期范围选择初始化
       getArticleCountAjaxFn(true);
+
+      if(val == 3){
+        setTimeout(() => {
+          proxy.$refs.dateRef.handleOpen()
+          }, 0);
+      }
     }
     function timeForMat(count) {
       return new Date().setTime(
