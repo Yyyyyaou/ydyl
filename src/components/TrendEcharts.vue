@@ -22,12 +22,13 @@ export default {
       tooltip: {
         trigger: "axis",
         // formatter: '{a0}: {c0}<br/>'+'{a1}: {c1}'
-        formatter: function (params) {
+        formatter: function (params, index) {
+          console.log(index)
           var num1 = params[0]==undefined?0:params[0]?.value;
           var num2 = params[1]==undefined?0:params[1]?.value;
           var num = num1+num2;
           var result =
-            '<span style="font-weight:700;text-align:center;">投稿数' +
+            '<span style="font-weight:700;text-align:center;">'+params[0].axisValueLabel+'投稿数' +
             "&nbsp;&nbsp;&nbsp;" +
             num +
             "</span></br>";
