@@ -200,4 +200,7 @@ export default {
       }
     }
   }
+  :deep(.el-textarea__inner){
+    resize: none;
+  }
 </style>

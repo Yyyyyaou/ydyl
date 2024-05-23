@@ -48,6 +48,8 @@
             :fetch-suggestions="querySearch"
             clearable
             placeholder="稿件来源"
+            @select="autocompleteSelect"
+            @clear="autocompleteClear"
           />
         </div>
         <el-select
@@ -65,6 +67,7 @@
         </el-select>
         <el-config-provider :locale="locale">
           <el-date-picker
+            :disabled-date="disabledDate"
             v-model="dateDefaultTime"
             type="daterange"
             start-placeholder="开始日期"
@@ -279,7 +282,21 @@ export default {
 
     //日期选择 数据
     const dateDefaultTime = ref('');
-
+    const disabledDate = (time) => {
+      return time.getTime() > Date.now();
+    };
+    let articleSource = 0;
+    //稿件单位选择后调用接口
+    function autocompleteSelect(item) {
+      console.log(item);
+      articleSource = item.id ? item.id : 0;
+      getBrokeListAjaxFn();
+    }
+    //清除稿件单位
+    function autocompleteClear() {
+      articleSource = 0;
+      getBrokeListAjaxFn();
+    }
     //表格数据
     const tableData = reactive([]);
 
@@ -318,6 +335,7 @@ export default {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       const paramsO = {
+        articleSource: articleSource,
         language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
         currPage:page1.value,//当前页
         pageSize:limit1.value,//每页条数
@@ -397,8 +415,9 @@ export default {
     // end of getBrokeListAjaxFn
 
     onMounted(() => {
+      findSourceListAjaxFn();
       getBrokeListAjaxFn(); //已发稿件
-      restaurants.value = loadAll(); //联想输入框赋值
+      //restaurants.value = loadAll(); //联想输入框赋值
     });
     const router = useRouter();
     /**
@@ -426,26 +445,55 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-    const loadAll = () => {
-      return [
-        { value: "vue", link: "https://github.com/vuejs/vue" },
-        { value: "element", link: "https://github.com/ElemeFE/element" },
-        { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
-        { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
-        { value: "vuex", link: "https://github.com/vuejs/vuex" },
-        { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
-        { value: "babel", link: "https://github.com/babel/babel" },
-      ];
-    };
+    // const loadAll = () => {
+    //   return [
+    //     { value: "vue", link: "https://github.com/vuejs/vue" },
+    //     { value: "element", link: "https://github.com/ElemeFE/element" },
+    //     { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
+    //     { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
+    //     { value: "vuex", link: "https://github.com/vuejs/vuex" },
+    //     { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
+    //     { value: "babel", link: "https://github.com/babel/babel" },
+    //   ];
+    // };
+    //获取稿件来源list
+    function findSourceListAjaxFn() {
+      httpAxiosO({
+        method: "get",
+        url: "/web/source/findSourceList",
+      })
+        .then((D) => {
+          console.log("已发稿件-稿件来源", D);
+          if (D.status != 200) {
+            ElMessage({
+              message: "稿件来源数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            restaurants.value = D.data;
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "稿件来源接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
     const createFilter = (queryString) => {
       return (restaurant) => {
         return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          restaurant.sourceName.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
         );
       };
     };
     return {
+      disabledDate,
       userAuthority,
       searchInput,
       searchSelectValue,
@@ -476,6 +524,9 @@ export default {
       getFindByIdAjaxFn,
       originInput,
       querySearch,
+      autocompleteSelect,
+      autocompleteClear,
+      findSourceListAjaxFn,
     };
   },
 };

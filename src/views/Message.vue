@@ -38,12 +38,14 @@
             </div>
             <el-config-provider :locale="locale">
               <el-date-picker
+            :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
+                @change="timeSelectChange"
               />
             </el-config-provider>
             <el-button type="primary" class="marl10" style="width: 78px" @click="getArticleRecordListAjaxFn">
@@ -205,6 +207,12 @@ export default {
     ];
     //日期选择 数据
     const dateDefaultTime = ref('');
+    const disabledDate = (time) => {
+      return time.getTime() > Date.now();
+    };
+    function timeSelectChange() {
+      getArticleRecordListAjaxFn()
+    }
     //表格数据
     const tableData = reactive([]);
     //分页器
@@ -313,6 +321,8 @@ export default {
     });
 
     return {
+      disabledDate,
+      timeSelectChange,
       searchInput,
       searchSelectValue,
       searchOptions,
