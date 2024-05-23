@@ -103,6 +103,7 @@ body {
   padding: 0 !important;
 }
 .container-style {
+  height:calc(100% - 60px);
   display: flex;
 }
 </style>

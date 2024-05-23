@@ -128,7 +128,13 @@ export function initLanguageListFn(){
  * 设置页面视图比例
  */
 export function setPageViewProportionFn(){
-// return;
+
+  if(//没登录就不执行，因为登录页有考虑比例问题，不想再重写登录页代码了
+    !store.state.StroeLoginO.isLogin
+  ){
+    return;
+  }
+
   const targetWidth = 1920;
   const htmlEleO =  document.querySelector('html');
   const bodyEleO =  document.querySelector('body');
@@ -137,7 +143,6 @@ export function setPageViewProportionFn(){
   bodyEleO.attributeStyleMap.set('height','100%');
   bodyEleO.attributeStyleMap.set('width','100%');
   bodyEleO.attributeStyleMap.set('transform','scale(1)');
-
 
   const viewProportion = window.innerWidth / window.innerHeight ;
 
@@ -150,21 +155,20 @@ export function setPageViewProportionFn(){
   bodyEleO.attributeStyleMap.set('overflow-x','hidden');
 
   if(
-    window.outerHeight >= bodyEleO.clientHeight
+    (window.innerHeight + 3) >= bodyEleO.clientHeight
   ){
-    console.log('if');
-    // htmlEleO.attributeStyleMap.set('height',(window.outerHeight)+'px');
+
     bodyEleO.attributeStyleMap.set('height',(targetWidth/viewProportion)+'px');
+    
   }else{
-    console.log('else');
+
     htmlEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
     bodyEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
+
   }
   
 }
-
 setPageViewProportionFn();
-
 window.addEventListener('resize',setPageViewProportionFn);
 
 
