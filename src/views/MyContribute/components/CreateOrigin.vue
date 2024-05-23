@@ -279,8 +279,7 @@ export default {
      * @param {*} itemP 在来源列表中选中的对象
      */
     function articleSourceHandleSelectFn(itemP){
-      console.log('articleSourceHandleSelectFn itemP',itemP);
-      formData['articleSource'] = itemP.id;
+      formData['articleSource'] = itemP.sourceId;
       formData['sourceName'] = '';
     }
     // end of articleSourceHandleSelectFn

@@ -128,7 +128,7 @@ export function initLanguageListFn(){
  * 设置页面视图比例
  */
 export function setPageViewProportionFn(){
-return;
+// return;
   const targetWidth = 1920;
   const htmlEleO =  document.querySelector('html');
   const bodyEleO =  document.querySelector('body');
@@ -138,11 +138,14 @@ return;
   bodyEleO.attributeStyleMap.set('width','100%');
   bodyEleO.attributeStyleMap.set('transform','scale(1)');
 
-  const proportion = window.innerWidth/targetWidth;
-  const differenceValue = 1 - proportion;
+
+  const viewProportion = window.innerWidth / window.innerHeight ;
+
+  const widthProportion = window.innerWidth/targetWidth;
+  // const differenceValue = 1 - widthProportion;
 
   bodyEleO.attributeStyleMap.set('width',targetWidth + 'px');
-  bodyEleO.attributeStyleMap.set('transform','scale('+proportion+')');
+  bodyEleO.attributeStyleMap.set('transform','scale('+widthProportion+')');
   bodyEleO.attributeStyleMap.set('transform-origin','left top');
   bodyEleO.attributeStyleMap.set('overflow-x','hidden');
 
@@ -151,7 +154,7 @@ return;
   ){
     console.log('if');
     // htmlEleO.attributeStyleMap.set('height',(window.outerHeight)+'px');
-    bodyEleO.attributeStyleMap.set('height',(window.outerHeight+window.outerHeight* differenceValue)+'px');
+    bodyEleO.attributeStyleMap.set('height',(targetWidth/viewProportion)+'px');
   }else{
     console.log('else');
     htmlEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
