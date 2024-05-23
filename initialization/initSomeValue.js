@@ -128,6 +128,7 @@ export function initLanguageListFn(){
  * 设置页面视图比例
  */
 export function setPageViewProportionFn(){
+  return;
   const targetWidth = 1920;
   const htmlEleO =  document.querySelector('html');
   const bodyEleO =  document.querySelector('body');
@@ -159,7 +160,7 @@ export function setPageViewProportionFn(){
   
 }
 
-setPageViewProportionFn();
+// setPageViewProportionFn();
 
 window.addEventListener('resize',setPageViewProportionFn);
 
