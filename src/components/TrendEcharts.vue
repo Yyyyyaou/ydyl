@@ -119,9 +119,9 @@ export default {
       option.series[0].data = x1list;
       option.series[1].data = x2list;
       myChart.setOption(option);
-      window.addEventListener("resize", () => {
-        myChart.resize();
-      });
+      // window.addEventListener("resize", () => {
+      //   myChart.resize();
+      // });
     };
     const initEcharts = (y, x1, x2) => {
       ylist = y;
@@ -142,7 +142,7 @@ export default {
  
 <style scoped>
 .canvars {
-  width: calc(100vw - 320px);
+  width: 1620px;
   height: 400px;
 }
 </style>
