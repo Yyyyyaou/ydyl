@@ -112,6 +112,14 @@ const routes = [
     meta: { title: '审核报题' }
   },
   {
+    path: '/Message',
+    name: 'Message',
+    component: function () {
+      return import('../views/Message.vue')
+    },
+    meta: { title: '系统消息' }
+  },
+  {
     path: '/Drafts',
     name: 'Drafts',
     component: RouterReplaceComp(() => import('../views/Drafts.vue')),
@@ -138,15 +146,6 @@ const routes = [
     }
     ],
   },
-  {
-    path: '/Message',
-    name: 'Message',
-    component: function () {
-      return import('../views/Message.vue')
-    },
-    meta: { title: '系统消息' }
-  },
-
   {
     path: '/RecycleBin',
     name: 'RecycleBin',
