@@ -20,7 +20,7 @@
         <img src="../assets/avatar.png" alt="" srcset="" />
         <span>{{ loginUser.userName }}</span>
         <a href="javascript:;" @click="logoutFn" v-if="!showNoticeDetail">退出</a>
-        <i class="iconfont icon-goit" />
+        <i class="iconfont icon-goit" v-show="false"/>
       </div>
     </div>
   </div>

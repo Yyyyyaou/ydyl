@@ -100,14 +100,14 @@
                     <span>正文：</span><span>{{ scope.row.content }}</span>
                   </p>
                   <div class="elpopover-button">
-                    <el-button
+                    <!-- <el-button
                       type="primary"
                       @click="
                         scope.row.visible = false;
                         popoverShowFlag = false;
                       "
                       >确定
-                    </el-button>
+                    </el-button> -->
                     <el-button
                       type="info"
                       @click="

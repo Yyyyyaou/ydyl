@@ -7,9 +7,10 @@
       <el-breadcrumb separator="/">
         <!-- <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item> -->
         <template v-for="(item, index) in breadList">
-          <el-breadcrumb-item v-if="item.name" :key="index" :to="item.path">{{
-            item.meta.title
-          }}</el-breadcrumb-item>
+          <el-breadcrumb-item v-if="item.name" :key="index">
+             <!-- :to="item.path" -->
+            {{item.meta.title}}
+          </el-breadcrumb-item>
         </template>
       </el-breadcrumb>
     </div>

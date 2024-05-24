@@ -89,7 +89,7 @@
             </el-table-column>
             <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
-                <span
+                <div
                   @click="getFindByIdAjaxFn(scope)"
                   style="cursor: pointer"
                   :style="
@@ -97,15 +97,15 @@
                       let _styleStr1 = 'cursor: pointer;';
                       let _styleStr2 =
                         'cursor: pointer;direction: rtl;text-align:auto;text-align:-webkit-auto;';
-                      return scope.row.languageName === '阿文' ||
-                        scope.row.languageName === '阿语'
+                      return scope.row.languageName == '阿文' ||
+                        scope.row.languageName == '阿语'
                         ? _styleStr2
                         : _styleStr1;
                     })(scope)
                   "
                 >
                   {{ scope.row.articleTitle }}
-                </span>
+                </div>
               </template>
             </el-table-column>
             <el-table-column
@@ -133,10 +133,8 @@
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div
-                    @click="
-                      router.push(
-                        '/MyContribute/CreateContribute?id=' + scope.row.id
-                      )
+                    @click="scope.row.articleType == 0?
+                      router.push('/Drafts/EditOrigin?id=' + scope.row.id):router.push('/Drafts/EditReproduction?id=' + scope.row.id)
                     "
                   >
                     编辑
@@ -327,6 +325,7 @@ export default {
             _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
             tableData.push(_o);
           });
+
           pageTotal.value = data.totalResults;
         })
         .catch((error) => {
@@ -377,12 +376,24 @@ export default {
      * 跳转到细览页，需要传递 稿件id
      */
     function getFindByIdAjaxFn(scopeP) {
-      const c = router.resolve({
-        path: "/PubDetail",
-        query: {
-          id: scopeP.row.id,
-        },
-      });
+      //原创
+      let c
+      if (scopeP.row.articleType == 0) {
+         c= router.resolve({
+          path: "/OriginDetail",
+          query: {
+            id: scopeP.row.id,
+          },
+        });
+      }
+      else{
+        c= router.resolve({
+          path: "/ReproductionDetail",
+          query: {
+            id: scopeP.row.id,
+          },
+        });
+      }
 
       window.open(c.href, "_blank");
       return;

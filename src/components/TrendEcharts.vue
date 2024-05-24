@@ -27,8 +27,8 @@ export default {
           var num2 = params[1]==undefined?0:params[1]?.value;
           var num = num1+num2;
           var result =
-            '<span style="font-weight:700;text-align:center;">'+params[0].axisValueLabel+'投稿数' +
-            "&nbsp;&nbsp;&nbsp;" +
+            '<span style="font-weight:700;text-align:center;">'+params[0].axisValueLabel+' '+'投稿数:'+
+            "&nbsp;"+
             num +
             "</span></br>";
           params.forEach(function (item) {
