@@ -129,7 +129,7 @@ const routes = [
     meta: { title: '草稿箱' },
     children: [{
       path: 'EditOrigin',
-      name: 'EditOrigin',
+      name: 'EditOriginDrafts',
       component: function () {
         return import('../views/MyContribute/views/CreateContribute.vue')
       },
@@ -137,7 +137,7 @@ const routes = [
     },
     {
       path: 'EditReproduction',
-      name: 'EditReproduction',
+      name: 'EditReproductionDrafts',
       //component: CreateContribute,
       component: function () {
         return import('../views/MyContribute/views/CreateContribute.vue')
@@ -153,7 +153,7 @@ const routes = [
     meta: { title: '回收站' },
     children: [{
       path: 'EditOrigin',
-      name: 'EditOrigin',
+      name: 'EditOriginRecycleBin',
       component: function () {
         return import('../views/MyContribute/views/CreateContribute.vue')
       },
@@ -161,7 +161,7 @@ const routes = [
     },
     {
       path: 'EditReproduction',
-      name: 'EditReproduction',
+      name: 'EditReproductionRecycleBin',
       component: function () {
         return import('../views/MyContribute/views/CreateContribute.vue')
       },

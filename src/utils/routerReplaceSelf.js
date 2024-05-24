@@ -2,7 +2,6 @@ import {defineAsyncComponent, h} from "vue";
 import {  RouterView } from 'vue-router';
 
 export default function RouterReplaceComp(component) {
-  console.log('999')
   return {
     comp:component,
     name: 'routeReplaceSelf',
