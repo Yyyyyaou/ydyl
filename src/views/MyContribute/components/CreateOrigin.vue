@@ -2,7 +2,7 @@
   <section>
   <div class="createorigin-content">
     <el-form :model="formData" :rules="rules">
-      <el-form-item label="稿件标题" prop="articleTitle" :class="{ langAyu: formData.language == 3 }">
+      <el-form-item label="稿件标题" prop="articleTitle">
         <el-input v-model="formData.articleTitle" clearable />
       </el-form-item>
       <el-row style="justify-content: space-between">
@@ -31,11 +31,28 @@
           </el-form-item>
         </el-col>
       </el-row>
+<!-- 
+让正文区内容 居右的 代码 有问题 先注释掉 20240524.1020
+        :class="{ 
+          langAyu: (()=>{
+            let _boolean = false;
+            let _curLanguage =  langOptions.filter((o)=>{
+              return formData.language === o.value
+            })[0];
+            if(
+              _curLanguage.label === '阿语'
+              || _curLanguage.label === '阿文'
+            ){
+              _boolean = true;
+            }
+            return _boolean;
+          })()
+        }"
+ -->
       <el-form-item
         label="稿件正文"
         prop="articleHtmlCon"
         class="createorigin-content-editor"
-        :class="{ langAyu: formData.language == 3 }"
       >
         <!-- <section id="QuillEditorEleID"></section> -->
         <!-- <textarea id="tinymceEditorEleID" placeholder="编辑正文"></textarea> -->
@@ -196,19 +213,20 @@ export default {
 
     const { forPropsGetFindByIdAjaxFnReturnO } = toRefs(props);
 
-    function langSelectChange(val){
-      let domtext =document.getElementsByClassName("tox-edit-area__iframe")[0].contentWindow.document.getElementById('tinymce')
-      if(domtext == undefined || domtext == null){
-        return
-      }
-      if(val == 3){
-        domtext.style.textAlign = 'right'
-      }
-      else{
-        domtext.style.textAlign = 'left'
-      }
+    function langSelectChange(val){val
+      // let domtext =document.getElementsByClassName("tox-edit-area__iframe")[0].contentWindow.document.getElementById('tinymce')
+      // if(domtext == undefined || domtext == null){
+      //   return
+      // }
+      // if(val == 3){
+      //   domtext.style.textAlign = 'right'
+      // }
+      // else{
+      //   domtext.style.textAlign = 'left'
+      // }
 
     }
+    // end of langSelectChange
 
     const formData = reactive({
       articleSource:0,//保存 已有来源（即来源列表接口能查到），则把列表里该来源的 sourceId 赋值给它
@@ -560,8 +578,8 @@ export default {
     function checkFieldValueFn(datasOP){
       const { articleTitle,articleSource,language,articleHtmlCon,sourceName,auditing } = datasOP;
 
-      console.log('sourceName',sourceName);
-      console.log('articleSource',articleSource);
+      // console.log('sourceName',sourceName);
+      // console.log('articleSource',articleSource);
       // console.log('articleTitle',articleTitle);
 
 
@@ -820,7 +838,7 @@ export default {
 
       //查看 中文 字段值 是多少，∵语种列表是不断变化的，中文字段值不一定是 1
       const zhCNValue =  langOptions.filter((o)=>{
-        return o.label == '中文';
+        return o.label === '中文';
       })[0]['value'];
 
 
@@ -876,6 +894,9 @@ export default {
       });
 
 
+      console.log('getPropsFn formData',formData);
+
+
       editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
 
       editorTEXTContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
@@ -920,8 +941,8 @@ export default {
       });
       //回显附件列表，因为附件列表是单独的变量 结束
 
-
     }
+    //end of getPropsFn
 
     /**
      * 重置页面表单字段，
@@ -929,43 +950,43 @@ export default {
      * 如果是 “继续采用”“编辑” 稿件就回到初始状态
      */
     function resetFormFn(){
-      //如果没有id 就是 新建稿件
-      if(
-        !forPropsGetFindByIdAjaxFnReturnO.value.id
+
+    if(//清空正文
+        editorHTMLContent.value !== ''
+        ||editorHTMLContent.value === '<p></p>'
+        ||editorHTMLContent.value === '<br/>'
+        ||editorHTMLContent.value === '<br />'
       ){
-        if(//清空正文
-          editorHTMLContent.value !== ''
-          ||editorHTMLContent.value === '<p></p>'
-          ||editorHTMLContent.value === '<br/>'
-          ||editorHTMLContent.value === '<br />'
+        editorHTMLContent.value = '';
+      }
+
+      for(let key in formData){
+        if(//初始化 语种
+          key === 'language'
+        ){
+          formData[key] = langOptions.filter((o)=>{
+            return o.label === '中文';
+          })[0]['value'];
+        }else if(
+          key === 'articleHtmlCon'
+          ||key === 'articleContent'
         ){
           editorHTMLContent.value = '';
+          editorTEXTContent.value = '';
+          formData[key] = '';
+        }else{
+          formData[key] = '';//清空其它字段
         }
+      }
+      // end of for
 
-        for(let key in formData){
-          if(//初始化 语种
-            key === 'language'
-          ){
-            formData[key] = langOptions.filter((o)=>{
-              return o.label == '中文';
-            })[0]['value'];
-          }else if(
-            key === 'articleHtmlCon'
-            ||key === 'articleContent'
-          ){
-            editorHTMLContent.value = '';
-            editorTEXTContent.value = '';
-            formData[key] = '';
-          }else{
-            formData[key] = '';//清空其它字段
-          }
-        }
-        // end of for
-        return;
+      //有id 就是 “继续采用”、“编辑”
+      if(
+        forPropsGetFindByIdAjaxFnReturnO.value.id
+      ){
+        getPropsFn();
       }
       // end of if
-
-      
 
     }
     // end of resetFormFn
@@ -1096,6 +1117,7 @@ export default {
 .langAyu{
   :deep(input){
     text-align: right;
+    direction: rtl;
   }
 }
 </style>
