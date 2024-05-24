@@ -50,8 +50,6 @@
             :fetch-suggestions="querySearch"
             clearable
             placeholder="稿件来源"
-            @select="autocompleteSelect"
-            @clear="autocompleteClear"
           />
         </div>
         <el-select
@@ -289,16 +287,16 @@ export default {
     };
     let articleSource = 0;
     //稿件单位选择后调用接口
-    function autocompleteSelect(item) {
-      console.log(item);
-      articleSource = item.id ? item.id : 0;
-      getBrokeListAjaxFn();
-    }
+    // function autocompleteSelect(item) {
+    //   console.log(item);
+    //   articleSource = item.id ? item.id : 0;
+    //   getBrokeListAjaxFn();
+    // }
     //清除稿件单位
-    function autocompleteClear() {
-      articleSource = 0;
-      getBrokeListAjaxFn();
-    }
+    // function autocompleteClear() {
+    //   articleSource = 0;
+    //   getBrokeListAjaxFn();
+    // }
     //表格数据
     const tableData = reactive([]);
 
@@ -313,7 +311,21 @@ export default {
       page1.value = val;
       getBrokeListAjaxFn();
     }
-
+    //输入框与下拉列表比对获取SourceId
+    function getSourceId(str){
+      if(str.value == ""){
+        articleSource = ''
+        return
+      }
+      articleSource = 0
+      for(let num = 0; num<restaurants.value.length;num++){
+        if(str.value == restaurants.value[num].sourceName)
+        {
+          articleSource = restaurants.value[num].sourceId;
+          break;
+        }
+      }
+    }
     /**
      * 已发稿件 接口请求
      * 以下注释摘抄至接口文档（20240409.0912）
@@ -335,7 +347,7 @@ export default {
       const articleUseStatusNameArr = ["待处理", "审核中", "已发布", "未采用"];
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
-
+      getSourceId(originInput)
       const paramsO = {
         articleSource: articleSource,
         language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
@@ -526,8 +538,6 @@ export default {
       getFindByIdAjaxFn,
       originInput,
       querySearch,
-      autocompleteSelect,
-      autocompleteClear,
       findSourceListAjaxFn,
     };
   },

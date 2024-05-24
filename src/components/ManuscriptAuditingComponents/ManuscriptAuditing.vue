@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="mid-content-mycontribute" data-desc="审核稿件组件">
-
       <div
         class="mid-content-mycontribute-table-content"
         v-if="statusRadio == 1"
@@ -23,11 +22,14 @@
             <el-button
               class="mid-content-mycontribute-table-btngroup-search-btn"
               @click="dialogBatchProcessingFn"
-            >批量审核</el-button>
+              >批量审核</el-button
+            >
             <div
               class="mid-content-mycontribute-table-btngroup-search-divide"
             ></div>
-            <div class="mid-content-mycontribute-table-btngroup-search-keyword flexcenter">
+            <div
+              class="mid-content-mycontribute-table-btngroup-search-keyword flexcenter"
+            >
               <el-select
                 v-model="searchSelectValue"
                 placeholder=""
@@ -62,7 +64,8 @@
                 />
               </el-select> -->
               <el-autocomplete
-                v-model="originSelect"
+                :value-key="'sourceName'"
+                v-model="originInput"
                 style="width: 190px"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -85,7 +88,7 @@
             </el-select>
             <el-config-provider :locale="locale">
               <el-date-picker
-            :disabled-date="disabledDate"
+                :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
                 start-placeholder="提交起始日期"
@@ -94,7 +97,10 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px"
+            <el-button
+              type="primary"
+              class="marl10"
+              style="width: 78px"
               @click="getNeedAuditCountAjaxFn"
             >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
@@ -111,12 +117,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              'color': '#6a6d74',
+              color: '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              'color': '#727789',
+              color: '#727789',
               'font-size': '16px',
             }"
           >
@@ -153,7 +159,7 @@
                         {{ scope.row.articleTitle }}
                       </div>
                       <div class="elpopover-content-left-info flexcenter">
-                        <span >作者：</span><span>{{ scope.row.trueName }}</span>
+                        <span>作者：</span><span>{{ scope.row.trueName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -161,7 +167,8 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>发布时间：</span><span>{{ scope.row.crtime }}</span>
+                        <span>发布时间：</span
+                        ><span>{{ scope.row.crtime }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -224,16 +231,17 @@
                       </el-timeline>
                     </div>
                     <!-- end of elpopover-content-right -->
-                    
                   </div>
-                  
-                  <AuditOpinion 
-                    :externalAuditArticleFindByIdOArray="[externalAuditArticleFindByIdO]" 
-                    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
-                    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
-                    @TriggerCloseElpopoverCommentFn = "
-                        scope.row.visible = false;
-                        popoverShowFlag = false;
+
+                  <AuditOpinion
+                    :externalAuditArticleFindByIdOArray="[
+                      externalAuditArticleFindByIdO,
+                    ]"
+                    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn"
+                    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1"
+                    @TriggerCloseElpopoverCommentFn="
+                      scope.row.visible = false;
+                      popoverShowFlag = false;
                     "
                   />
                   <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
@@ -258,9 +266,13 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="稿件来源" width="125" />
+            <el-table-column prop="sourceName" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
-            <el-table-column prop="postTimeFormat" label="提交日期" width="200" />
+            <el-table-column
+              prop="postTimeFormat"
+              label="提交日期"
+              width="200"
+            />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
@@ -320,7 +332,9 @@
           <div
             class="mid-content-mycontribute-table-btngroup-search flexcenter"
           >
-            <div class="mid-content-mycontribute-table-btngroup-search-keyword flexcenter">
+            <div
+              class="mid-content-mycontribute-table-btngroup-search-keyword flexcenter"
+            >
               <el-select
                 v-model="searchSelectValue1"
                 placeholder=""
@@ -342,6 +356,7 @@
             </div>
             <div class="marl10">
               <el-autocomplete
+                :value-key="'sourceName'"
                 v-model="originInput1"
                 style="width: 190px"
                 :fetch-suggestions="querySearch1"
@@ -391,7 +406,7 @@
             </el-select>
             <el-config-provider :locale="locale">
               <el-date-picker
-            :disabled-date="disabledDate"
+                :disabled-date="disabledDate"
                 v-model="dateDefaultTime1"
                 type="daterange"
                 start-placeholder="起始日期"
@@ -400,7 +415,10 @@
                 style="margin-left: 10px; width: 270px"
               />
             </el-config-provider>
-            <el-button type="primary" class="marl10" style="width: 78px"
+            <el-button
+              type="primary"
+              class="marl10"
+              style="width: 78px"
               @click="getNeedAuditCountAjaxFn1"
             >
               <el-icon style="margin-right: 5px"><Search /></el-icon>
@@ -416,12 +434,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              'color': '#6a6d74',
+              color: '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              'color': '#727789',
+              color: '#727789',
               'font-size': '16px',
             }"
           >
@@ -468,7 +486,8 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>发布时间：</span><span>{{ scope.row.crtime }}</span>
+                        <span>发布时间：</span
+                        ><span>{{ scope.row.crtime }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -528,14 +547,14 @@
                               {{ activity.sec }}
                             </div>
                             <div class="elpopover-content-timeline-details-thi">
-                              <span>审核人：</span><span>{{ activity.cRuser }}</span>
+                              <span>审核人：</span
+                              ><span>{{ activity.cRuser }}</span>
                             </div>
                           </div>
                         </el-timeline-item>
                       </el-timeline>
                     </div>
                     <!-- end of elpopover-content-right -->
-
                   </div>
                   <template #reference>
                     <span
@@ -557,7 +576,7 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="稿件来源" width="125" />
+            <el-table-column prop="sourceName" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="articleUseStatus" label="状态" width="110">
               <template #default="scope">
@@ -571,8 +590,16 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="currentNodeName" label="稿件节点" width="120" />
-            <el-table-column prop="postTimeFormat" label="提交日期" width="140" />
+            <el-table-column
+              prop="currentNodeName"
+              label="稿件节点"
+              width="120"
+            />
+            <el-table-column
+              prop="postTimeFormat"
+              label="提交日期"
+              width="140"
+            />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
@@ -615,25 +642,26 @@
     <!-- end of mid-content-mycontribute -->
   </div>
 
-<!-- 用于批量审核的弹窗开始 -->
-<el-dialog v-model="dialogBatchProcessingVisible" title="批量审核" width="800">
-  <AuditOpinion 
-    :externalAuditArticleFindByIdOArray="tableSelectedDataArray" 
-    @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn" 
-    @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1" 
-    @TriggerCloseElpopoverCommentFn = "
-      dialogBatchProcessingVisible = false;
-    "
-  />
-  <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
-</el-dialog>
-<!-- 用于批量审核的弹窗结束 -->
-
+  <!-- 用于批量审核的弹窗开始 -->
+  <el-dialog
+    v-model="dialogBatchProcessingVisible"
+    title="批量审核"
+    width="800"
+  >
+    <AuditOpinion
+      :externalAuditArticleFindByIdOArray="tableSelectedDataArray"
+      @TriggerGetNeedAuditCountAjaxFn="getNeedAuditCountAjaxFn"
+      @TriggerGetNeedAuditCountAjaxFn1="getNeedAuditCountAjaxFn1"
+      @TriggerCloseElpopoverCommentFn="dialogBatchProcessingVisible = false"
+    />
+    <!-- end of elpopover-comment 审核意见以及提交按钮板块 -->
+  </el-dialog>
+  <!-- 用于批量审核的弹窗结束 -->
 </template>
 
 <script>
-import { onMounted, reactive, ref,computed } from "vue";
-import { useStore } from "vuex"
+import { onMounted, reactive, ref, computed } from "vue";
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage, ElLoading } from "element-plus";
@@ -641,9 +669,8 @@ import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 
 import AuditOpinion from "./AuditOpinion.vue";
-
 export default {
-  components: { 
+  components: {
     AuditOpinion,
   },
   setup() {
@@ -691,22 +718,19 @@ export default {
     //表格数据
     const tableData = reactive([]);
 
-    const tableSelectedDataArray = reactive([]);//记录选中checkbox的数据
-    
+    const tableSelectedDataArray = reactive([]); //记录选中checkbox的数据
+
     /**
      * 监听 选中table checkbox 变化
      * @param {*} selectedArrP 选中checkbox的数据
      */
-    function handleSelectionTableDataFn(
-      selectedArrP,
-    ){
-      tableSelectedDataArray.splice(0,tableSelectedDataArray.length);
-      selectedArrP.forEach((o)=>{
+    function handleSelectionTableDataFn(selectedArrP) {
+      tableSelectedDataArray.splice(0, tableSelectedDataArray.length);
+      selectedArrP.forEach((o) => {
         tableSelectedDataArray.push(o);
       });
     }
     //end of handleSelectionTableDataFn
-    
 
     //分页器
     let limit = ref(15);
@@ -719,17 +743,13 @@ export default {
       page.value = val;
     }
 
-
-
     //稿件标题点击置灰
     const isClickedArr = ref([]);
     const popoverShowFlag = ref(false);
 
-
-
-    const originSelect = ref("");//来源
-    const originSelectOption = ref([]);originSelectOption
-
+    const originInput = ref("");
+    1;
+    //联想输入框
     const restaurants = ref([]);
     const querySearch = (queryString, cb) => {
       const results = queryString
@@ -752,31 +772,30 @@ export default {
     const createFilter = (queryString) => {
       return (restaurant) => {
         return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
+          restaurant.sourceName
+            .toLowerCase()
+            .indexOf(queryString.toLowerCase()) === 0
         );
       };
     };
 
-    const statusRadio = ref(1);//切换 待审核 已处理
+    const statusRadio = ref(1); //切换 待审核 已处理
 
-    const dialogBatchProcessingVisible = ref(false);//用于显示批量审核的弹窗
+    const dialogBatchProcessingVisible = ref(false); //用于显示批量审核的弹窗
     /**
      * 批量审核按钮触发
      */
-    function dialogBatchProcessingFn(){
+    function dialogBatchProcessingFn() {
       //如果没选中稿件，则退出
-      if(tableSelectedDataArray.length === 0){
+      if (tableSelectedDataArray.length === 0) {
         ElMessage({
-          message: '请先选择稿件',
-          type: 'warning',
+          message: "请先选择稿件",
+          type: "warning",
         });
         return;
       }
       dialogBatchProcessingVisible.value = true;
     }
-
-    
 
     // <!-- 已处理部分 -->
     //关键词
@@ -795,17 +814,17 @@ export default {
     //语种select数据
     const langSelectValue1 = ref("");
     const langOptions1 = reactive([]);
-    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o) => {
       langOptions1.push({
         value: o.id,
         label: o.desc,
-      })
+      });
     });
 
     //日期选择 数据
-    const dateDefaultTime1 = ref('');
+    const dateDefaultTime1 = ref("");
     //状态select数据
-    const statusSelectValue = ref('全部状态');
+    const statusSelectValue = ref("全部状态");
     const statusOptions = [
       { value: 0, label: "全部状态" },
       { value: 1, label: "审核中" },
@@ -814,8 +833,9 @@ export default {
     ];
     //稿件节点select数据
     const nodeSelectValue = ref("全部节点");
-    const nodeOptions = [//0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布 显示为空字符
-      { value: '', label: "全部节点" },
+    const nodeOptions = [
+      //0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布 显示为空字符
+      { value: "", label: "全部节点" },
       { value: 0, label: "编辑" },
       { value: 1, label: "国家信息中心" },
       { value: 2, label: "国家发改委" },
@@ -858,165 +878,207 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-
+    //获取稿件来源list
+    function findSourceListAjaxFn() {
+      httpAxiosO({
+        method: "get",
+        url: "/web/source/findSourceList",
+      })
+        .then((D) => {
+          console.log("审核稿件-稿件来源", D);
+          if (D.status != 200) {
+            ElMessage({
+              message: "稿件来源数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            restaurants.value = D.data;
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "稿件来源接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
+    let articleSource = "";
+    let articleSource1 = "";
     //字体选择
     const fontSelect = ref("中");
     //当前 详情页弹窗 接口返回信息 和 点击 table 某一列信息
     const externalAuditArticleFindByIdO = reactive({});
 
-
     //时间轴数据
     const timelineData = reactive([]);
-    
+
     /**
      * 查询 稿件详情
      */
-    function externalAuditArticleFindByIdFn(scopeP){
-
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+    function externalAuditArticleFindByIdFn(scopeP) {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
       // if (popoverShowFlag.value) {
       //   //有弹窗打开时 跳出方法
       //   return;
       // }
 
       //关闭所有详情弹窗
-      tableData.forEach((o)=>{
+      tableData.forEach((o) => {
         o.visible = false;
       });
-      tableData1.forEach((o)=>{
+      tableData1.forEach((o) => {
         o.visible = false;
       });
 
+      store
+        .dispatch(
+          "externalAuditArticleFindByIdFn",
+          scopeP.row.externalAuditArticleId
+        )
+        .then((D) => {
+          console.log("D 稿件详情", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "稿件详情请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
 
-      store.dispatch('externalAuditArticleFindByIdFn',scopeP.row.externalAuditArticleId)
-      .then((D)=>{
-        console.log('D 稿件详情',D);
-        const { data,success } = D.data
-        if(!success){
-          ElMessage({
-            message: '稿件详情请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: '稿件详情请求成功',
+          //   type: 'success',
+          //   plain: true,
+          // });
 
-        //注释于 20240515.1530 jira YDYL-5 建议删除
-        // ElMessage({
-        //   message: '稿件详情请求成功',
-        //   type: 'success',
-        //   plain: true,
-        // });
-      
+          popoverShowFlag.value = true;
+          scopeP.row.visible = true;
+          scopeP.row.articleHtmlCon = data.articleHtmlCon; //在element-ui中，table的列中 赋值 articleHtmlCon
+          scopeP.row.trueName = data.trueName; //在element-ui中，table的列中 赋值 trueName
+          scopeP.row.crtime = data.crtime; //稿件创建时间 2024-04-11 09:18:29
 
-        popoverShowFlag.value = true;
-        scopeP.row.visible = true;
-        scopeP.row.articleHtmlCon = data.articleHtmlCon;//在element-ui中，table的列中 赋值 articleHtmlCon
-        scopeP.row.trueName = data.trueName;//在element-ui中，table的列中 赋值 trueName
-        scopeP.row.crtime = data.crtime;//稿件创建时间 2024-04-11 09:18:29
+          //把当前打开的详情信息储存起来
+          for (let key in data) {
+            externalAuditArticleFindByIdO[key] = data[key];
+          }
+          //把点击 table 某列的文章 信息储存起来
+          for (let key in scopeP.row) {
+            externalAuditArticleFindByIdO[key] = scopeP.row[key];
+          }
 
-
-        //把当前打开的详情信息储存起来
-        for(let key in data){
-          externalAuditArticleFindByIdO[key] = data[key];
-        }
-        //把点击 table 某列的文章 信息储存起来
-        for(let key in scopeP.row){
-          externalAuditArticleFindByIdO[key] = scopeP.row[key];
-        }
-
-        externalAuditArticleRecordListAjaxFn(scopeP);//文章正文右侧的“审核流程记录”板块
-
-      })
-      .catch((error)=>{
-        console.log('error 稿件详情',error);
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+          externalAuditArticleRecordListAjaxFn(scopeP); //文章正文右侧的“审核流程记录”板块
+        })
+        .catch((error) => {
+          console.log("error 稿件详情", error);
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
     }
 
+    //输入框与下拉列表比对获取SourceId
+    function getSourceId(str, target) {
+      if (str.value == "") {
+        target == 0 ? (articleSource = "") : (articleSource1 = "");
+        return;
+      }
+      target == 0 ? (articleSource = 0) : (articleSource1 = 0);
+      for (let num = 0; num < restaurants.value.length; num++) {
+        if (str.value == restaurants.value[num].sourceName) {
+          target == 0
+            ? (articleSource = restaurants.value[num].sourceId)
+            : (articleSource1 = restaurants.value[num].sourceId);
+          break;
+        }
+      }
+    }
     /**
      * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
      * radio = '待审核'
      */
-     function getNeedAuditCountAjaxFn(){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
-        return o.desc
+    function getNeedAuditCountAjaxFn() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o) => {
+        return o.desc;
       });
-
+      getSourceId(originInput, 0);
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
         // currentNode:2,//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
-        articleKind:0,//0外审稿件  1外审报题   （属于哪个栏目）
-        listStatus:0,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
-        pageSize:limit.value,
-        currPage:page.value,
-      }
-      
-      langSelectValue.value&&(paramsO.language=langSelectValue.value);//这个接口 表现“全部语种” 是 什么都不传
+        articleKind: 0, //0外审稿件  1外审报题   （属于哪个栏目）
+        listStatus: 0, //必传	0 待处理 2 已处理  国家信息中心/国家发改委
+        pageSize: limit.value,
+        currPage: page.value,
+        sourceId: articleSource,
+      };
 
-      switch(searchSelectValue.value){
+      langSelectValue.value && (paramsO.language = langSelectValue.value); //这个接口 表现“全部语种” 是 什么都不传
+
+      switch (searchSelectValue.value) {
         case 0:
-        paramsO.articleTitle = searchInput.value;//按标题搜索
+          paramsO.articleTitle = searchInput.value; //按标题搜索
           break;
         case 1:
-        paramsO.articleContent = searchInput.value;//按正文搜索
+          paramsO.articleContent = searchInput.value; //按正文搜索
           break;
       }
 
       //时间段
-      if(
-        dateDefaultTime.value
-      ){
-        paramsO.startTime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.startTime+=' 00:00:00';
-        paramsO.endTime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
-        paramsO.endTime+=' 23:59:59';
+      if (dateDefaultTime.value) {
+        paramsO.startTime = timeFormatFn(dateDefaultTime.value[0])[
+          "YYYY-MM-DD"
+        ]; //起始时间
+        paramsO.startTime += " 00:00:00";
+        paramsO.endTime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"]; //结束时间
+        paramsO.endTime += " 23:59:59";
       }
 
       httpAxiosO({
-        method:'get',
-        url:'/web/externalAuditArticle/list.do',
-        params:paramsO,
+        method: "get",
+        url: "/web/externalAuditArticle/list.do",
+        params: paramsO,
       })
-      .then((D)=>{
-        console.log('D 查询审核稿件、报题',D);
-        const { data,success } = D.data
-        if(!success){
-          ElMessage({
-            message: '查询请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
+        .then((D) => {
+          console.log("D 查询审核稿件、报题", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "查询请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
 
-        //注释于 20240515.1530 jira YDYL-5 建议删除
-        // ElMessage({
-        //   message: '查询请求成功',
-        //   type: 'success',
-        //   plain: true,
-        // });
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: '查询请求成功',
+          //   type: 'success',
+          //   plain: true,
+          // });
 
-        tableData.splice(0,tableData.length);
-        data.ldata.forEach((o)=>{
-          let _o = o;
-          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-          _o.postTimeFormat = timeFormatFn(o.postTime)['YYYY-MM-DD']//时间格式化
-          tableData.push(_o);
+          tableData.splice(0, tableData.length);
+          data.ldata.forEach((o) => {
+            let _o = o;
+            _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            _o.postTimeFormat = timeFormatFn(o.postTime)["YYYY-MM-DD"]; //时间格式化
+            tableData.push(_o);
+          });
+          pageTotal.value = data.totalResults;
+        })
+        .catch((error) => {
+          console.log("error 查询审核稿件、报题", error);
+        })
+        .finally(() => {
+          loadingInstance1.close();
         });
-        pageTotal.value = data.totalResults;
-      })
-      .catch((error)=>{
-        console.log('error 查询审核稿件、报题',error);
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
     }
     // end of getNeedAuditCountAjaxFn
 
@@ -1024,122 +1086,120 @@ export default {
      * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
      * radio = '已处理'
      */
-     function getNeedAuditCountAjaxFn1(){
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
-        return o.desc
+    function getNeedAuditCountAjaxFn1() {
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o) => {
+        return o.desc;
       });
-
+      getSourceId(originInput1, 1);
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
-        
-        articleKind:0,//0外审稿件  1外审报题   （属于哪个栏目）
-        listStatus:2,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
-        pageSize:limit1.value,
-        currPage:page1.value,
+
+        articleKind: 0, //0外审稿件  1外审报题   （属于哪个栏目）
+        listStatus: 2, //必传	0 待处理 2 已处理  国家信息中心/国家发改委
+        pageSize: limit1.value,
+        currPage: page1.value,
+        sourceId: articleSource1,
+      };
+
+      if (
+        nodeSelectValue.value !== "" &&
+        nodeSelectValue.value !== "全部节点"
+      ) {
+        paramsO.currentNode = nodeSelectValue.value; //非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
       }
 
-      if(
-        nodeSelectValue.value!==''
-        &&nodeSelectValue.value !=='全部节点'
-      )
-      {
-        paramsO.currentNode=nodeSelectValue.value;//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
-      }
+      langSelectValue1.value && (paramsO.language = langSelectValue1.value); //这个接口 表现“全部语种” 是 什么都不传
 
-      langSelectValue1.value&&(paramsO.language=langSelectValue1.value);//这个接口 表现“全部语种” 是 什么都不传
-
-      switch(searchSelectValue1.value){
+      switch (searchSelectValue1.value) {
         case 0:
-        paramsO.articleTitle = searchInput1.value;//按标题搜索
+          paramsO.articleTitle = searchInput1.value; //按标题搜索
           break;
         case 1:
-        paramsO.articleContent = searchInput1.value;//按正文搜索
+          paramsO.articleContent = searchInput1.value; //按正文搜索
           break;
       }
 
       //时间段
-      if(
-        dateDefaultTime1.value
-      ){
-        paramsO.startTime=timeFormatFn(dateDefaultTime1.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.startTime+=' 00:00:00';
-        paramsO.endTime=timeFormatFn(dateDefaultTime1.value[1])['YYYY-MM-DD'] //结束时间
-        paramsO.endTime+=' 23:59:59';
+      if (dateDefaultTime1.value) {
+        paramsO.startTime = timeFormatFn(dateDefaultTime1.value[0])[
+          "YYYY-MM-DD"
+        ]; //起始时间
+        paramsO.startTime += " 00:00:00";
+        paramsO.endTime = timeFormatFn(dateDefaultTime1.value[1])["YYYY-MM-DD"]; //结束时间
+        paramsO.endTime += " 23:59:59";
       }
 
-
-
       httpAxiosO({
-        method:'get',
-        url:'/web/externalAuditArticle/list.do',
-        params:paramsO,
+        method: "get",
+        url: "/web/externalAuditArticle/list.do",
+        params: paramsO,
       })
-      .then((D)=>{
-        console.log('D 查询审核稿件、报题 已处理',D);
-        const { data,success } = D.data
-        if(!success){
-          ElMessage({
-            message: '查询请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
-
-        //注释于 20240515.1530 jira YDYL-5 建议删除
-        // ElMessage({
-        //   message: '查询请求成功',
-        //   type: 'success',
-        //   plain: true,
-        // });
-
-        tableData1.splice(0,tableData1.length);
-        data.ldata.forEach((o)=>{
-          let _o = o;
-          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-          _o.postTimeFormat = timeFormatFn(o.postTime)['YYYY-MM-DD']
-
-          switch(o.articleStatus){//显示状态名字
-            case 1:
-              _o.articleStatusName = '审核中'
-            break;
-            case 2:
-              _o.articleStatusName = '已发布'
-            break;
-            case 3:
-              _o.articleStatusName = '未通过'
-            break;
+        .then((D) => {
+          console.log("D 查询审核稿件、报题 已处理", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "查询请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
           }
 
-          //显示节点名字
-          switch(o.currentNode){
-            case 0:
-              _o.currentNodeName = '编辑'
-            break;
-            case 1:
-              _o.currentNodeName = '国家信息中心'
-            break;
-            case 2:
-              _o.currentNodeName = '国家发改委'
-            break;
-            case 4:
-              _o.currentNodeName = ' '//未通过或已发布
-            break;
-          }
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: '查询请求成功',
+          //   type: 'success',
+          //   plain: true,
+          // });
 
-          
-          tableData1.push(_o);
+          tableData1.splice(0, tableData1.length);
+          data.ldata.forEach((o) => {
+            let _o = o;
+            _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            _o.postTimeFormat = timeFormatFn(o.postTime)["YYYY-MM-DD"];
+
+            switch (
+              o.articleStatus //显示状态名字
+            ) {
+              case 1:
+                _o.articleStatusName = "审核中";
+                break;
+              case 2:
+                _o.articleStatusName = "已发布";
+                break;
+              case 3:
+                _o.articleStatusName = "未通过";
+                break;
+            }
+
+            //显示节点名字
+            switch (o.currentNode) {
+              case 0:
+                _o.currentNodeName = "编辑";
+                break;
+              case 1:
+                _o.currentNodeName = "国家信息中心";
+                break;
+              case 2:
+                _o.currentNodeName = "国家发改委";
+                break;
+              case 4:
+                _o.currentNodeName = " "; //未通过或已发布
+                break;
+            }
+
+            tableData1.push(_o);
+          });
+          pageTotal1.value = data.totalResults;
+        })
+        .catch((error) => {
+          console.log("error 查询审核稿件、报题", error);
+        })
+        .finally(() => {
+          loadingInstance1.close();
         });
-        pageTotal1.value = data.totalResults;
-      })
-      .catch((error)=>{
-        console.log('error 查询审核稿件、报题',error);
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
     }
     // end of getNeedAuditCountAjaxFn1
 
@@ -1147,40 +1207,42 @@ export default {
      * 审核流程记录 板块
      * 查询外审记录 接口
      */
-    function externalAuditArticleRecordListAjaxFn(scopeP){
-      
+    function externalAuditArticleRecordListAjaxFn(scopeP) {
       const { externalAuditArticleId } = scopeP.row;
 
       const paramsO = {
-        externalAuditArticleId,//必传，id为1有假数据
-      }
+        externalAuditArticleId, //必传，id为1有假数据
+      };
       httpAxiosO({
-        method:'get',
-        url:'/web/externalAuditArticleRecord/list.do',
-        params:paramsO,
+        method: "get",
+        url: "/web/externalAuditArticleRecord/list.do",
+        params: paramsO,
       })
-      .then((D)=>{
-        console.log('D 审核流程记录',D);
-        timelineData.splice(0,timelineData.length);
-        const { data } = D.data;
-        data.ldata.forEach((o)=>{
-          let _o = o;
-          _o.auditSignName = store.state.ROLESETO[userAuthority.value]['auditSign'][o.auditSign]
-          _o.auditTimeFormat = timeFormatFn(o.auditTime)['YYYY-MM-DD hh:mm'];
-          timelineData.push(_o);
+        .then((D) => {
+          console.log("D 审核流程记录", D);
+          timelineData.splice(0, timelineData.length);
+          const { data } = D.data;
+          data.ldata.forEach((o) => {
+            let _o = o;
+            _o.auditSignName =
+              store.state.ROLESETO[userAuthority.value]["auditSign"][
+                o.auditSign
+              ];
+            _o.auditTimeFormat = timeFormatFn(o.auditTime)["YYYY-MM-DD hh:mm"];
+            timelineData.push(_o);
+          });
+        })
+        .catch((error) => {
+          console.log("error 审核流程记录", error);
         });
-      })
-      .catch((error)=>{
-        console.log('error 审核流程记录',error);
-      })
-      ;
     }
     //end of externalAuditArticleRecordListAjaxFn
 
     onMounted(() => {
       // restaurants.value = loadAll();
-      getNeedAuditCountAjaxFn();//待审核
-      getNeedAuditCountAjaxFn1();//已处理
+      findSourceListAjaxFn();
+      getNeedAuditCountAjaxFn(); //待审核
+      getNeedAuditCountAjaxFn1(); //已处理
     });
 
     return {
@@ -1193,7 +1255,7 @@ export default {
       dateDefaultTime,
       locale: zhCn, //date-range 语言设置
       tableData,
-
+      originInput,
       limit,
       page,
       pageTotal,
@@ -1202,9 +1264,8 @@ export default {
       isClickedArr,
 
       popoverShowFlag,
-      originSelect,
       querySearch,
-      
+
       statusRadio,
 
       dialogBatchProcessingVisible,
@@ -1244,7 +1305,6 @@ export default {
 
       externalAuditArticleFindByIdO,
       tableSelectedDataArray,
-
     };
   },
 };
@@ -1474,7 +1534,7 @@ export default {
     max-height: 710px !important;
   }
 }
-.mid-content-mycontribute-table-btngroup-search{
+.mid-content-mycontribute-table-btngroup-search {
   overflow: auto;
 }
 ///* 滚动条 */

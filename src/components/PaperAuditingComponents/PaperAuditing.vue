@@ -245,7 +245,7 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="稿件来源" width="125" />
+            <el-table-column prop="sourceName" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="postTimeFormat" label="提交日期" width="200" />
             <el-table-column prop="operate" label="操作" width="80">
@@ -544,7 +544,7 @@
                 </el-popover>
               </template>
             </el-table-column>
-            <el-table-column prop="origin" label="稿件来源" width="125" />
+            <el-table-column prop="sourceName" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="articleUseStatus" label="状态" width="110">
               <template #default="scope">
@@ -845,6 +845,8 @@ export default {
       cb(results);
     };
 
+    let articleSource = "";
+    let articleSource1 = "";
     //字体选择
     const fontSelect = ref("中");
     //当前 详情页弹窗 接口返回信息 和 点击 table 某一列信息
@@ -923,6 +925,23 @@ export default {
       ;
     }
 
+    //输入框与下拉列表比对获取SourceId
+    function getSourceId(str, target) {
+      if (str.value == "") {
+        target == 0 ? (articleSource = "") : (articleSource1 = "");
+        return;
+      }
+      target == 0 ? (articleSource = 0) : (articleSource1 = 0);
+      for (let num = 0; num < restaurants.value.length; num++) {
+        if (str.value == restaurants.value[num].sourceName) {
+          target == 0
+            ? (articleSource = restaurants.value[num].sourceId)
+            : (articleSource1 = restaurants.value[num].sourceId);
+          break;
+        }
+      }
+    }
+
     /**
      * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
      * radio = '待审核'
@@ -932,7 +951,7 @@ export default {
       const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
         return o.desc
       });
-
+      getSourceId(originInput,0)
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
         // currentNode:2,//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
@@ -940,6 +959,7 @@ export default {
         listStatus:0,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
         pageSize:limit.value,
         currPage:page.value,
+        sourceId: articleSource,
       }
       
       langSelectValue.value&&(paramsO.language=langSelectValue.value);//这个接口 表现“全部语种” 是 什么都不传
@@ -1015,7 +1035,7 @@ export default {
       const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
         return o.desc
       });
-
+      getSourceId(originInput1, 1);
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
         
@@ -1023,6 +1043,7 @@ export default {
         listStatus:2,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
         pageSize:limit1.value,
         currPage:page1.value,
+        sourceId: articleSource1,
       }
 
       if(
