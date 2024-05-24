@@ -889,7 +889,7 @@ export default {
         auditingUploadFilesArray1.value = [];
       }
 
-      forPropsGetFindByIdAjaxFnReturnO.value.fileUnit.split(',').forEach((o)=>{
+      forPropsGetFindByIdAjaxFnReturnO.value.fileUnit&&forPropsGetFindByIdAjaxFnReturnO.value.fileUnit.split(',').forEach((o)=>{
         auditingUploadFilesArray.value.push({
           name: o,
           url: '',
@@ -904,7 +904,7 @@ export default {
         });
       });
 
-      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory.split(',').forEach((o)=>{
+      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory&&forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory.split(',').forEach((o)=>{
         auditingUploadFilesArray1.value.push({
           name: o,
           url: '',
@@ -926,7 +926,7 @@ export default {
     /**
      * 重置页面表单字段，
      * 如果是新建稿件就全部清空
-     * 如果是“继续采用”稿件就回到初始状态
+     * 如果是 “继续采用”“编辑” 稿件就回到初始状态
      */
     function resetFormFn(){
       //如果没有id 就是 新建稿件
@@ -965,6 +965,7 @@ export default {
       }
       // end of if
 
+      
 
     }
     // end of resetFormFn
