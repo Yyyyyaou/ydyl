@@ -89,7 +89,7 @@
             </el-table-column>
             <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
-                <span
+                <div
                   @click="getFindByIdAjaxFn(scope)"
                   style="cursor: pointer"
                   :style="
@@ -105,7 +105,7 @@
                   "
                 >
                   {{ scope.row.articleTitle }}
-                </span>
+                </div>
               </template>
             </el-table-column>
             <el-table-column

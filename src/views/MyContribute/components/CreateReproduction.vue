@@ -38,22 +38,30 @@
               <el-input v-model="dataList[index].articleTitle" clearable />
             </el-form-item>
             <el-row style="justify-content: space-between">
-              <el-col :span="11">
+              <el-col :span="11" 
+              :data-ddd = "                        dataList[index]['articleSourceName']"
+              >
                 <el-form-item label="稿件来源" prop="articleSourceName">
                   <el-autocomplete
                     v-model="dataList[index].articleSourceName"
                     :fetch-suggestions="
-                      articleSourceQuerySearchFn.bind(this, index)
+                      articleSourceQuerySearchFn.bind(
+                        this, 
+                        index,
+                        dataList[index]['articleSourceName']
+                      )
                     "
                     clearable
                     style="width: 100%"
                     placeholder="请输入来源"
-                    @select="articleSourceHandleSelectFn.bind(this, index)"
+                    @select="(selectedItemOP)=>{
+                      articleSourceHandleSelectFn.call(this,index,selectedItemOP)
+                    }"
                   />
                 </el-form-item>
               </el-col>
               <el-col :span="11">
-                <el-form-item label="语种" prop="lang">
+                <el-form-item label="语种" prop="language">
                   <el-select v-model="dataList[index].language" placeholder="">
                     <el-option
                       v-for="item in langOptions"
@@ -170,9 +178,9 @@ export default {
     const dataList = ref([
       {
         articleSource: 0,
-        articleSourceName: "",
-        sourceName: "",
-        fileAccessory: "",
+        articleSourceName: '',
+        sourceName: '',
+        fileAccessory: '',
       },
     ]);
     const rules = reactive({
@@ -266,8 +274,8 @@ export default {
      * @param {*} itemP 在来源列表中选中的对象
      */
     function articleSourceHandleSelectFn(indexP, itemP) {
-      dataList.value[indexP]["articleSource"] = itemP.id;
-      dataList.value[indexP]["sourceName"] = "";
+      dataList.value[indexP]['articleSource'] = itemP.sourceId;
+      dataList.value[indexP]['sourceName'] = '';
     }
     // end of articleSourceHandleSelectFn
 
@@ -280,21 +288,29 @@ export default {
      * @param {*} sourceNameP 来源检索词
      */
     async function articleSourceQuerySearchFn(indexP, sourceNameP) {
-      await store
-        .dispatch("getSearchFindSourceListFn", sourceNameP)
-        .then((D) => {
-          console.log("D", D);
+      //清空来源搜索结果
+      articleSourceQuerySearchResultsArr.splice(
+        0,
+        articleSourceQuerySearchResultsArr.length
+      );
 
-          articleSourceQuerySearchResultsArr.splice(
-            0,
-            articleSourceQuerySearchResultsArr.length
-          );
+      await store
+        .dispatch("getSearchFindSourceListFn", sourceNameP||'')
+        .then((D) => {
 
           if (Array.isArray(D.data) && D.data.length > 0) {
+
+            //如果没有 sourceNameP === o.sourceName ，sourceNameP 为 新来源
+            let isNewSourceName = false;//false 为 非新来源
+
             D.data.forEach((o) => {
               let _o = o;
               _o.value = o.sourceName;
               articleSourceQuerySearchResultsArr.push(_o);
+
+              if( !(sourceNameP === o.sourceName) ){
+                isNewSourceName = true;
+              }
 
               //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
               if (dataList.value[indexP].articleSourceName === o.sourceName) {
@@ -302,13 +318,19 @@ export default {
                 dataList.value[indexP].articleSource = o.sourceId; //表示用的已有来源
                 dataList.value[indexP].sourceName = ""; //清空它，表示不是新来源
               }
+
             });
-            console.log(
-              "articleSourceQuerySearchResultsArr",
-              articleSourceQuerySearchResultsArr
-            );
+            
+            if(
+              isNewSourceName
+            ){
+              dataList.value[indexP]["sourceName"] = sourceNameP.trim();
+              dataList.value[indexP]["articleSource"] = 0; //把来源id字段设成0，与袁冰 协商后 传0代表没有id
+            }
+
+
           } else {
-            //没查到结果，说明该检索字符串为新字符串
+            //没查到结果，说明该检索字符串为新字符串，更新 sourceName 字段
             dataList.value[indexP]["sourceName"] = sourceNameP.trim();
             dataList.value[indexP]["articleSource"] = 0; //把来源id字段设成0，与袁冰 协商后 传0代表没有id
           }
@@ -316,6 +338,12 @@ export default {
         .catch((error) => {
           console.log("error", error);
         });
+
+        console.log(
+          "articleSourceQuerySearchResultsArr",
+          articleSourceQuerySearchResultsArr
+        );
+
       return articleSourceQuerySearchResultsArr;
     }
     // end of articleSourceQuerySearchFn
@@ -476,10 +504,10 @@ export default {
       });
       dataList.value[dataList.value.length - 1].fold = false;
     }
-    function checkLang(datasOP) {
+    function checkLanguageFn(datasOP) {
       //查看 中文 字段值 是多少，∵语种列表是不断变化的，中文字段值不一定是 1
       const zhCNValue = langOptions.filter((o) => {
-        return o.label == "中文";
+        return o.label === "中文";
       })[0]["value"];
 
       //非要判断 稿件标题是否含有中文，如果不含有中文则  字段 language === 1 时提醒....
@@ -514,8 +542,12 @@ export default {
         articleTitle, //稿件标题
         articleSource, //稿件来源id
         sourceName, //稿件来源 名字（来源模糊查询不到的，新的 来源）
+        articleSourceName,//用来显示稿件来源 的 名字，用户输入输出直接操作的字段
         srcUrl, //稿件原地址
       } = datasOP;
+
+      console.log('articleSource',articleSource);
+      console.log('sourceName',sourceName);
 
       let checkResult = true;
       if (!articleTitle || (articleTitle && articleTitle.trim() === "")) {
@@ -527,9 +559,17 @@ export default {
         checkResult = false;
       }
       if (
-        !articleSource &&
-        articleSource === 0 &&
-        (!sourceName || (sourceName && sourceName.trim() === ""))
+        articleSourceName === ''
+        ||
+        (
+          !articleSource
+          && articleSource === 0
+        )
+        &&
+        (
+          !sourceName
+          ||(sourceName&&sourceName?.trim() === '')
+        )
       ) {
         ElMessage({
           message: "请填写稿件来源",
@@ -572,7 +612,10 @@ export default {
       for (let num = 0; num < dataList.value.length; num++) {
         let o = dataList.value[num],
           i = num;
-        if (auditingUploadFilesArrays.length != 0) {
+        if (
+          auditingUploadFilesArrays.length !== 0
+          &&auditingUploadFilesArrays[i].length !== 0
+        ) {
           o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
             const { fileName } = next.response.data[0];
             let _str = old === "" ? fileName : old + "," + fileName;
@@ -586,18 +629,29 @@ export default {
         }
 
         console.log("o.fileAccessory", o.fileAccessory);
-        console.log("o.fileIds", o.fileIds);
+        console.log("o.fileIds",typeof o.fileIds);
+
+        //附件id 集合
+        if(typeof o.fileIds === 'undefined'){
+          o.fileIds = '';
+        }
 
         o.articleTitle = o.articleTitle?.trim();
+        o.articleSourceName = o.articleSourceName?.trim();
 
         o.articleStatus = articleStatusP;
-        if (!checkFieldValueFn(o)) {
+
+        checkFieldValueFnResult = checkFieldValueFn(o);
+        if (!checkFieldValueFnResult) {
           return;
         }
-        if (!checkLang(o)) {
+        checkFieldValueFnResult = checkLanguageFn(o);
+        if (!checkFieldValueFnResult) {
           return;
         }
       }
+      // end of for
+
       // dataList.value.forEach((o, i) => {
       //   if (auditingUploadFilesArrays.length != 0) {
       //     o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
@@ -619,7 +673,7 @@ export default {
 
       //   o.articleStatus = articleStatusP;
       //   checkFieldValueFnResult = checkFieldValueFn(o);
-      //   checkLang(o)
+      //   checkLanguageFn(o)
       // });
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
@@ -717,6 +771,7 @@ export default {
         auditingUploadFilesArrays[0] = [];
       }
 
+      forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory&&
       forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory
         .split(",")
         .forEach((o) => {

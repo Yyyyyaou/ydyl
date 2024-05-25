@@ -129,8 +129,9 @@ export function initLanguageListFn(){
  */
 export function setPageViewProportionFn(){
 
-  if(//没登录就不执行，因为登录页有考虑比例问题，不想再重写登录页代码了
+  if(//如果在登录页面，因为登录页有考虑比例问题，不想再重写登录页代码了
     !store.state.StroeLoginO.isLogin
+    &&location.hash==='#/HomePage'
   ){
     return;
   }

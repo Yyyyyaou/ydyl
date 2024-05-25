@@ -245,7 +245,14 @@ export default {
         {
           required: true,
           message: "必填项",
-          trigger: "blur",
+          trigger:'blur',
+          // validate:{
+          //   callback: (rule, value, callback) => {
+          //     if(value === ''){
+          //       return new Error('必填项');
+          //     }
+          //   }
+          // },
         },
       ],
       articleSource: [//稿件来源id，用来储存来源id，Number类型
@@ -576,12 +583,13 @@ export default {
      * @param {*} datasOP 
      */
     function checkFieldValueFn(datasOP){
-      const { articleTitle,articleSource,language,articleHtmlCon,sourceName,auditing } = datasOP;
+      const { articleTitle,articleSource,language,articleHtmlCon,sourceName,articleSourceName,auditing } = datasOP;
 
       // console.log('sourceName',sourceName);
       // console.log('articleSource',articleSource);
       // console.log('articleTitle',articleTitle);
-
+      // console.log('articleSourceName',articleSourceName);
+      
 
       let checkResult = true;
       if(
@@ -596,6 +604,8 @@ export default {
         checkResult = false;
       }
       if(
+        articleSourceName === ''
+        ||
         (
           !articleSource
           && articleSource === 0
@@ -671,6 +681,7 @@ export default {
         articleType:0,//稿件类型 0原创稿件 1转载稿件
         articleStatus:articleStatusP,//稿件状态 （-1：已删除，0：草稿，1：已投稿）
         sourceName:formData.sourceName,//稿件来源名字，用来储存来源 查询不到的来源名字,即新的来源，Sting类型
+        articleSourceName:formData.articleSourceName?.trim(),//稿件来源用来显示的字段,String类型
       };
 
 
@@ -1054,7 +1065,7 @@ export default {
     font-weight: 300;
     font-size: 16px;
   }
-  .createorigin-content-editor {
+  .createorigin-content-editor {align-items: flex-start;
     :deep(.el-form-item__content) {
       display: block;
     }
