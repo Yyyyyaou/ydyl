@@ -55,7 +55,7 @@
             </div>
             <el-config-provider :locale="locale">
               <el-date-picker
-            :disabled-date="disabledDate"
+                :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
                 start-placeholder="开始日期"
@@ -105,7 +105,7 @@
             </el-table-column>
             <el-table-column prop="articleTitle" label="稿件标题">
               <template #default="scope">
-                <span
+                <div
                   style="cursor: pointer"
                   @click="getFindByIdAjaxFn(scope)"
                   :style="
@@ -121,7 +121,7 @@
                   "
                 >
                   {{ scope.row.articleTitle }}
-                </span>
+                </div>
               </template>
             </el-table-column>
             <el-table-column
@@ -140,7 +140,7 @@
             />
             <el-table-column
               prop="crtimeFormat"
-              label="删除时间"
+              label="删除日期"
               width="140"
               header-align="center"
               align="center"
@@ -155,10 +155,8 @@
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div
-                    @click="
-                      router.push(
-                        '/MyContribute/CreateContribute?id=' + scope.row.id
-                      )
+                    @click="scope.row.articleType == 0?
+                      router.push('/RecycleBin/EditOrigin?id=' + scope.row.id):router.push('/RecycleBin/EditReproduction?id=' + scope.row.id)
                     "
                   >
                     继续采用
@@ -285,7 +283,7 @@ export default {
       const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o) => {
         return o.desc;
       });
-      languageNameArr.unshift("全部");
+      //languageNameArr.unshift("全部");
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
@@ -421,12 +419,24 @@ export default {
      * 跳转到细览页，需要传递 稿件id
      */
     function getFindByIdAjaxFn(scopeP) {
-      const c = router.resolve({
-        path: "/PubDetail",
-        query: {
-          id: scopeP.row.id,
-        },
-      });
+      //原创
+      let c
+      if (scopeP.row.articleType == 0) {
+         c= router.resolve({
+          path: "/OriginDetail",
+          query: {
+            id: scopeP.row.id,
+          },
+        });
+      }
+      else{
+        c= router.resolve({
+          path: "/ReproductionDetail",
+          query: {
+            id: scopeP.row.id,
+          },
+        });
+      }
 
       window.open(c.href, "_blank");
       return;

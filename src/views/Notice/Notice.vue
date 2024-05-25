@@ -97,7 +97,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="pubTime" label="创建时间" width="240" />
+            <el-table-column prop="pubTime" label="发布时间" width="240" />
           </el-table>
           <div class="flexcenter el-pagination-style">
             <el-pagination

@@ -67,6 +67,8 @@ export default {
         if (
           newValue.path  === '/NoticeDetail'
           || newValue.path === '/PubDetail'
+          || newValue.path ==='/OriginDetail'
+          || newValue.path ==='/ReproductionDetail'
         ) {
           showNoticeDetail.value = true;
         }else{

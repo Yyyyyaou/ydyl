@@ -161,7 +161,7 @@
         />
         <el-table-column
           prop="crtimeFormat"
-          label="发布日期"
+          label="投稿时间"
           width="140"
           header-align="center"
           align="center"

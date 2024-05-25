@@ -19,6 +19,8 @@ export default function RouterReplaceComp(component) {
     render() {
       // defineAsyncComponent 创建一个在需要时才会加载的异步组件
       // 若不同 则渲染 当前路由所对应的页面   若相同则渲染当前
+      console.log(defineAsyncComponent(component))
+      console.log(RouterView)
       return this.currentPage?h(defineAsyncComponent(component)):h(RouterView)
     }
   }

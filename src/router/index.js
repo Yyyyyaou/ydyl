@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory,createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 createWebHistory
 
 import RouterReplaceComp from '@/utils/routerReplaceSelf.js'
@@ -19,8 +19,8 @@ const routes = [
   {
     path: '/MyContribute',
     name: 'MyContribute',
-    component: RouterReplaceComp(()=>import('../views/MyContribute/MyContribute.vue')),
-    meta: { title: '我的投稿' },  
+    component: RouterReplaceComp(() => import('../views/MyContribute/MyContribute.vue')),
+    meta: { title: '我的投稿' },
     children: [{
       path: 'CreateContribute',
       name: 'CreateContribute',
@@ -49,7 +49,10 @@ const routes = [
   {
     path: '/Notice',
     name: 'Notice',
-    component: RouterReplaceComp(()=>import('../views/Notice/Notice.vue')),
+    //component: RouterReplaceComp(() => import('../views/Notice/Notice.vue')),
+    component: function () {
+      return import('../views/Notice/Notice.vue')
+    },
     meta: { title: '通知公告' },
     // children: [{
     //   path: 'NoticeDetail',
@@ -67,6 +70,22 @@ const routes = [
       return import('../views/Notice/views/PubDetail.vue')
     },
     meta: { title: '稿件详情' }
+  },
+  {
+    path: '/OriginDetail',
+    name: 'OriginDetail',
+    component: function () {
+      return import('../views/Notice/views/PubDetail.vue')
+    },
+    meta: { title: '原创稿件详情' }
+  },
+  {
+    path: '/ReproductionDetail',
+    name: 'ReproductionDetail',
+    component: function () {
+      return import('../views/Notice/views/PubDetail.vue')
+    },
+    meta: { title: '转载稿件详情' }
   },
   {
     path: '/NoticeDetail',
@@ -103,18 +122,52 @@ const routes = [
   {
     path: '/Drafts',
     name: 'Drafts',
-    component: function () {
-      return import('../views/Drafts.vue')
+    component: RouterReplaceComp(() => import('../views/Drafts.vue')),
+    // component: function () {
+    //   return import('../views/Drafts.vue')
+    // },
+    meta: { title: '草稿箱' },
+    children: [{
+      path: 'EditOrigin',
+      name: 'EditOriginDrafts',
+      component: function () {
+        return import('../views/MyContribute/views/CreateContribute.vue')
+      },
+      meta: { title: '原创稿件' },
     },
-    meta: { title: '草稿箱' }
+    {
+      path: 'EditReproduction',
+      name: 'EditReproductionDrafts',
+      //component: CreateContribute,
+      component: function () {
+        return import('../views/MyContribute/views/CreateContribute.vue')
+      },
+      meta: { title: '转载稿件' },
+    }
+    ],
   },
   {
     path: '/RecycleBin',
     name: 'RecycleBin',
-    component: function () {
-      return import('../views/RecycleBin.vue')
+    component: RouterReplaceComp(() => import('../views/RecycleBin.vue')),
+    meta: { title: '回收站' },
+    children: [{
+      path: 'EditOrigin',
+      name: 'EditOriginRecycleBin',
+      component: function () {
+        return import('../views/MyContribute/views/CreateContribute.vue')
+      },
+      meta: { title: '原创稿件' },
     },
-    meta: { title: '回收站' }
+    {
+      path: 'EditReproduction',
+      name: 'EditReproductionRecycleBin',
+      component: function () {
+        return import('../views/MyContribute/views/CreateContribute.vue')
+      },
+      meta: { title: '转载稿件' },
+    }
+    ]
   },
 ]
 
