@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { onMounted,computed, watch } from 'vue';
+import { onMounted,computed, watch,ref } from 'vue';
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
 
@@ -171,13 +171,13 @@ export default {
       upDateGetNeedAuditCountFn();
     });
 
-    let defaultActive
+    const defaultActive = ref('');
     // 监听当前路由
     watch(
       () => router.currentRoute.value,
       (newValue) => {
         let arr = newValue.path.split('/')
-        defaultActive = '/'+arr[1]
+        defaultActive.value = '/'+arr[1];
       },
       { immediate: true }
     );

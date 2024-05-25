@@ -167,6 +167,9 @@ before-remove 在附件列表删除文件钩子
     <el-button class="createorigin-btngroup-save" @click="postAddEditAjaxFn(0)">保存到草稿箱</el-button>
     <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn" data-desc="预 览">提 交</el-button>
     <el-button class="createorigin-btngroup-reset"
+      @click="router.go(-1)"
+    >返 回</el-button>
+    <el-button class="createorigin-btngroup-reset"
       @click="resetFormFn"
     >重 置</el-button>
   </div>
@@ -318,22 +321,31 @@ export default {
      * @param {*} sourceNameP 来源检索词
      */
     async function articleSourceQuerySearchFn(sourceNameP){
+      //清空来源搜索结果
+      articleSourceQuerySearchResultsArr.splice(
+        0,articleSourceQuerySearchResultsArr.length
+      );
 
-      await store.dispatch('getSearchFindSourceListFn',sourceNameP)
+      await store.dispatch('getSearchFindSourceListFn',sourceNameP||'')
       .then((D)=>{
-
-        console.log('D',D);
         
-        articleSourceQuerySearchResultsArr.splice(0,articleSourceQuerySearchResultsArr.length);
-
         if(
           Array.isArray(D.data)
           &&D.data.length>0
         ){
+
+          //如果没有 sourceNameP === o.sourceName ，sourceNameP 为 新来源
+          let isNewSourceName = false;//false 为 非新来源
+
           D.data.forEach((o)=>{
             let _o = o;
             _o.value = o.sourceName;
             articleSourceQuerySearchResultsArr.push(_o);
+
+            if( !(sourceNameP === o.sourceName) ){
+              isNewSourceName = true;
+            }
+
 
             //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
             if(formData.articleSourceName === o.sourceName){//检索词 与 来源名称 精准相同时候
@@ -343,7 +355,12 @@ export default {
 
           });
 
-          console.log('articleSourceQuerySearchResultsArr',articleSourceQuerySearchResultsArr);
+          if(
+            isNewSourceName
+          ){
+            formData["sourceName"] = sourceNameP.trim();
+            formData["articleSource"] = 0; //把来源id字段设成0，与袁冰 协商后 传0代表没有id
+          }
 
         }else{//没查到结果，说明该检索字符串为新字符串
           formData['sourceName'] = sourceNameP?.trim();

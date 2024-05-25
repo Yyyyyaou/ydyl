@@ -149,7 +149,10 @@
         @click="postAddEditReprintAjaxFn(1)"
         >提 交</el-button
       >
-      <el-button class="createreproduction-btngroup-reset">重 置</el-button>
+      <el-button class="createorigin-btngroup-reset"
+        @click="router.go(-1)"
+      >返 回</el-button>
+      <el-button class="createreproduction-btngroup-reset" @click="resetFormFn">重 置</el-button>
     </div>
   </div>
 </template>
@@ -177,6 +180,7 @@ export default {
 
     const dataList = ref([
       {
+        articleTitle: '',
         articleSource: 0,
         articleSourceName: '',
         sourceName: '',
@@ -312,11 +316,15 @@ export default {
                 isNewSourceName = true;
               }
 
+
               //如果用户搜索 词搜索到了来源（即，来源列表包含 搜索词），但用户没点击选中 来源搜索词时候，需要formData.articleSource = o.sourceId
               if (dataList.value[indexP].articleSourceName === o.sourceName) {
                 //检索词 与 来源名称 精准相同时候
                 dataList.value[indexP].articleSource = o.sourceId; //表示用的已有来源
-                dataList.value[indexP].sourceName = ""; //清空它，表示不是新来源
+                dataList.value[indexP].sourceName = ''; //清空它，表示不是新来源
+
+                console.log('dataList',dataList);
+
               }
 
             });
@@ -493,9 +501,10 @@ export default {
         fold: false,
         language: 1,
         articleSource: 0,
-        articleSourceName: "",
-        sourceName: "",
+        articleSourceName: '',
+        sourceName: '',
       });
+      auditingUploadFilesArrays.push([]);//同步更新附件列表变量
     }
     function deleteData(index) {
       dataList.value.splice(index, 1);
@@ -503,8 +512,10 @@ export default {
         element.fold = true;
       });
       dataList.value[dataList.value.length - 1].fold = false;
+      auditingUploadFilesArrays.pop();//同步更新附件列表变量
     }
     function checkLanguageFn(datasOP) {
+
       //查看 中文 字段值 是多少，∵语种列表是不断变化的，中文字段值不一定是 1
       const zhCNValue = langOptions.filter((o) => {
         return o.label === "中文";
@@ -546,8 +557,9 @@ export default {
         srcUrl, //稿件原地址
       } = datasOP;
 
-      console.log('articleSource',articleSource);
-      console.log('sourceName',sourceName);
+      // console.log('articleTitle',articleTitle);
+      // console.log('articleSource',articleSource);
+      // console.log('sourceName',sourceName);
 
       let checkResult = true;
       if (!articleTitle || (articleTitle && articleTitle.trim() === "")) {
@@ -579,14 +591,21 @@ export default {
         checkResult = false;
       }
 
-      if (!srcUrl) {
+      const regExp = /^https?:\/\/[a-zA-Z0-9]+\.*/;
+      if (
+        !srcUrl
+        ||!regExp.test(srcUrl)
+      ) {
         ElMessage({
-          message: "请输入稿件原地址",
+          message: "请输入稿件原地址，或者稿件原地址不符合要求",
           type: "warning",
           plain: true,
         });
         checkResult = false;
       }
+
+      console.log('checkResult',checkResult);
+
       return checkResult;
     }
 
@@ -598,6 +617,8 @@ export default {
      *
      */
     function postAddEditReprintAjaxFn(articleStatusP) {
+      console.log('start of for dataList',dataList);
+
       // articleTitle 稿件标题
       // articleSource 稿件来源
       // language 语种
@@ -607,14 +628,15 @@ export default {
 
       let checkFieldValueFnResult = true; //true为校验通过
 
-      // console.log('auditingUploadFilesArrays',auditingUploadFilesArrays);
 
       for (let num = 0; num < dataList.value.length; num++) {
         let o = dataList.value[num],
-          i = num;
+            i = num
+        ;
+
         if (
-          auditingUploadFilesArrays.length !== 0
-          &&auditingUploadFilesArrays[i].length !== 0
+          auditingUploadFilesArrays?.length !== 0
+          &&auditingUploadFilesArrays[i]?.length !== 0
         ) {
           o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
             const { fileName } = next.response.data[0];
@@ -652,29 +674,7 @@ export default {
       }
       // end of for
 
-      // dataList.value.forEach((o, i) => {
-      //   if (auditingUploadFilesArrays.length != 0) {
-      //     o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
-      //       const { fileName } = next.response.data[0];
-      //       let _str = old === "" ? fileName : old + "," + fileName;
-      //       return _str;
-      //     }, "");
-      //     o.fileIds = auditingUploadFilesArrays[i].reduce((old, next) => {
-      //       const { id } = next.response.data[0];
-      //       let _str = old === "" ? id : old + "," + id;
-      //       return _str;
-      //     }, "");
-      //   }
-
-      //   console.log("o.fileAccessory", o.fileAccessory);
-      //   console.log("o.fileIds", o.fileIds);
-
-      //   o.articleTitle = o.articleTitle?.trim();
-
-      //   o.articleStatus = articleStatusP;
-      //   checkFieldValueFnResult = checkFieldValueFn(o);
-      //   checkLanguageFn(o)
-      // });
+      console.log('end of for dataList',dataList);
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       // const _regExp1 = /\n$/;
@@ -684,7 +684,7 @@ export default {
         //验证各个字段
         return;
       }
-      console.log("dataList", dataList);
+      console.log("postAddEditReprintAjaxFn dataList", dataList);
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
@@ -693,8 +693,11 @@ export default {
         let _url = "";
         if (forPropsGetFindByIdAjaxFnReturnO.value.id) {
           _url = "/web/article/update.do";
-          dataList.value.forEach((o) => {
-            o.id = forPropsGetFindByIdAjaxFnReturnO.value.id; //父组件传下来的id
+          dataList.value.forEach((o,i) => {
+            //如果是 继续采用、编辑，只能是第一个稿件是旧稿件，其它的是新稿，是没 稿件id的
+            if(i===0){
+              o.id = forPropsGetFindByIdAjaxFnReturnO.value.id; //父组件传下来的id
+            }
           });
         } else {
           _url = "/web/article/addEditReprint.do";
@@ -753,12 +756,14 @@ export default {
       const o = {
         articleTitle: forPropsGetFindByIdAjaxFnReturnO.value.articleTitle, //稿件标题
         articleSource:
-          forPropsGetFindByIdAjaxFnReturnO.value.articleSource || "", //稿件来源
+          forPropsGetFindByIdAjaxFnReturnO.value.articleSource || '', //稿件来源
         articleSourceName: forPropsGetFindByIdAjaxFnReturnO.value.sourceName, //用来显示在页面上的来源名字
-        language: forPropsGetFindByIdAjaxFnReturnO.value.language || "", //语种
-        remark: forPropsGetFindByIdAjaxFnReturnO.value.remark || "", //备注
-        srcUrl: forPropsGetFindByIdAjaxFnReturnO.value.srcUrl || "", //稿件原地址
+        language: forPropsGetFindByIdAjaxFnReturnO.value.language || '', //语种
+        sourceName:'',
+        remark: forPropsGetFindByIdAjaxFnReturnO.value.remark || '', //备注
+        srcUrl: forPropsGetFindByIdAjaxFnReturnO.value.srcUrl || '', //稿件原地址
         articleType: 1, //稿件类型 0原创稿件 1转载稿件
+        
       };
 
       //回显附件列表，因为附件列表是单独的变量
@@ -794,6 +799,46 @@ export default {
     }
     // end of getPropsFn
 
+
+    /**
+     * 重置页面表单字段，
+     * 如果是新建稿件就全部清空
+     * 如果是 “继续采用”“编辑” 稿件就回到初始状态
+     */
+    function resetFormFn(){
+
+      // dataList.value.push(o); //回显详情各个字段
+
+      dataList.value.forEach((formDataP)=>{
+
+        for(let key in formDataP){
+          if(//初始化 语种
+            key === 'language'
+          ){
+            formDataP[key] = langOptions.filter((o)=>{
+              return o.label === '中文';
+            })[0]['value'];
+          }else{
+            formDataP[key] = '';//清空其它字段
+          }
+        }
+        // end of for
+
+      });
+
+      //有id 就是 “继续采用”、“编辑”
+      if(
+        forPropsGetFindByIdAjaxFnReturnO.value.id
+      ){
+        getPropsFn();
+      }
+      // end of if
+
+    }
+    // end of resetFormFn
+
+
+
     onMounted(() => {
       getPropsFn();
     });
@@ -819,6 +864,8 @@ export default {
       handleAuditingUploadSuccessFn,
 
       postAddEditReprintAjaxFn,
+      resetFormFn,
+
     };
   },
 };
