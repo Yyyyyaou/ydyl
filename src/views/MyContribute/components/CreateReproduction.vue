@@ -617,7 +617,7 @@ export default {
      *
      */
     function postAddEditReprintAjaxFn(articleStatusP) {
-      console.log('start of for dataList',dataList);
+
 
       // articleTitle 稿件标题
       // articleSource 稿件来源
@@ -674,7 +674,6 @@ export default {
       }
       // end of for
 
-      console.log('end of for dataList',dataList);
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       // const _regExp1 = /\n$/;

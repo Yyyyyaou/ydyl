@@ -53,7 +53,8 @@ module.exports = {
         }
       },
       '/webSocket':{
-        target:'ws://192.168.137.1:8090/',
+        // target:'ws://192.168.137.1:8090/',
+        target:'ws://192.168.200.7/',
         ws:true,//开启ws
         changeOrigin:true,
         pathRewrite:{

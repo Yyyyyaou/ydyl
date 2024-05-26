@@ -28,7 +28,7 @@
 <script>
 import router from '@/router';
 import { useStore } from "vuex";
-import { ref, watch,onUnmounted } from 'vue';
+import { ref, watch, } from 'vue';
 
 export default {
   name: "TopHeader",
@@ -64,22 +64,6 @@ export default {
       { immediate: true }
     );
 
-
-    //websocket 开始
-    // const SOCKET = new WebSocket("/webSocket/tougaoadmin/web/websocket/"+loginUser.id);
-    // SOCKET.addEventListener("open", function (event) {
-    //   console.log("连接成功 event",event);
-    //   SOCKET.send("Hello Server!");
-    // });
-    // // Listen for messages
-    // SOCKET.addEventListener("message", function (event) {
-    //   console.log("Message from server +++++++++++++++++++++++++++++++", event.data);
-    // });
-
-    onUnmounted(()=>{
-      //关闭 SOCKET
-      // SOCKET.close();
-    })
 
 
     return {

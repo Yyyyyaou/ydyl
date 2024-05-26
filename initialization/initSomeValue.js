@@ -97,18 +97,18 @@ export function initLanguageListFn(){
     if(success){
       const _message = eval(message)||[];//_message 应为数组
     
-      if(
-        !Array.isArray(_message)
-        ||_message.length===0
-        ){//接口有问题时候，没有语种，先搞点假语种
-        ['中文','俄文','英文','德文','法文'].forEach((o,i)=>{
-          _message.push({
-            id:i+1,
-            desc:o,
-          });
-        });
+      // if(
+      //   !Array.isArray(_message)
+      //   ||_message.length===0
+      //   ){//接口有问题时候，没有语种，先搞点假语种
+      //   ['中文','俄文','英文','德文','法文'].forEach((o,i)=>{
+      //     _message.push({
+      //       id:i+1,
+      //       desc:o,
+      //     });
+      //   });
         
-      }
+      // }
       _message.unshift({
         id:0,
         desc:'全部',
@@ -140,31 +140,31 @@ export function setPageViewProportionFn(){
   const htmlEleO =  document.querySelector('html');
   const bodyEleO =  document.querySelector('body');
   
-  htmlEleO.attributeStyleMap.set('height','100%');
-  bodyEleO.attributeStyleMap.set('height','100%');
-  bodyEleO.attributeStyleMap.set('width','100%');
-  bodyEleO.attributeStyleMap.set('transform','scale(1)');
+  htmlEleO.style.setProperty('height','100%');
+  bodyEleO.style.setProperty('height','100%');
+  bodyEleO.style.setProperty('width','100%');
+  bodyEleO.style.setProperty('transform','scale(1)');
 
   const viewProportion = window.innerWidth / window.innerHeight ;
 
   const widthProportion = window.innerWidth/targetWidth;
   // const differenceValue = 1 - widthProportion;
 
-  bodyEleO.attributeStyleMap.set('width',targetWidth + 'px');
-  bodyEleO.attributeStyleMap.set('transform','scale('+widthProportion+')');
-  bodyEleO.attributeStyleMap.set('transform-origin','left top');
-  bodyEleO.attributeStyleMap.set('overflow-x','hidden');
+  bodyEleO.style.setProperty('width',targetWidth + 'px');
+  bodyEleO.style.setProperty('transform','scale('+widthProportion+')');
+  bodyEleO.style.setProperty('transform-origin','left top');
+  bodyEleO.style.setProperty('overflow-x','hidden');
 
   if(
     (window.innerHeight + 3) >= bodyEleO.clientHeight
   ){
 
-    bodyEleO.attributeStyleMap.set('height',(targetWidth/viewProportion)+'px');
+    bodyEleO.style.setProperty('height',(targetWidth/viewProportion)+'px');
     
   }else{
 
-    htmlEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
-    bodyEleO.attributeStyleMap.set('height',(bodyEleO.clientHeight)+'px');
+    htmlEleO.style.setProperty('height',(bodyEleO.clientHeight)+'px');
+    bodyEleO.style.setProperty('height',(bodyEleO.clientHeight)+'px');
 
   }
   

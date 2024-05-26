@@ -116,8 +116,6 @@ export async function getNeedAuditCountFn(ctx){
     //更新未审核的稿件列表
     ctx.commit('MSystemUntreatedMessageList',needAudit);
 
-    //显示右下角弹窗
-    needAudit.length&&ctx.commit('MIsShowSystemUntreatedMessagePopup',true);
 
     //更新导航栏的小红点 数值
     ctx.commit('MLeftMenuMessageCount',{
@@ -128,3 +126,4 @@ export async function getNeedAuditCountFn(ctx){
   })
 
 }
+// end of getNeedAuditCountFn

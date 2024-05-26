@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { onMounted,computed, watch,ref } from 'vue';
+import { onMounted,onUnmounted,computed,ref, watch } from 'vue';
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
 
@@ -128,6 +128,7 @@ export default {
 
     //创建store实例
     const store = useStore();
+    const { loginUser } = store.state.StroeLoginO;
 
     const router = useRouter();
     function menuSelect(key) {
@@ -150,6 +151,7 @@ export default {
      * 导航栏的小红点 和 右下角的消息弹窗提醒
     */
     async function upDateGetNeedAuditCountFn(){
+      
       let isReturn = false;
       await store.dispatch('getNeedAuditCountFn')
       .catch((error)=>{
@@ -160,16 +162,58 @@ export default {
       if(isReturn){//如果接口返回错误，则退出
         return;
       }
-      return setTimeout(()=>{
-        upDateGetNeedAuditCountFn();
-      },1000*60*2);
+
     }
     // end of getNeedAuditCountFn
     
     
-    onMounted(() => {
-      upDateGetNeedAuditCountFn();
+    //websocket 开始
+    const SOCKET = (()=>{
+      if(
+        CURRENT_ROLE_Computed.value === '外部用户'
+      ){
+        const _ = new EventTarget();
+        _.close = function(){};
+        return _;
+      }
+      
+      const socketUrl = process.env.NODE_ENV === 'development'?
+      '/webSocket/tougaoadmin/web/websocket/':
+      'ws://192.168.200.7/tougaoadmin/web/websocket/'
+      ;
+
+      return new WebSocket(socketUrl+loginUser.id);
+    })()
+    SOCKET.addEventListener("open", function (event) {
+      console.log("连接成功 event",event);
+      SOCKET.send("Hello Server!");
     });
+    // Listen for messages
+    SOCKET.addEventListener("message", function (event) {
+      console.log("Message from server +++++++++++++++++++++++++++++++", event.data);
+      try{
+        JSON.parse(event.data);
+        const messageO = JSON.parse(event.data);
+        console.log('messageO',messageO);
+        store.commit('MWebsocketAboutSystemUntreatedMessage',{
+          needArticleAudit:messageO.needArticleAudit,
+          needReportAudit:messageO.needReportAudit,
+        });
+        if(
+          messageO.needArticleAudit
+          ||messageO.needReportAudit
+        ){
+          //显示右下角弹窗
+          store.commit('MIsShowSystemUntreatedMessagePopup',true);
+        }
+      }catch(error){
+        //to do
+      }
+
+
+    });
+
+
 
     const defaultActive = ref('');
     // 监听当前路由
@@ -182,6 +226,15 @@ export default {
       { immediate: true }
     );
 
+    onMounted(() => {
+      upDateGetNeedAuditCountFn();
+    });
+
+    onUnmounted(()=>{
+      //关闭 SOCKET
+      SOCKET.close();
+    })
+    
     return {
       defaultActive,
       menuSelect,
