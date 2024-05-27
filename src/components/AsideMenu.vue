@@ -190,11 +190,11 @@ export default {
     });
     // Listen for messages
     SOCKET.addEventListener("message", function (event) {
-      console.log("Message from server +++++++++++++++++++++++++++++++", event.data);
+      // console.log("Message from server +++++++++++++++++++++++++++++++", event.data);
       try{
         JSON.parse(event.data);
         const messageO = JSON.parse(event.data);
-        console.log('messageO',messageO);
+        // console.log('messageO',messageO);
         store.commit('MWebsocketAboutSystemUntreatedMessage',{
           needArticleAudit:messageO.needArticleAudit,
           needReportAudit:messageO.needReportAudit,

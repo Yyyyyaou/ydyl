@@ -39,7 +39,6 @@
             </el-form-item>
             <el-row style="justify-content: space-between">
               <el-col :span="11" 
-              :data-ddd = "                        dataList[index]['articleSourceName']"
               >
                 <el-form-item label="稿件来源" prop="articleSourceName">
                   <el-autocomplete
@@ -51,11 +50,12 @@
                         dataList[index]['articleSourceName']
                       )
                     "
+                    :trigger-on-focus="true"
                     clearable
                     style="width: 100%"
                     placeholder="请输入来源"
                     @select="(selectedItemOP)=>{
-                      articleSourceHandleSelectFn.call(this,index,selectedItemOP)
+                      articleSourceHandleSelectFn.call(null,index,selectedItemOP)
                     }"
                   />
                 </el-form-item>
@@ -82,7 +82,6 @@
               class="auditingUploadFilesArraysOuterC"
             >
               <el-input
-                v-model="dataList[index].fileAccessory"
                 clearable
                 disabled
                 placeholder="附件文件格式doc、pdf、jpg、png"
@@ -278,6 +277,7 @@ export default {
      * @param {*} itemP 在来源列表中选中的对象
      */
     function articleSourceHandleSelectFn(indexP, itemP) {
+      console.log('articleSourceHandleSelectFn indexP itemP',indexP, itemP);
       dataList.value[indexP]['articleSource'] = itemP.sourceId;
       dataList.value[indexP]['sourceName'] = '';
     }
@@ -634,8 +634,10 @@ export default {
             i = num
         ;
 
+
         if (
           auditingUploadFilesArrays?.length !== 0
+          &&auditingUploadFilesArrays[i]
           &&auditingUploadFilesArrays[i]?.length !== 0
         ) {
           o.fileAccessory = auditingUploadFilesArrays[i].reduce((old, next) => {
@@ -645,13 +647,33 @@ export default {
           }, "");
           o.fileIds = auditingUploadFilesArrays[i].reduce((old, next) => {
             const { id } = next.response.data[0];
+            if(typeof id === 'undefined'){
+              return old;
+            }
             let _str = old === "" ? id : old + "," + id;
             return _str;
           }, "");
+
+          //如果有从父组件传下来的 fileIds ，需要追加到列表里
+          if(
+            forPropsGetFindByIdAjaxFnReturnO.value.id
+          ){
+            if(
+              i===0
+              && forPropsGetFindByIdAjaxFnReturnO.value.fileIds !== ''
+            ){
+              o.fileIds +=
+              ','+forPropsGetFindByIdAjaxFnReturnO.value.fileIds;
+            }
+            // end of if
+          }
+          // end of if
+
         }
 
         console.log("o.fileAccessory", o.fileAccessory);
         console.log("o.fileIds",typeof o.fileIds);
+        console.log("o.fileIds",o.fileIds);
 
         //附件id 集合
         if(typeof o.fileIds === 'undefined'){
@@ -752,18 +774,19 @@ export default {
         return;
       }
 
-      const o = {
-        articleTitle: forPropsGetFindByIdAjaxFnReturnO.value.articleTitle, //稿件标题
-        articleSource:
-          forPropsGetFindByIdAjaxFnReturnO.value.articleSource || '', //稿件来源
-        articleSourceName: forPropsGetFindByIdAjaxFnReturnO.value.sourceName, //用来显示在页面上的来源名字
-        language: forPropsGetFindByIdAjaxFnReturnO.value.language || '', //语种
-        sourceName:'',
-        remark: forPropsGetFindByIdAjaxFnReturnO.value.remark || '', //备注
-        srcUrl: forPropsGetFindByIdAjaxFnReturnO.value.srcUrl || '', //稿件原地址
-        articleType: 1, //稿件类型 0原创稿件 1转载稿件
-        
-      };
+      const o = {};
+      // articleTitle 稿件标题
+      // articleSource 稿件来源
+      // language 语种
+      // remark 备注
+      // srcUrl 稿件原地址
+      // articleType 稿件类型: 0原创稿件 1转载稿件
+      for(let key in forPropsGetFindByIdAjaxFnReturnO.value){
+        o[key] = forPropsGetFindByIdAjaxFnReturnO.value[key];
+      }
+
+      // articleSourceName 用来显示在页面上的来源名字
+      o.articleSourceName = o.sourceName;
 
       //回显附件列表，因为附件列表是单独的变量
       console.log(
@@ -793,8 +816,11 @@ export default {
           });
         });
 
+      console.log('dataList o',o);
+
       dataList.value.splice(0, dataList.value.length);
       dataList.value.push(o); //回显详情各个字段
+      
     }
     // end of getPropsFn
 

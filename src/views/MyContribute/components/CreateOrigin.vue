@@ -11,6 +11,7 @@
             <el-autocomplete
               v-model="formData.articleSourceName"
               :fetch-suggestions="articleSourceQuerySearchFn"
+              :trigger-on-focus="true"
               clearable
               style="width:100%;"
               placeholder="请输入来源"
@@ -190,7 +191,7 @@ before-remove 在附件列表删除文件钩子
 import Editor from '@tinymce/tinymce-vue';
 import PubDetail from '@/views/Notice/views/PubDetail.vue';
 
-import { onMounted, reactive,ref,nextTick, toRefs } from "vue";
+import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
@@ -468,33 +469,110 @@ export default {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const {fileName} = uploadFile.response.data[0];
 
-      return httpAxiosO({
-        url: '/web/article/delFileObj',
-        method: 'delete',
-        params: {
-          fileName
-        }
-      })
+      return deleteArticleDelFileObjFn(fileName)
       .finally(()=>{
         loadingInstance1.close();
       });
     }
     //end of handleAuditingUploadBeforeRemoveFn
 
+
+
     /**
-     * 附件下载接口，这里用于图片预览
+     * 删除附件接口
      */
-    function handleAuditingGetobjFn(fileNameP){
-      httpAxiosO({
-        url: '/web/article/getobj',
-        method: 'get',
+    function deleteArticleDelFileObjFn(fileNamep){
+      return httpAxiosO({
+        url: '/web/article/delFileObj',
+        method: 'delete',
         params: {
-          fileName:fileNameP,
+          fileName:fileNamep,
         }
       })
-    }handleAuditingGetobjFn
-    // end of handleAuditingGetobjRemoveFn
+    }
+    // end of deleteArticleDelFileObjFn
 
+    /**
+     * 针对非新稿 删除未提交的稿件附件
+     */
+    function deleteUncommittedArticleDelFileObjFn(){
+      //没有id就退出
+      if(!forPropsGetFindByIdAjaxFnReturnO.value.id){
+        return;
+      }
+
+      const fileUnitArr = forPropsGetFindByIdAjaxFnReturnO.value.fileUnit !==''?forPropsGetFindByIdAjaxFnReturnO.value.fileUnit.split(',')
+      :
+      [];
+
+      const fileAccessoryArr = forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory !==''?forPropsGetFindByIdAjaxFnReturnO.value.fileAccessory.split(',')
+      :
+      [];
+
+      //审核附件开始
+      if(
+        auditingUploadFilesArray.value.length
+      ){
+        if(fileUnitArr.length === 0){//旧稿件中无附件
+
+          auditingUploadFilesArray.value.forEach((o)=>{
+            const { response } = o;
+            const fileName = response.data[0].fileName
+            deleteArticleDelFileObjFn(fileName);
+          });
+
+        }else{// 附件列表中 旧稿件中有附件，要排除原有附件，删除新加的附件
+
+          auditingUploadFilesArray.value.forEach((o)=>{
+            const { response } = o;
+            const fileName = response.data[0].fileName
+            if(fileUnitArr.includes(fileName)){
+              return false;
+            }
+            deleteArticleDelFileObjFn(fileName);
+          });
+
+        }
+        //end of else
+      }
+      //end of if
+      
+      //审核附件结束
+
+      //普通附件开始
+      if(
+        auditingUploadFilesArray1.value.length
+      ){
+        if(fileAccessoryArr.length === 0){//旧稿件中无附件
+
+          auditingUploadFilesArray1.value.forEach((o)=>{
+            const { response } = o;
+            const fileName = response.data[0].fileName
+            deleteArticleDelFileObjFn(fileName);
+          });
+
+        }else{// 附件列表中 旧稿件中有附件，要排除原有附件，删除新加的附件
+
+          auditingUploadFilesArray1.value.forEach((o)=>{
+            const { response } = o;
+            const fileName = response.data[0].fileName
+            if(fileAccessoryArr.includes(fileName)){
+              return false;
+            }
+            deleteArticleDelFileObjFn(fileName);
+          });
+
+        }
+        //end of else
+      }
+      //end of if
+      //普通附件结束
+
+      //正文附件开始
+
+      //正文附件结束
+
+    }
 
     /**
      * 资质附件上传
@@ -921,9 +999,7 @@ export default {
         auditingUploadFilesFileIds.push(o);
       });
 
-
       console.log('getPropsFn formData',formData);
-
 
       editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
 
@@ -1025,6 +1101,10 @@ export default {
       getPropsFn();
     })
 
+    onBeforeUnmount(()=>{
+      deleteUncommittedArticleDelFileObjFn();
+    });
+
     return {
       router,
 
@@ -1054,6 +1134,8 @@ export default {
       handleAuditingUploadErrorFn,
       handleAuditingUploadBeforeRemoveFn,
       handleAuditingUploadSuccessFn,
+      deleteArticleDelFileObjFn,
+      deleteUncommittedArticleDelFileObjFn,
 
       postAddEditAjaxFn,
       previewAddEditFn,
