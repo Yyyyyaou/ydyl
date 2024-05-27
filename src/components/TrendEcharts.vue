@@ -23,12 +23,15 @@ export default {
         trigger: "axis",
         // formatter: '{a0}: {c0}<br/>'+'{a1}: {c1}'
         formatter: function (params) {
-          var num1 = params[0]==undefined?0:params[0]?.value;
-          var num2 = params[1]==undefined?0:params[1]?.value;
-          var num = num1+num2;
+          var num1 = params[0] == undefined ? 0 : params[0]?.value;
+          var num2 = params[1] == undefined ? 0 : params[1]?.value;
+          var num = num1 + num2;
           var result =
-            '<span style="font-weight:700;text-align:center;">'+params[0].axisValueLabel+' '+'投稿数:'+
-            "&nbsp;"+
+            '<span style="font-weight:700;text-align:center;">' +
+            params[0].axisValueLabel +
+            " " +
+            "投稿数:" +
+            "&nbsp;" +
             num +
             "</span></br>";
           params.forEach(function (item) {
@@ -53,7 +56,7 @@ export default {
         type: "category",
         data: ylist,
         axisLabel: {
-          interval:0,
+          interval: 0,
           // rotate: 15,
         },
       },
@@ -118,30 +121,30 @@ export default {
       option.xAxis.data = ylist;
       option.series[0].data = x1list;
       option.series[1].data = x2list;
-            // 获取图表的总宽度
-var totalWidth = myChart.getWidth();
+      // 获取图表的总宽度
+      var totalWidth = myChart.getWidth();
       // 遍历坐标轴配置，寻找横轴宽度
-var xAxisWidth;
-var xAxis = option.xAxis
-    if (xAxis.type === 'category') {
+      var xAxisWidth;
+      var xAxis = option.xAxis;
+      if (xAxis.type === "category") {
         // 假设轴标签没有自定义宽度
-        xAxisWidth = xAxis.axisLabel && xAxis.axisLabel.width ? xAxis.axisLabel.width : totalWidth / xAxis.data.length;
-    }
- 
-// 输出横轴宽度
-console.log('横轴宽度:', xAxisWidth);
-if(xAxisWidth<100){
-  option.xAxis.axisLabel.rotate = 15
-}
-else{
-  option.xAxis.axisLabel.rotate = 0
-}
+        xAxisWidth =
+          xAxis.axisLabel && xAxis.axisLabel.width
+            ? xAxis.axisLabel.width
+            : totalWidth / xAxis.data.length;
+      }
+
+      // 输出横轴宽度
+      // console.log("横轴宽度:", xAxisWidth);
+      if (xAxisWidth < 100) {
+        option.xAxis.axisLabel.rotate = 15;
+      } else {
+        option.xAxis.axisLabel.rotate = 0;
+      }
       myChart.setOption(option);
       // window.addEventListener("resize", () => {
       //   myChart.resize();
       // });
-
-
     };
     const initEcharts = (y, x1, x2) => {
       ylist = y;

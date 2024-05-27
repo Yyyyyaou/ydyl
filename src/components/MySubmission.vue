@@ -426,15 +426,36 @@ export default {
      * 跳转到细览页，需要传递 稿件id
      */
     function getFindByIdAjaxFn(scopeP){
-      const c = router.resolve({
-        path: "/PubDetail",
-        query: {
-          id: scopeP.row.id,
-        },
-      });
+            //原创
+      let c
+      if (scopeP.row.articleType == 0) {
+         c= router.resolve({
+          path: "/OriginDetail",
+          query: {
+            id: scopeP.row.id,
+          },
+        });
+      }
+      else{
+        c= router.resolve({
+          path: "/ReproductionDetail",
+          query: {
+            id: scopeP.row.id,
+          },
+        });
+      }
 
       window.open(c.href, "_blank");
       return;
+      // const c = router.resolve({
+      //   path: "/PubDetail",
+      //   query: {
+      //     id: scopeP.row.id,
+      //   },
+      // });
+
+      // window.open(c.href, "_blank");
+      // return;
     }
 
     /**

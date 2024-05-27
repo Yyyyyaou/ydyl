@@ -100,21 +100,18 @@
                     <span>正文：</span><span>{{ scope.row.content }}</span>
                   </p>
                   <div class="elpopover-button">
-                    <!-- <el-button
+                    <el-button
                       type="primary"
-                      @click="
-                        scope.row.visible = false;
-                        popoverShowFlag = false;
-                      "
-                      >确定
-                    </el-button> -->
+                      @click="router.push('/MyContribute')"
+                      >查看
+                    </el-button>
                     <el-button
                       type="info"
                       @click="
                         scope.row.visible = false;
                         popoverShowFlag = false;
                       "
-                      >关闭
+                      >取消
                     </el-button>
                   </div>
                   <template #reference>
@@ -179,8 +176,10 @@ import { ElMessage,ElLoading } from "element-plus";
 import { useStore } from 'vuex';
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import { useRouter } from "vue-router";
 export default {
   setup() {
+    const router = useRouter();
     const store = useStore();
 
     // 获取用户角色
@@ -322,6 +321,7 @@ export default {
     });
 
     return {
+      router,
       disabledDate,
       timeSelectChange,
       searchInput,
