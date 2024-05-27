@@ -139,7 +139,7 @@
               align="center"
             />
             <el-table-column
-              prop="crtimeFormat"
+              prop="deleteTimeFormat"
               label="删除日期"
               width="140"
               header-align="center"
@@ -338,7 +338,7 @@ export default {
           data.ldata.forEach((o) => {
             let _o = o;
             _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
-            _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
+            _o.deleteTimeFormat = timeFormatFn(o.deleteTime)["YYYY-MM-DD"]; //时间格式化
             tableData.push(_o);
           });
           pageTotal.value = data.totalResults;

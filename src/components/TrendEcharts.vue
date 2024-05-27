@@ -54,7 +54,7 @@ export default {
         data: ylist,
         axisLabel: {
           interval:0,
-          rotate: 15,
+          // rotate: 15,
         },
       },
       series: [
@@ -118,10 +118,30 @@ export default {
       option.xAxis.data = ylist;
       option.series[0].data = x1list;
       option.series[1].data = x2list;
+            // 获取图表的总宽度
+var totalWidth = myChart.getWidth();
+      // 遍历坐标轴配置，寻找横轴宽度
+var xAxisWidth;
+var xAxis = option.xAxis
+    if (xAxis.type === 'category') {
+        // 假设轴标签没有自定义宽度
+        xAxisWidth = xAxis.axisLabel && xAxis.axisLabel.width ? xAxis.axisLabel.width : totalWidth / xAxis.data.length;
+    }
+ 
+// 输出横轴宽度
+console.log('横轴宽度:', xAxisWidth);
+if(xAxisWidth<100){
+  option.xAxis.axisLabel.rotate = 15
+}
+else{
+  option.xAxis.axisLabel.rotate = 0
+}
       myChart.setOption(option);
       // window.addEventListener("resize", () => {
       //   myChart.resize();
       // });
+
+
     };
     const initEcharts = (y, x1, x2) => {
       ylist = y;
