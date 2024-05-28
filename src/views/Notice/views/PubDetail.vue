@@ -15,7 +15,7 @@
       </div>
       <div class="mid-divider"></div>
       <div class="noticedetail-content-word flexcenter">
-        <div class="htmlContentC" v-html="articleHtmlCon"></div>
+        <div class="htmlContentC" v-html="articleHtmlCon" data-desc="PubDetail"></div>
       </div>
       <!-- 没数据时不显示 -->
       <div>
@@ -447,8 +447,8 @@ ul,ol,li{list-style:auto;}
     }
   }
 }
-.htmlContentC{font-size:18px;line-height:2.6em;padding:20px;overflow:hidden;
-  >*{padding:10px 0;word-break: break-all;}
+.htmlContentC{font-size:18px;line-height:1.88em;padding:20px;overflow:hidden;
+  :deep(&>*){padding:10px 0;word-break: break-all;margin-bottom:1.25em;}
   :deep(ul){display: block; list-style-type: disc; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
     li{list-style: initial;}
   }
@@ -470,7 +470,7 @@ ul,ol,li{list-style:auto;}
     }
   }
 }
-.noticedetail-content-word{width:1366px;margin:0 auto;}
+.noticedetail-content-word{width:auto;padding:20px 50px;margin:0 auto;}
 
 .awenLauguageC .noticedetail-content-title{direction: rtl;}
 .awenLauguageC .htmlContentC{direction: rtl;}
