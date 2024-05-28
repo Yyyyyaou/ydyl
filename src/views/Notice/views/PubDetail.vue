@@ -14,7 +14,7 @@
         <span v-if="crTime">创建时间：{{ crTime }}</span>
       </div>
       <div class="mid-divider"></div>
-      <div class="noticedetail-content-word flexcenter">
+      <div class="noticedetail-content-word">
         <div class="htmlContentC" v-html="articleHtmlCon" data-desc="PubDetail"></div>
       </div>
       <!-- 没数据时不显示 -->
@@ -470,7 +470,7 @@ ul,ol,li{list-style:auto;}
     }
   }
 }
-.noticedetail-content-word{width:auto;padding:20px 50px;margin:0 auto;}
+.noticedetail-content-word{max-width:1400px;padding:20px 50px;margin:0 auto;display:flex;justify-content: center;}
 
 .awenLauguageC .noticedetail-content-title{direction: rtl;}
 .awenLauguageC .htmlContentC{direction: rtl;}
