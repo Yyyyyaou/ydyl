@@ -102,11 +102,14 @@
                   <div class="elpopover-button">
                     <el-button
                       type="primary"
-                      @click="router.push('/MyContribute')"
-                      >查看
+                      @click="CURRENT_ROLE_Computed=='外部用户'?router.push('/MyContribute'):scope.row.articleKind == 0?router.push('/ManuscriptAuditing'):router.push('/PaperAuditing')"
+                      >
+                      <span v-if="CURRENT_ROLE_Computed=='外部用户'">查看</span>
+                      <span v-else>审核</span>
                     </el-button>
                     <el-button
                       type="info"
+                      style="margin-left:60px;"
                       @click="
                         scope.row.visible = false;
                         popoverShowFlag = false;
@@ -184,6 +187,7 @@ export default {
 
     // 获取用户角色
     const CURRENT_ROLE_Computed = computed(()=>{
+      console.log(store.state.StroeLoginO.loginUser.CURRENT_ROLE,'123');
       return store.state.StroeLoginO.loginUser.CURRENT_ROLE;
     });
     // 获取用户角色value
