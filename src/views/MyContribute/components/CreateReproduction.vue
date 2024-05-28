@@ -747,16 +747,16 @@ export default {
             });
             return;
           }
-          ElMessage({
-            message: "转载稿件提交成功",
-            type: "success",
-            plain: true,
-          });
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: "转载稿件提交成功",
+          //   type: "success",
+          //   plain: true,
+          // });
 
-          //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿
-          router.push({
-            path: articleStatusP ? "/MyContribute" : "/Drafts",
-          });
+          //操作完后返回上一级页面
+          router.go(-1);
+
         })
         .catch((error) => {
           console.log("转载稿件提交 error", error);

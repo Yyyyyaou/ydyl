@@ -970,10 +970,8 @@ export default {
 
         dialogNoticeDetailVisible.value = false;//关闭详情预览弹窗
         
-        //articleStatusP 0 跳到草稿箱 articleStatusP 1 跳到 我的投稿 
-        router.push({
-          path:articleStatusP?'/MyContribute':'/Drafts'
-        });
+        //操作完后返回上一级页面
+        router.go(-1);
 
       })
       .catch((error)=>{
