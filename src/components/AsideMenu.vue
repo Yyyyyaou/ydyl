@@ -177,8 +177,11 @@ export default {
         return _;
       }
       
-      const socketUrl = process.env.NODE_ENV === 'development'?
-      '/webSocket/tougaoadmin/web/websocket/':
+      // const socketUrl = process.env.NODE_ENV === 'development'?
+      // '/webSocket/tougaoadmin/web/websocket/':
+      // 'ws://192.168.200.7/tougaoadmin/web/websocket/'
+      // ;
+      const socketUrl = 
       'ws://192.168.200.7/tougaoadmin/web/websocket/'
       ;
 
