@@ -1043,6 +1043,7 @@ export default {
             confirmButtonText: '继续预览',
             cancelButtonText: '取消，去修改',
             type: 'warning',
+            customClass:'selfElMessageBox'
           }
         )
         .then(() => {

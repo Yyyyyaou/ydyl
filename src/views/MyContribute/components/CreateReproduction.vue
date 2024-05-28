@@ -535,6 +535,7 @@ export default {
           "提示",
           {
             confirmButtonText: "取消，去修改",
+            customClass:'selfElMessageBox'
           }
         )
           .then(() => {})
