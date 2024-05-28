@@ -121,3 +121,47 @@
 
 /* 为了应付弹窗 与 自适应视图 的 冲突 */
 .el-popup-parent--hidden{width:1920px !important;}
+
+
+//ElMessageBox全局样式
+.el-message-box{
+    padding: 0;
+    --el-messagebox-width: 500px;
+    .el-message-box__header.show-close{
+        background-color: #f3f3f3;
+        padding: 0;
+        .el-message-box__title{
+            height: 45px;
+            line-height: 45px;
+            span{
+                margin-left: 15px;
+            }
+        }
+        .el-message-box__headerbtn{
+            height: 45px;
+            line-height: 45px;
+        }
+    }
+    .el-message-box__content{
+        .el-message-box__container{
+            justify-content: center;
+            margin: 35px 0;
+            font-size: 16px;
+            .el-icon {
+                display: none;
+            }
+            .el-message-box__message{
+                text-align: center;
+            }
+        }
+    }
+    .el-message-box__btns{
+        justify-content: center;
+        margin-bottom: 35px;
+        direction: rtl;
+        .el-button+.el-button{
+            margin-left: 0;
+            margin-right: 25px;
+        }
+    }
+}
