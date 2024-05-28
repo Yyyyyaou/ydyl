@@ -1,5 +1,7 @@
 <template>
-  <div class="mid-content" data-desc="稿件详情">
+  <div class="mid-content" data-desc="稿件详情"
+    :class="(languageName==='阿文'||languageName==='阿语')?'awenLauguageC':''"
+  >
     <div class="noticedetail-content">
       <div class="noticedetail-content-title flexcenter">
         {{ noticeTitle }}
@@ -412,20 +414,32 @@ export default {
     }
   }
 }
-.htmlContentC{font-size:18px;line-height:2.6em;padding:20px;overflow:hidden;
-  &>*{padding:10px 0;}
+.htmlContentC{font-size:18px;line-height:1.88em;padding:20px;overflow:hidden;
+  :deep(&>*){padding:10px 0;word-break: break-all;margin-bottom:1.25em;}
+  :deep(ul){display: block; list-style-type: disc; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
+    li{list-style: initial;}
+  }
+  :deep(ol){display: block; list-style-type: decimal; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
+    li{list-style-type: decimal;}
+  }
+  :deep(img){max-width:100%;}
 }
 
+
 .noticedetail-bottom-content {padding: 0 110px; margin-top: 53px; font-size: 18px; color: #000;
-  .noticedetail-bottom-content-img {
-    display: flex;flex-wrap:wrap;
-    >div{
-      width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;justify-content: center;box-shadow: 0 0 1px 1px #ccc;
-    }
-    img{
-      max-width:100%;max-height:100%;
-    }
+.noticedetail-bottom-content-img {
+  display: flex;flex-wrap:wrap;
+  >div{
+    width:110px;height:145px;flex:0 0 auto;margin:5px;cursor:pointer;word-break: break-all;display:flex;align-items: center;justify-content: center;    box-shadow: 0 0 1px 1px #ccc;
+  }
+  img{
+    max-width:100%;max-height:100%;
   }
 }
+}
+.noticedetail-content-word{width:auto;padding:20px 50px;margin:0 auto;}
+
+.awenLauguageC .noticedetail-content-title{direction: rtl;}
+.awenLauguageC .htmlContentC{direction: rtl;}
 
 </style>

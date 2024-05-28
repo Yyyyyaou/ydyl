@@ -148,7 +148,7 @@
         @click="postAddEditReprintAjaxFn(1)"
         >提 交</el-button
       >
-      <el-button class="createorigin-btngroup-reset"
+      <el-button
         @click="router.go(-1)"
       >返 回</el-button>
       <el-button class="createreproduction-btngroup-reset" @click="resetFormFn">重 置</el-button>

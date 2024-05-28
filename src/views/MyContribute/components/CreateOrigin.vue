@@ -167,7 +167,7 @@ before-remove 在附件列表删除文件钩子
   <div class="createorigin-btngroup flexcenter">
     <el-button class="createorigin-btngroup-save" @click="postAddEditAjaxFn(0)">保存到草稿箱</el-button>
     <el-button class="createorigin-btngroup-submit" @click="previewAddEditFn" data-desc="预 览">提 交</el-button>
-    <el-button class="createorigin-btngroup-reset"
+    <el-button
       @click="router.go(-1)"
     >返 回</el-button>
     <el-button class="createorigin-btngroup-reset"
