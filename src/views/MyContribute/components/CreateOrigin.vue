@@ -175,7 +175,7 @@ before-remove 在附件列表删除文件钩子
     >重 置</el-button>
   </div>
 
-  <el-dialog v-model="dialogNoticeDetailVisible" width="80vw" height="80vh">
+  <el-dialog v-model="dialogNoticeDetailVisible" width="100%" height="80vh">
     <PubDetail ref="NoticeDetailRef" :propsArticleO="formData" :propsId="forPropsGetFindByIdAjaxFnReturnO.id" />
     <div class="createorigin-btngroup flexcenter">
       <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
@@ -405,7 +405,6 @@ export default {
     });
 
 
-
     //附件上传接口地址
     const auditingUploadFilesPostUrl = ref('');
     process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
@@ -454,7 +453,7 @@ export default {
           auditingUploadFilesArray1.value.push(o);
           break;
           case 2://正文附件
-          auditingUploadFilesArray2.value.push(o);
+          // auditingUploadFilesArray2.value.push(o);
           break;
         }
 
@@ -612,10 +611,11 @@ export default {
     const editorTEXTContent = ref('');
     /**
      * 监听编辑器输入
-     * a、b 两个参数暂时不知道属于什么对象
+     * a、b 两个参数暂时不知道是什么
      */
     function editorChangeFn(a,b){
       a
+      //收集正文 TEXT 格式
       editorTEXTContent.value = b.getContent({
         format: 'text'
       });
@@ -629,7 +629,8 @@ export default {
      * succFun 成功回调
      * failFun 失败回调
      */
-    function editorImagesUploadHandlerFn(blobInfo, succFun, failFun){succFun,failFun
+    function editorImagesUploadHandlerFn(blobInfo, succFun, failFun){
+      console.log('editorImagesUploadHandlerFn succFun failFun',blobInfo,succFun,failFun);
       const httpAxiosFormData = new FormData();
       httpAxiosFormData.append('files', blobInfo.blob());
       httpAxiosFormData.append("fileText", 2);//0审核单,1附件,2正文
@@ -658,6 +659,19 @@ export default {
           });
           return;
         }
+
+        //该附件id是否已经保存
+        let idIsExists = false;
+        auditingUploadFilesArray2.value.forEach((o)=>{
+          if(o.id === data[0].id){
+            idIsExists = true;
+          }
+        });
+        if(!idIsExists){//把正文图片附件收集起来
+          auditingUploadFilesArray2.value.push(data[0]);
+        }
+
+      
         const { fileName } =  data[0];
         // succFun(`${URL_IS_API}/web/article/getobj?fileName=${fileName}`);
         return `${URL_IS_API}/web/article/getobj?fileName=${fileName}`
@@ -715,23 +729,34 @@ export default {
             console.log('正文视频上传 D',D);
             const { data,success } = D.data;
             const {fileName} = data[0];
-            console.log('data',data);
+
             if(!success){
               return;
             }
+
+            //该附件id是否已经保存
+            let idIsExists = false;
+            auditingUploadFilesArray2.value.forEach((o)=>{
+              if(o.id === data[0].id){
+                idIsExists = true;
+              }
+            });
+            if(!idIsExists){//把正文图片附件收集起来
+              auditingUploadFilesArray2.value.push(data[0]);
+            }
+
             callbackP(
               `${URL_IS_API}/web/article/getobj?fileName=${fileName}`,
               {
                 title:fileName,
               }
             )
+
           })
           .finally(()=>{
             videoUploadProgressValue.value = 0;
           })
           ;
-
-
       
         };
         input.click();
@@ -752,7 +777,6 @@ export default {
       `
     }
     // end of editorVideoTemplateCallbackFn
-
 
 
     /**
@@ -867,7 +891,6 @@ export default {
       datasO.articleContent = editorTEXTContent.value||'';//稿件文本内容
 
 
-
       //审核附件列表
       const _fileUnit = auditingUploadFilesArray.value.map((o)=>{
         if(o.response){
@@ -884,7 +907,7 @@ export default {
           return;
         }
       });
-      //接口接受字符串
+      //接口 接受附件 字符串 'x1,x2,x3'
       datasO.fileUnit =  _fileUnit.toString();
 
       //普通附件列表
@@ -902,12 +925,31 @@ export default {
           return;
         }
       });
-      //接口接受字符串
+      //接口 接受附件 字符串 'x1,x2,x3'
       datasO.fileAccessory =  _fileAccessory.toString();
+
+      //正文附件列表
+      const _fileHtmlCon = auditingUploadFilesArray2.value.map((o)=>{
+          //收集附件id
+          if(
+            !auditingUploadFilesFileIds.includes(o.id)
+            && o.id !== '' 
+          ){
+            auditingUploadFilesFileIds.push(o.id);
+          }
+          return o.fileName
+      });
+      //接口 接受附件 字符串 'x1,x2,x3'
+      datasO.fileHtmlCon = _fileHtmlCon.toString();
+      //正文附件 特殊，∵用户可以随时 用退格键删除正文区附件  ∴要和 articleHtmlCon 对比 一下
+      // eslint-disable-next-line no-useless-escape
+      const articleHtmlConRegExp = new RegExp('(?<=api/tougaoadmin/web/article/getobj\?fileName=).+?(\.jpg|\.jpeg|\.png|\.gif|\.svg|\.webp|\.avif|\.ico|\.bmp|\.tiff|\.tif|\.raw|\.cr2|\.nef)','img');
+      auditingUploadFilesArray2.value
+      editorHTMLContent.value.match(articleHtmlConRegExp)
+
 
       //附件id 接口 接收字符串
       datasO.fileIds = auditingUploadFilesFileIds.toString();
-
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       const _regExp1 = /\n$/;
@@ -938,7 +980,8 @@ export default {
         return _url
       })();
 
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
 
       httpAxiosO({
         url:httpAxiosOUrl,
@@ -1093,6 +1136,9 @@ export default {
       if(!Array.isArray(auditingUploadFilesArray1)){
         auditingUploadFilesArray1.value = [];
       }
+      if(!Array.isArray(auditingUploadFilesArray2)){
+        auditingUploadFilesArray2.value = [];
+      }
 
       forPropsGetFindByIdAjaxFnReturnO.value.fileUnit&&forPropsGetFindByIdAjaxFnReturnO.value.fileUnit.split(',').forEach((o)=>{
         auditingUploadFilesArray.value.push({
@@ -1121,6 +1167,12 @@ export default {
               }
             ],
           },
+        });
+      });
+
+      forPropsGetFindByIdAjaxFnReturnO.value.fileHtmlCon&&forPropsGetFindByIdAjaxFnReturnO.value.fileHtmlCon.split(',').forEach((o)=>{
+        auditingUploadFilesArray2.value.push({
+          fileName: o,
         });
       });
       //回显附件列表，因为附件列表是单独的变量 结束
