@@ -869,6 +869,7 @@ export default {
     });
 
     return {
+      router,
       dataList,
       rules,
       langOptions,

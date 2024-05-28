@@ -182,6 +182,16 @@ before-remove 在附件列表删除文件钩子
       <el-button class="createorigin-btngroup-close" @click="dialogNoticeDetailVisible=false">关 闭</el-button>
     </div>
   </el-dialog>
+
+  <!-- 视频上传进度条dom -->
+  <div class="videoUploadProgressC" 
+    v-show="videoUploadProgressValue"
+  >
+    <el-progress :text-inside="true" :stroke-width="26"
+    :percentage="videoUploadProgressValue" />
+  </div>
+  <!-- end of videoUploadProgressC -->
+
   </section>
 </template>
 
@@ -409,6 +419,10 @@ export default {
     const auditingUploadFilesArray1 = ref([]);//fileText=1
     //正文附件列表
     const auditingUploadFilesArray2 = ref([]);//fileText=2
+    //正文视频上传进度条相关
+    const videoUploadProgressValue = ref(0);
+    const URL_IS_API = process.env.NODE_ENV === 'development'?'/api/tougaoadmin':'/tougaoadmin';
+
     //审核资质附件
     // const postAddEditAjaxFormData = new FormData();
     function handleAuditingUploadChangeFn(file,files){file,files
@@ -610,21 +624,54 @@ export default {
     // end of editorChangeFn
 
     /**
-     * 图片上传
+     * 正文图片插入（正文图片上传）
+     * blobInfo 图片信息
+     * succFun 成功回调
+     * failFun 失败回调
      */
-    function editorImagesUploadHandlerFn(a,b){
-      console.log('a',a)
-      console.log('b',b)
-      return new Promise((resolved)=>{
-        setTimeout(()=>{
-          resolved('https://www.trs.com.cn/gjlm_zqnr/sygg/202309/W020230908654837080566.jpg')
-        },2000)
-      });
+    function editorImagesUploadHandlerFn(blobInfo, succFun, failFun){succFun,failFun
+      const httpAxiosFormData = new FormData();
+      httpAxiosFormData.append('files', blobInfo.blob());
+      httpAxiosFormData.append("fileText", 2);//0审核单,1附件,2正文
+      return httpAxiosO({
+        url: "/web/article/upload",
+        method: "post",
+        data: httpAxiosFormData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          console.log(progressEvent);
+          console.log(progressEvent.loaded);
+          console.log(progressEvent.total);
+          videoUploadProgressValue.value = Math.floor(progressEvent.loaded/progressEvent.total) * 100;
+        },
+      })
+      .then((D)=>{
+        console.log('正文图片上传 D',D);
+        const { data,success } = D.data;
+        if(!success){
+          ElMessage({
+            message: "正文图片上传失败",
+            type: "error",
+            duration: 2000,
+          });
+          return;
+        }
+        const { fileName } =  data[0];
+        // succFun(`${URL_IS_API}/web/article/getobj?fileName=${fileName}`);
+        return `${URL_IS_API}/web/article/getobj?fileName=${fileName}`
+      })
+      .finally(()=>{
+        videoUploadProgressValue.value = 0;
+      })
+      ;
     }
     // end of editorImagesUploadHandlerFn
 
     /**
-     * 文件上传拦截
+     * 正文文件插入（正文文件上传）
+     * 这里指插入的视频文件
      */
     function editorFilePickerCallbackFn(callbackP,valueP,metaP){
       if(metaP.filetype==='media'){
@@ -645,16 +692,51 @@ export default {
             });
             return;
           }
-          callbackP(
-            'https://www.trs.com.cn/virtual-video/xybsjb_2022.11.23shijiebeibobao.mp4',
-            {
-              title:file.name,
+          videoUploadProgressValue.value = 1;
+          const httpAxiosFormData = new FormData();
+          httpAxiosFormData.append("files", file);
+          httpAxiosFormData.append("fileText", 2);//0审核单,1附件,2正文
+          
+          httpAxiosO({
+            url: "/web/article/upload",
+            method: "post",
+            data: httpAxiosFormData,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            onUploadProgress: (progressEvent) => {
+              console.log(progressEvent);
+              console.log(progressEvent.loaded);
+              console.log(progressEvent.total);
+              videoUploadProgressValue.value = Math.floor(progressEvent.loaded/progressEvent.total) * 100;
+            },
+          })
+          .then((D)=>{
+            console.log('正文视频上传 D',D);
+            const { data,success } = D.data;
+            const {fileName} = data[0];
+            console.log('data',data);
+            if(!success){
+              return;
             }
-          )
+            callbackP(
+              `${URL_IS_API}/web/article/getobj?fileName=${fileName}`,
+              {
+                title:fileName,
+              }
+            )
+          })
+          .finally(()=>{
+            videoUploadProgressValue.value = 0;
+          })
+          ;
+
+
       
         };
         input.click();
       }
+      // end of metaP.filetype==='media'
     }
     //end of editorFilePickerCallbackFn
 
@@ -1130,6 +1212,9 @@ export default {
       auditingUploadFilesArray,
       auditingUploadFilesArray1,
       auditingUploadFilesArray2,
+      videoUploadProgressValue,
+      URL_IS_API,
+
       handleAuditingUploadChangeFn,
       handleAuditingUploadErrorFn,
       handleAuditingUploadBeforeRemoveFn,
@@ -1230,4 +1315,9 @@ export default {
     direction: rtl;
   }
 }
+
+.videoUploadProgressC{position:fixed;background:rgba(0,0,0,.3);top:0;bottom:0;left:0;right:0;z-index:2000;display:flex;justify-content:center;align-items:center;
+  .el-progress{width:80%;}
+}
+
 </style>

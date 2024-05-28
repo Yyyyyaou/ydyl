@@ -1,5 +1,7 @@
 <template>
-  <div class="mid-content" data-desc="稿件详情">
+  <div class="mid-content" data-desc="稿件详情"
+    :class="(languageName==='阿文'||languageName==='阿语')?'awenLauguageC':''"
+  >
     <div class="noticedetail-content">
       <div class="noticedetail-content-title flexcenter">
         {{ articleTitle }}
@@ -119,6 +121,7 @@ export default {
     const remark = ref("");//备注
     const fileUnit = reactive([]);//审核单附件
     const fileAccessory = reactive([]);//普通附件
+    const languageName = ref("");//语种 汉字名字，∵语种列表是不断变化的，id 编码  和  语种 不是永久关联的，∴要随时用随时和 语种列表 匹配
 
     /**
      * 当详情信息对象 通过 propsArticleO 传进来时
@@ -137,6 +140,11 @@ export default {
       crTime.value = timeFormatFn(new Date().getTime())['YYYY-MM-DD hh:mm:ss'];
       remark.value = propsArticleO.value.remark||'';
 
+      store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+        if(propsArticleO.value.language === o.id){
+          languageName.value = o.desc;
+        }
+      });
 
 
       //审核附件列表
@@ -233,6 +241,8 @@ export default {
           articleTitle.value = data.articleTitle;
           sourceName.value = data.sourceName;
           
+
+
           //如果是转载稿件
           if(articleType.value){
             articleHtmlCon.value=`<p><a href="${data.srcUrl}" target="_blank">${data.srcUrl}</p>`
@@ -240,11 +250,17 @@ export default {
             articleHtmlCon.value = data.articleHtmlCon;
           }
 
-
-
           postUser.value = data.postUser;
           crTime.value = timeFormatFn(data.crtime)["YYYY-MM-DD hh:mm:ss"];
           remark.value = data.remark;
+
+
+          store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+            if(data.language === o.id){
+              languageName.value = o.desc;
+            }
+          });
+
 
           //为 fileUnit 赋值
           (() => {
@@ -382,6 +398,7 @@ export default {
       remark,
       fileUnit,
       fileAccessory,
+      languageName,
 
       handleAuditingGetobjFn,
       triggerHandleAuditingGetobjFn,
@@ -430,7 +447,7 @@ ul,ol,li{list-style:auto;}
     }
   }
 }
-.htmlContentC{font-size:18px;line-height:2.6em;padding:20px 50px;overflow:hidden;
+.htmlContentC{font-size:18px;line-height:2.6em;padding:20px;overflow:hidden;
   >*{padding:10px 0;word-break: break-all;}
   :deep(ul){display: block; list-style-type: disc; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
     li{list-style: initial;}
@@ -453,5 +470,9 @@ ul,ol,li{list-style:auto;}
     }
   }
 }
+.noticedetail-content-word{width:1366px;margin:0 auto;}
+
+.awenLauguageC .noticedetail-content-title{direction: rtl;}
+.awenLauguageC .htmlContentC{direction: rtl;}
 
 </style>
