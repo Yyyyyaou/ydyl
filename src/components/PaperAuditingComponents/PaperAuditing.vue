@@ -45,15 +45,30 @@
                 style="width: 190px"
                 placeholder="请输入关键词"
                 clearable
+                @keydown.enter="getNeedAuditCountAjaxFn"
               />
             </div>
+            <el-select
+              v-model="typeSelectValue"
+              placeholder="稿件类型"
+              style="width: 140px"
+              class="marl10"
+              @change="getNeedAuditCountAjaxFn"
+            >
+              <el-option label="全部类型" value="" />
+              <el-option label="原创稿件" value="0" />
+              <el-option label="转载稿件" value="1" />
+            </el-select>
             <div class="marl10">
               <el-autocomplete
+                :value-key="'sourceName'"
                 v-model="originInput"
                 style="width: 190px"
                 :fetch-suggestions="querySearch"
                 clearable
                 placeholder="稿件来源"
+                @select="getNeedAuditCountAjaxFn"
+                @clear="getNeedAuditCountAjaxFn"
               />
             </div>
 
@@ -62,6 +77,7 @@
               placeholder="语种"
               style="width: 140px"
               class="marl10"
+              @change="getNeedAuditCountAjaxFn"
             >
               <el-option
                 v-for="item in langOptions"
@@ -79,6 +95,7 @@
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
+                @change="getNeedAuditCountAjaxFn"
               />
             </el-config-provider>
             <el-button type="primary" class="marl10" style="width: 78px"
@@ -245,6 +262,17 @@
                 </el-popover>
               </template>
             </el-table-column>
+            <el-table-column
+              prop="articleType"
+              label="稿件类型"
+              header-align="center"
+              align="center"
+              width="125"
+            >
+              <template #default="scope">
+                <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="sourceName" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="postTimeFormat" label="提交日期" width="200" />
@@ -322,18 +350,33 @@
               </el-select>
               <el-input
                 v-model="searchInput1"
-                style="width: 190px"
+                style="width: 150px"
                 placeholder="请输入关键词"
                 clearable
+                @keydown.enter="getNeedAuditCountAjaxFn1"
               />
             </div>
+            <el-select
+              v-model="typeSelectValue1"
+              placeholder="稿件类型"
+              style="width: 140px"
+              class="marl10"
+              @change="getNeedAuditCountAjaxFn1"
+            >
+              <el-option label="全部类型" value="" />
+              <el-option label="原创稿件" value="0" />
+              <el-option label="转载稿件" value="1" />
+            </el-select>
             <div class="marl10">
               <el-autocomplete
+                :value-key="'sourceName'"
                 v-model="originInput1"
-                style="width: 190px"
+                style="width: 170px"
                 :fetch-suggestions="querySearch1"
                 clearable
                 placeholder="稿件来源"
+                @select="getNeedAuditCountAjaxFn1"
+                @clear="getNeedAuditCountAjaxFn1"
               />
             </div>
 
@@ -342,6 +385,7 @@
               placeholder="语种"
               style="width: 140px"
               class="marl10"
+              @change="getNeedAuditCountAjaxFn1"
             >
               <el-option
                 v-for="item in langOptions1"
@@ -355,6 +399,7 @@
               placeholder="状态"
               style="width: 140px"
               class="marl10"
+              @change="getNeedAuditCountAjaxFn1"
             >
               <el-option
                 v-for="item in statusOptions"
@@ -368,6 +413,7 @@
               placeholder="稿件节点"
               style="width: 140px"
               class="marl10"
+              @change="getNeedAuditCountAjaxFn1"
             >
               <el-option
                 v-for="item in nodeOptions"
@@ -384,7 +430,8 @@
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :locale="locale"
-                style="margin-left: 10px; width: 270px"
+                style="margin-left: 10px; width: 240px"
+                @change="getNeedAuditCountAjaxFn1"
               />
             </el-config-provider>
             <el-button type="primary" class="marl10" style="width: 78px"
@@ -544,6 +591,17 @@
                 </el-popover>
               </template>
             </el-table-column>
+            <el-table-column
+              prop="articleType"
+              label="稿件类型"
+              header-align="center"
+              align="center"
+              width="125"
+            >
+              <template #default="scope">
+                <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="sourceName" label="稿件来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="articleUseStatus" label="状态" width="110">
@@ -661,6 +719,9 @@ export default {
       },
     ];
 
+    const typeSelectValue = ref(null);
+    const typeSelectValue1 = ref(null);
+
     //语种select数据
     const langSelectValue = ref("");
     const langOptions = reactive([]);
@@ -724,21 +785,21 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-    const loadAll = () => {
-      return [
-        { value: "vue", link: "https://github.com/vuejs/vue" },
-        { value: "element", link: "https://github.com/ElemeFE/element" },
-        { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
-        { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
-        { value: "vuex", link: "https://github.com/vuejs/vuex" },
-        { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
-        { value: "babel", link: "https://github.com/babel/babel" },
-      ];
-    };
+    // const loadAll = () => {
+    //   return [
+    //     { value: "vue", link: "https://github.com/vuejs/vue" },
+    //     { value: "element", link: "https://github.com/ElemeFE/element" },
+    //     { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
+    //     { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
+    //     { value: "vuex", link: "https://github.com/vuejs/vuex" },
+    //     { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
+    //     { value: "babel", link: "https://github.com/babel/babel" },
+    //   ];
+    // };
     const createFilter = (queryString) => {
       return (restaurant) => {
         return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          restaurant.sourceName.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
         );
       };
@@ -791,7 +852,7 @@ export default {
     //日期选择 数据
     const dateDefaultTime1 = ref('');
     //状态select数据
-    const statusSelectValue = ref('全部状态');
+    const statusSelectValue = ref('');
     const statusOptions = [
       { value: 0, label: "全部状态" },
       { value: 1, label: "审核中" },
@@ -799,7 +860,7 @@ export default {
       { value: 3, label: "未通过" },
     ];
     //稿件节点select数据
-    const nodeSelectValue = ref("全部节点");
+    const nodeSelectValue = ref(null);
     const nodeOptions = [//0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布 显示为空字符
       { value: '', label: "全部节点" },
       { value: 0, label: "编辑" },
@@ -844,7 +905,34 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-
+    //获取稿件来源list
+    function findSourceListAjaxFn() {
+      httpAxiosO({
+        method: "get",
+        url: "/web/source/findSourceList",
+      })
+        .then((D) => {
+          console.log("审核稿件-稿件来源", D);
+          if (D.status != 200) {
+            ElMessage({
+              message: "稿件来源数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            restaurants.value = D.data;
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "稿件来源接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
     let articleSource = "";
     let articleSource1 = "";
     //字体选择
@@ -955,6 +1043,7 @@ export default {
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
         // currentNode:2,//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
+        articleType: typeSelectValue.value || '',
         articleKind:1,//0外审稿件  1外审报题   （属于哪个栏目）
         listStatus:0,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
         pageSize:limit.value,
@@ -1038,7 +1127,8 @@ export default {
       getSourceId(originInput1, 1);
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
-        
+        articleStatus:statusSelectValue.value|| '',//非必传 //1：审核中 2：已发布 3：未通过
+        articleType: typeSelectValue1.value || '',
         articleKind:1,//0外审稿件  1外审报题   （属于哪个栏目）
         listStatus:2,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
         pageSize:limit1.value,
@@ -1185,7 +1275,7 @@ export default {
     //end of externalAuditArticleRecordListAjaxFn
 
     onMounted(() => {
-      restaurants.value = loadAll();
+      findSourceListAjaxFn();
       getNeedAuditCountAjaxFn();//待审核
       getNeedAuditCountAjaxFn1();//已处理
     });
@@ -1195,6 +1285,7 @@ export default {
       searchInput,
       searchSelectValue,
       searchOptions,
+      typeSelectValue,
       langSelectValue,
       langOptions,
       dateDefaultTime,
@@ -1222,6 +1313,7 @@ export default {
       searchInput1,
       searchSelectValue1,
       searchOptions1,
+      typeSelectValue1,
       langSelectValue1,
       langOptions1,
       dateDefaultTime1,

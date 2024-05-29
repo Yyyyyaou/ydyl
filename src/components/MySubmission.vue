@@ -1,6 +1,9 @@
 <template>
   <div class="mid-content-statistics-table-content" data-desc="我的投稿组件">
-    <div class="mid-content-statistics-table-btngroup flexcenter" data-desc="我的投稿组件-检索区">
+    <div
+      class="mid-content-statistics-table-btngroup flexcenter"
+      data-desc="我的投稿组件-检索区"
+    >
       <div>
         <el-button
           class="btn-tougao"
@@ -10,12 +13,8 @@
           &nbsp;&nbsp;&nbsp;投稿
         </el-button>
       </div>
-      <div
-        class="mid-content-statistics-table-btngroup-search flexcenter"
-      >
-        <div
-          class="mid-content-statistics-table-btngroup-search-keyword"
-        >
+      <div class="mid-content-statistics-table-btngroup-search flexcenter">
+        <div class="mid-content-statistics-table-btngroup-search-keyword">
           <el-select
             v-model="searchSelectValue"
             placeholder=""
@@ -37,10 +36,22 @@
           />
         </div>
         <el-select
+          v-model="typeSelectValue"
+          placeholder="稿件类型"
+          style="width: 140px"
+          class="marl10"
+          @change="getArticleListAjaxFn"
+        >
+          <el-option label="全部类型" value='' />
+          <el-option label="原创稿件" value=0 />
+          <el-option label="转载稿件" value=1 />
+        </el-select>
+        <el-select
           v-model="langSelectValue"
           placeholder="语种"
           style="width: 140px"
           class="marl10"
+          @change="getArticleListAjaxFn"
         >
           <el-option
             v-for="item in langOptions"
@@ -54,6 +65,7 @@
           placeholder="状态"
           style="width: 140px"
           class="marl10"
+          @change="getArticleListAjaxFn"
         >
           <el-option
             v-for="item in statusOptions"
@@ -70,6 +82,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             style="margin-left: 10px; width: 270px"
+            @change="getArticleListAjaxFn"
           />
         </el-config-provider>
         <el-button
@@ -85,22 +98,27 @@
     </div>
     <!-- end of mid-content-statistics-table-btngroup -->
 
-    <div class="mid-content-statistics-table-tabledata" data-desc="我的投稿组件-列表区">
+    <div
+      class="mid-content-statistics-table-tabledata"
+      data-desc="我的投稿组件-列表区"
+    >
       <el-table
         empty-text="暂无数据"
         :data="tableData"
         border
         style="width: 100%"
         :header-cell-style="{
-          'color': '#6a6d74',
+          color: '#6a6d74',
           'font-size': '16px',
         }"
         :cell-style="{
-          'color': '#727789',
+          color: '#727789',
           'font-size': '16px',
         }"
       >
-        <el-table-column label="序号" width="100"
+        <el-table-column
+          label="序号"
+          width="100"
           header-align="center"
           align="center"
         >
@@ -108,20 +126,39 @@
             {{ scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="articleTitle" label="稿件标题"
+        <el-table-column
+          prop="articleTitle"
+          label="稿件标题"
           header-align="center"
         >
           <template #default="scope">
             <div
-              :style="((scope)=>{
-                let _styleStr1 = 'cursor: pointer;'
-                let _styleStr2 = 'cursor: pointer;direction: rtl;text-align:auto;text-align:-webkit-auto;'
-                return (scope.row.languageName==='阿文'||scope.row.languageName==='阿语')?_styleStr2: _styleStr1
-              })(scope)"
+              :style="
+                ((scope) => {
+                  let _styleStr1 = 'cursor: pointer;';
+                  let _styleStr2 =
+                    'cursor: pointer;direction: rtl;text-align:auto;text-align:-webkit-auto;';
+                  return scope.row.languageName === '阿文' ||
+                    scope.row.languageName === '阿语'
+                    ? _styleStr2
+                    : _styleStr1;
+                })(scope)
+              "
               @click="getFindByIdAjaxFn(scope)"
             >
               {{ scope.row.articleTitle }}
             </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="articleType"
+          label="稿件类型"
+          header-align="center"
+          align="center"
+          width="125"
+        >
+          <template #default="scope">
+            <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -131,14 +168,20 @@
           align="center"
           width="125"
         />
-        <el-table-column prop="languageName" label="语种" 
-        header-align="center"
-        align="center"
-        width="120" />
-        <el-table-column prop="articleUseStatus" label="状态"
-        header-align="center"
-        align="center"
-        width="110">
+        <el-table-column
+          prop="languageName"
+          label="语种"
+          header-align="center"
+          align="center"
+          width="120"
+        />
+        <el-table-column
+          prop="articleUseStatus"
+          label="状态"
+          header-align="center"
+          align="center"
+          width="110"
+        >
           <template #default="scope">
             <span
               :class="{
@@ -158,29 +201,40 @@
           align="center"
           width="140"
         />
-        <el-table-column prop="articleUseStatus" label="操作"
-        header-align="center"
-        align="center" 
-        width="130" 
+        <el-table-column
+          prop="articleUseStatus"
+          label="操作"
+          header-align="center"
+          align="center"
+          width="130"
         >
           <template #default="scope">
-            <div
-              class="mid-content-statistics-table-tabledata-operate"
-            >
+            <div class="mid-content-statistics-table-tabledata-operate">
               <div @click="getFindByIdAjaxFn(scope)">查看</div>
               <span></span>
-              <div v-if="scope.row.articleUseStatus === 3" data-desc="已发布">链接</div>
-              <span v-if="scope.row.articleUseStatus === 3" data-desc="已发布"></span>
+              <div v-if="scope.row.articleUseStatus === 3" data-desc="已发布">
+                链接
+              </div>
+              <span
+                v-if="scope.row.articleUseStatus === 3"
+                data-desc="已发布"
+              ></span>
               <!-- 
                 注释于20240419.1657 许慧敏姐说这块不要编辑
                 <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理"
                 @click="router.push('/MyContribute/CreateContribute?id='+scope.row.id)"
               >编辑</div>
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span> -->
-              
+
               <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认-->
-                <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFnBox(scope)">删除</div> 
-              
+              <div
+                v-if="scope.row.articleUseStatus === 0"
+                data-desc="待处理"
+                @click="triggerDeleteLogicDeleteFnBox(scope)"
+              >
+                删除
+              </div>
+
               <!-- <el-popconfirm
                 v-if="scope.row.articleUseStatus === 0"
                 data-desc="待处理"
@@ -194,8 +248,10 @@
                 </template>
               </el-popconfirm> -->
 
-
-              <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
+              <span
+                v-if="scope.row.articleUseStatus === 0"
+                data-desc="待处理"
+              ></span>
             </div>
           </template>
         </el-table-column>
@@ -209,9 +265,7 @@
           <span class="el-pagination-style-leftpagination-total">
             共{{ pageTotal }}条
           </span>
-          <span
-            class="el-pagination-style-leftpagination-percent flexcenter"
-          >
+          <span class="el-pagination-style-leftpagination-percent flexcenter">
             {{ page }}/{{ Math.ceil(pageTotal / limit) }}
           </span>
         </el-pagination>
@@ -237,10 +291,10 @@
 
 <script>
 import { ref, reactive, onMounted } from "vue";
-import { useStore } from "vuex"
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import { ElMessage,ElLoading } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import { ElMessageBox } from "element-plus";
@@ -265,23 +319,24 @@ export default {
       },
     ];
 
+    //类型select数据
+    const typeSelectValue = ref(null);
     //语种select数据
     const langSelectValue = ref("");
     const langOptions = reactive([]);
-    store.state.GLOBAL_LANGUAGE_LIST.forEach((o)=>{
+    store.state.GLOBAL_LANGUAGE_LIST.forEach((o) => {
       langOptions.push({
         value: o.id,
         label: o.desc,
-      })
+      });
     });
-
 
     //状态select数据
     const statusSelectValue = ref(null);
     const statusOptions = [
       {
-        value: '',
-        label: "全部",
+        value: "",
+        label: "全部状态",
       },
       {
         value: 0,
@@ -302,7 +357,7 @@ export default {
     ];
 
     //日期选择 数据
-    const dateDefaultTime = ref('');
+    const dateDefaultTime = ref("");
     const disabledDate = (time) => {
       return time.getTime() > Date.now();
     };
@@ -322,123 +377,116 @@ export default {
       getArticleListAjaxFn();
     }
 
-
     /**
      * 我的投稿 接口请求
      * 以下注释摘抄至接口文档（20240409.0912）
-     * language 必填 中文1、英文2、阿语3、俄语4、西语5、法语6 
+     * language 必填 中文1、英文2、阿语3、俄语4、西语5、法语6
      * articleUseStatus 非必填 稿件发布状态（0：待处理 1：审核中 2：已发布 3：未采用 ）
      * articleTitle 非必填 关键字搜索
      * crtime 非必填 创建时间搜索
      * currPage 非必填 开始页数
      * pageSize 非必填 页面条数
-     * 
+     *
      * 接口返回数据字段，线上文档有写，很详细
-    */
-    function getArticleListAjaxFn(){
-
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
-        return o.desc
+     */
+    function getArticleListAjaxFn() {
+      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o) => {
+        return o.desc;
       });
 
-      const articleUseStatusNameArr = ['待处理','审核中','已发布','未采用'];
-      const loadingInstance1 = ElLoading.service({ fullscreen: true })
+      const articleUseStatusNameArr = ["待处理", "审核中", "已发布", "未采用"];
+      const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
-        articleUseStatus:"",
-        language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
-        currPage:page.value,//当前页
-        pageSize:limit.value,//每页条数
-      }
+        articleType: typeSelectValue.value || '',
+        articleUseStatus: "",
+        language: langSelectValue.value || 0, //0 可能代表 所有语种，文档里有提示 写 0
+        currPage: page.value, //当前页
+        pageSize: limit.value, //每页条数
+      };
 
-      
-      statusSelectValue.value!= undefined&&(paramsO.articleUseStatus=statusSelectValue.value) //稿件发布状态
+      statusSelectValue.value != undefined &&
+        (paramsO.articleUseStatus = statusSelectValue.value); //稿件发布状态
 
-      switch(searchSelectValue.value){
+      switch (searchSelectValue.value) {
         case 0:
-        paramsO.articleTitle = searchInput.value;//按标题搜索
+          paramsO.articleTitle = searchInput.value; //按标题搜索
           break;
         case 1:
-        paramsO.articleContent = searchInput.value;//按正文搜索
+          paramsO.articleContent = searchInput.value; //按正文搜索
           break;
       }
 
       //时间段
-      if(
-        dateDefaultTime.value
-      ){
-        paramsO.crtime=timeFormatFn(dateDefaultTime.value[0])['YYYY-MM-DD'] //起始时间
-        paramsO.endtime=timeFormatFn(dateDefaultTime.value[1])['YYYY-MM-DD'] //结束时间
+      if (dateDefaultTime.value) {
+        paramsO.crtime = timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD"]; //起始时间
+        paramsO.endtime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD"]; //结束时间
       }
-      
 
       httpAxiosO({
-        method: 'get',
-        url: '/web/article/articleList.do',
-        params:paramsO,
+        method: "get",
+        url: "/web/article/articleList.do",
+        params: paramsO,
       })
-      .then((D)=>{
-        console.log('我的投稿 D',D);
-        const { data,success } = D.data
-        if(!success){
-          ElMessage({
-            message: '我的投稿数据请求失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
+        .then((D) => {
+          console.log("我的投稿 D", D);
+          const { data, success } = D.data;
+          if (!success) {
+            ElMessage({
+              message: "我的投稿数据请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
 
-        //注释于 20240515.1530 jira YDYL-5 建议删除
-        // ElMessage({
-        //   message: '我的投稿数据请求成功',
-        //   type: 'success',
-        //   plain: true,
-        // })
-        
-        tableData.splice(0,tableData.length);   //清空tableData
-        data.ldata.forEach((o)=>{
-          let _o = o;
-          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
-          _o.articleUseStatusName = articleUseStatusNameArr[o.articleUseStatus]//状态名字，接口只提供了状态对应的 编号
-          _o.crtimeFormat = timeFormatFn(o.crtime)['YYYY-MM-DD']//时间格式化
-          tableData.push(_o);
-        });
-        pageTotal.value = data.totalResults;
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: '我的投稿数据请求成功',
+          //   type: 'success',
+          //   plain: true,
+          // })
 
-      })
-      .catch((error)=>{
-        console.log('我的投稿 接口请求 error',error);
-        ElMessage({
-          message: '我的投稿接口请求失败',
-          type: 'error',
-          plain: true,
+          tableData.splice(0, tableData.length); //清空tableData
+          data.ldata.forEach((o) => {
+            let _o = o;
+            _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            _o.articleUseStatusName =
+              articleUseStatusNameArr[o.articleUseStatus]; //状态名字，接口只提供了状态对应的 编号
+            _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
+            tableData.push(_o);
+          });
+          pageTotal.value = data.totalResults;
         })
-      })
-      .finally(()=>{
-        loadingInstance1.close();
-      })
-      ;
+        .catch((error) => {
+          console.log("我的投稿 接口请求 error", error);
+          ElMessage({
+            message: "我的投稿接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {
+          loadingInstance1.close();
+        });
       return;
     }
     // end of getArticleListAjaxFn
 
-
     /**
      * 跳转到细览页，需要传递 稿件id
      */
-    function getFindByIdAjaxFn(scopeP){
-            //原创
-      let c
+    function getFindByIdAjaxFn(scopeP) {
+      //原创
+      let c;
       if (scopeP.row.articleType == 0) {
-         c= router.resolve({
+        c = router.resolve({
           path: "/OriginDetail",
           query: {
             id: scopeP.row.id,
           },
         });
-      }
-      else{
-        c= router.resolve({
+      } else {
+        c = router.resolve({
           path: "/ReproductionDetail",
           query: {
             id: scopeP.row.id,
@@ -459,62 +507,55 @@ export default {
       // return;
     }
 
-    function triggerDeleteLogicDeleteFnBox(scopeP){
-        //删除之前弹出确认框
-        ElMessageBox.confirm(
-          "确认删除选中稿件？",
-          "提示",
-          {
-            confirmButtonText: "是",
-            cancelButtonText: '否',
-            customClass:'selfElMessageBox'
-          }
-        )
-          .then(() => {
-            triggerDeleteLogicDeleteFn(scopeP)
-          })
-          .catch(() => {});
+    function triggerDeleteLogicDeleteFnBox(scopeP) {
+      //删除之前弹出确认框
+      ElMessageBox.confirm("确认删除选中稿件？", "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        customClass: "selfElMessageBox",
+      })
+        .then(() => {
+          triggerDeleteLogicDeleteFn(scopeP);
+        })
+        .catch(() => {});
     }
     /**
-     *删除稿件到回收站 
+     *删除稿件到回收站
      */
-    function triggerDeleteLogicDeleteFn(scopeP){
+    function triggerDeleteLogicDeleteFn(scopeP) {
       const { id } = scopeP.row;
-      store.dispatch('deleteLogicDeleteFn',{
-        ids:String(id),
-      })
-      .then((D)=>{
-        if(
-          D === undefined
-        ){
-          ElMessage({
-            message: '接口请求成功 但删除失败',
-            type: 'error',
-            plain: true,
-          })
-          return;
-        }
-        ElMessage({
-          message: '删除到回收站',
-          type: 'success',
-          plain: true,
-        });
-
-        getArticleListAjaxFn();//更新我的投稿列表
-
-      })
-      .catch(()=>{
-        ElMessage({
-          message: '删除失败',
-          type: 'error',
-          plain: true,
+      store
+        .dispatch("deleteLogicDeleteFn", {
+          ids: String(id),
         })
-      })
-      ;
+        .then((D) => {
+          if (D === undefined) {
+            ElMessage({
+              message: "接口请求成功 但删除失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          ElMessage({
+            message: "删除到回收站",
+            type: "success",
+            plain: true,
+          });
+
+          getArticleListAjaxFn(); //更新我的投稿列表
+        })
+        .catch(() => {
+          ElMessage({
+            message: "删除失败",
+            type: "error",
+            plain: true,
+          });
+        });
     }
 
-    onMounted(()=>{
-      getArticleListAjaxFn();//我的投稿列表
+    onMounted(() => {
+      getArticleListAjaxFn(); //我的投稿列表
     });
 
     return {
@@ -524,10 +565,11 @@ export default {
       searchInput,
       searchSelectValue,
       searchOptions,
-      
+
       statusSelectValue,
       statusOptions,
 
+      typeSelectValue,
       langSelectValue,
       langOptions,
       dateDefaultTime,
@@ -544,81 +586,77 @@ export default {
       getArticleListAjaxFn,
       triggerDeleteLogicDeleteFn,
       triggerDeleteLogicDeleteFnBox,
-
-    }
-
+    };
   },
   //end of  setup()
-}
+};
 </script>
 
 <style lang="less" scoped>
-  .mid-content-statistics-table-content {
-    padding: 0 20px;
-    .mid-content-statistics-table-btngroup {
-      margin-top: 15px;
-      justify-content: space-between;
-      .btn-tougao {
-        background-color: #ff8624;
-        color: #fff;
-        border: none;
-        width: 115px;
-        font-size: 16px;
+.mid-content-statistics-table-content {
+  padding: 0 20px;
+  .mid-content-statistics-table-btngroup {
+    margin-top: 15px;
+    justify-content: space-between;
+    .btn-tougao {
+      background-color: #ff8624;
+      color: #fff;
+      border: none;
+      width: 115px;
+      font-size: 16px;
+    }
+    .mid-content-statistics-table-btngroup-search-keyword {
+      :deep(.el-select__wrapper) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
       }
-      .mid-content-statistics-table-btngroup-search-keyword {
-        :deep(.el-select__wrapper) {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-        }
-        :deep(.el-input__wrapper) {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-        }
-      }
-      :deep(.el-range__icon) {
-        position: absolute;
-        right: 10px;
-        color: #0b77cd;
-        font-size: 16px;
-      }
-      .marl10 {
-        margin-left: 10px;
+      :deep(.el-input__wrapper) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
       }
     }
-    .mid-content-statistics-table-tabledata {
-      margin-top: 15px;
-      .isyfb {
-        color: #3a8b38;
+    :deep(.el-range__icon) {
+      position: absolute;
+      right: 10px;
+      color: #0b77cd;
+      font-size: 16px;
+    }
+    .marl10 {
+      margin-left: 10px;
+    }
+  }
+  .mid-content-statistics-table-tabledata {
+    margin-top: 15px;
+    .isyfb {
+      color: #3a8b38;
+    }
+    .isdcl {
+      color: #f47373;
+    }
+    .isshz {
+      color: #4481f8;
+    }
+    .iswcy {
+      color: #fba010;
+    }
+    .mid-content-statistics-table-tabledata-operate {
+      display: flex;
+      align-items: center;
+      color: #3652d2;
+      justify-content: left;
+      div {
+        cursor: pointer;
+        padding: 0 8px;
       }
-      .isdcl {
-        color: #f47373;
+      span:nth-last-child(1) {
+        display: none;
       }
-      .isshz {
-        color: #4481f8;
-      }
-      .iswcy {
-        color: #fba010;
-      }
-      .mid-content-statistics-table-tabledata-operate {
-        display: flex;
-        align-items: center;
-        color: #3652d2;
-        justify-content: left;
-        div {
-          cursor: pointer;
-          padding: 0 8px;
-        }
-        span:nth-last-child(1) {
-          display: none;
-        }
-        span {
-          width: 1px;
-          height: 17px;
-          background: #3652d2;
-        }
+      span {
+        width: 1px;
+        height: 17px;
+        background: #3652d2;
       }
     }
   }
-
-
+}
 </style>
