@@ -13,12 +13,12 @@
       <div class="mid-content-mycontribute-table-content">
         <div class="mid-content-mycontribute-table-btngroup flexcenter">
           <div>
-            <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
-            <el-button class="clear-recyclebin" @click="clearRecyclebinFn()">
+            <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认-->
+            <el-button class="clear-recyclebin" @click="clearRecyclebinFnBox()">
               清除回收站
             </el-button> 
-            -->
-            <el-popconfirm
+            
+            <!-- <el-popconfirm
               title="确定删除吗？"
               confirm-button-text="删除"
               cancel-button-text="取消"
@@ -27,7 +27,7 @@
               <template #reference>
                 <el-button class="clear-recyclebin"> 清除回收站 </el-button>
               </template>
-            </el-popconfirm>
+            </el-popconfirm> -->
           </div>
           <div
             class="mid-content-mycontribute-table-btngroup-search flexcenter"
@@ -163,10 +163,10 @@
                   </div>
                   <span></span>
 
-                  <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
-                  <div @click="deleteArticleAjaxFn(scope.row.id)">删除</div>
-                  -->
-                  <el-popconfirm
+                  <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认-->
+                  <div @click="deleteArticleAjaxFnBox(scope.row.id)">删除</div>
+                  
+                  <!-- <el-popconfirm
                     title="确定删除吗？"
                     confirm-button-text="删除"
                     cancel-button-text="取消"
@@ -175,7 +175,7 @@
                     <template #reference>
                       <div>删除</div>
                     </template>
-                  </el-popconfirm>
+                  </el-popconfirm> -->
 
                   <span></span>
                 </div>
@@ -224,6 +224,7 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import { ElMessageBox } from "element-plus";
 export default {
   setup() {
     //路由实例
@@ -357,7 +358,22 @@ export default {
       return;
     }
     // end of getArticleDraftListAjaxFn
-
+    function clearRecyclebinFnBox(){
+      //删除之前弹出确认框
+        ElMessageBox.confirm(
+          "确认清除回收站中所有稿件？",
+          "提示",
+          {
+            confirmButtonText: "是",
+            cancelButtonText: '否',
+            customClass:'selfElMessageBox'
+          }
+        )
+          .then(() => {
+            clearRecyclebinFn()
+          })
+          .catch(() => {});
+    }
     //清除回收站
     const clearRecyclebinFn = () => {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
@@ -383,6 +399,22 @@ export default {
         });
     };
 
+    function deleteArticleAjaxFnBox(idP){
+      //删除之前弹出确认框
+        ElMessageBox.confirm(
+          "确认删除选中稿件？",
+          "提示",
+          {
+            confirmButtonText: "是",
+            cancelButtonText: '否',
+            customClass:'selfElMessageBox'
+          }
+        )
+          .then(() => {
+            deleteArticleAjaxFn(idP)
+          })
+          .catch(() => {});
+    }
     /**
      * 回收站列表删除接口，真正的删除
      */
@@ -468,8 +500,11 @@ export default {
 
       getArticleDraftListAjaxFn,
       clearRecyclebinFn,
+      clearRecyclebinFnBox,
 
       deleteArticleAjaxFn,
+      deleteArticleAjaxFnBox,
+
       getFindByIdAjaxFn,
     };
   },

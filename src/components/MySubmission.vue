@@ -178,10 +178,10 @@
               >编辑</div>
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span> -->
               
-              <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
-                <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFn(scope)">删除</div> 
-              -->
-              <el-popconfirm
+              <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认-->
+                <div v-if="scope.row.articleUseStatus === 0" data-desc="待处理" @click="triggerDeleteLogicDeleteFnBox(scope)">删除</div> 
+              
+              <!-- <el-popconfirm
                 v-if="scope.row.articleUseStatus === 0"
                 data-desc="待处理"
                 title="确定删除吗？"
@@ -192,7 +192,7 @@
                 <template #reference>
                   <div>删除</div>
                 </template>
-              </el-popconfirm>
+              </el-popconfirm> -->
 
 
               <span v-if="scope.row.articleUseStatus === 0" data-desc="待处理"></span>
@@ -243,6 +243,7 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage,ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import { ElMessageBox } from "element-plus";
 export default {
   setup() {
     //路由实例
@@ -458,6 +459,22 @@ export default {
       // return;
     }
 
+    function triggerDeleteLogicDeleteFnBox(scopeP){
+        //删除之前弹出确认框
+        ElMessageBox.confirm(
+          "确认删除选中稿件？",
+          "提示",
+          {
+            confirmButtonText: "是",
+            cancelButtonText: '否',
+            customClass:'selfElMessageBox'
+          }
+        )
+          .then(() => {
+            triggerDeleteLogicDeleteFn(scopeP)
+          })
+          .catch(() => {});
+    }
     /**
      *删除稿件到回收站 
      */
@@ -526,6 +543,7 @@ export default {
       getFindByIdAjaxFn,
       getArticleListAjaxFn,
       triggerDeleteLogicDeleteFn,
+      triggerDeleteLogicDeleteFnBox,
 
     }
 
