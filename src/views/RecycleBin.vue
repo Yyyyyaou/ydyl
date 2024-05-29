@@ -53,6 +53,17 @@
                 @keydown.enter="getArticleDraftListAjaxFn"
               />
             </div>
+            <el-select
+              v-model="typeSelectValue"
+              placeholder="稿件类型"
+              style="width: 140px"
+              class="marl10"
+              @change="getArticleDraftListAjaxFn"
+            >
+              <el-option label="全部类型" value="" />
+              <el-option label="原创稿件" value="0" />
+              <el-option label="转载稿件" value="1" />
+            </el-select>
             <el-config-provider :locale="locale">
               <el-date-picker
                 :disabled-date="disabledDate"
@@ -62,6 +73,7 @@
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
+                @change="getArticleDraftListAjaxFn"
               />
             </el-config-provider>
             <el-button
@@ -122,6 +134,19 @@
                 >
                   {{ scope.row.articleTitle }}
                 </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="articleType"
+              label="稿件类型"
+              header-align="center"
+              align="center"
+              width="125"
+            >
+              <template #default="scope">
+                <span>{{
+                  scope.row.articleType == 0 ? "原创稿件" : "转载稿件"
+                }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -245,6 +270,8 @@ export default {
         label: "正文",
       },
     ];
+
+    const typeSelectValue = ref(null);
     //日期选择 数据
     const dateDefaultTime = ref("");
     const disabledDate = (time) => {
@@ -288,6 +315,7 @@ export default {
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
+        articleType: typeSelectValue.value || '',
         articleStatus: -1, //-1 代表已删除
         currPage: page.value, //当前页
         pageSize: limit.value, //每页条数
@@ -485,6 +513,7 @@ export default {
       disabledDate,
       router,
 
+      typeSelectValue,
       searchInput,
       searchSelectValue,
       searchOptions,

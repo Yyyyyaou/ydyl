@@ -37,15 +37,27 @@
                 @keydown.enter="getArticleDraftListAjaxFn"
               />
             </div>
+            <el-select
+              v-model="typeSelectValue"
+              placeholder="稿件类型"
+              style="width: 140px"
+              class="marl10"
+              @change="getArticleDraftListAjaxFn"
+            >
+              <el-option label="全部类型" value="" />
+              <el-option label="原创稿件" value="0" />
+              <el-option label="转载稿件" value="1" />
+            </el-select>
             <el-config-provider :locale="locale">
               <el-date-picker
-            :disabled-date="disabledDate"
+                :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
+                @change="getArticleDraftListAjaxFn"
               />
             </el-config-provider>
             <el-button
@@ -109,6 +121,19 @@
               </template>
             </el-table-column>
             <el-table-column
+              prop="articleType"
+              label="稿件类型"
+              header-align="center"
+              align="center"
+              width="125"
+            >
+              <template #default="scope">
+                <span>{{
+                  scope.row.articleType == 0 ? "原创稿件" : "转载稿件"
+                }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
               prop="sourceName"
               label="稿件来源"
               width="125"
@@ -133,8 +158,12 @@
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div
-                    @click="scope.row.articleType == 0?
-                      router.push('/Drafts/EditOrigin?id=' + scope.row.id):router.push('/Drafts/EditReproduction?id=' + scope.row.id)
+                    @click="
+                      scope.row.articleType == 0
+                        ? router.push('/Drafts/EditOrigin?id=' + scope.row.id)
+                        : router.push(
+                            '/Drafts/EditReproduction?id=' + scope.row.id
+                          )
                     "
                   >
                     编辑
@@ -142,10 +171,8 @@
                   <span></span>
 
                   <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认-->
-                  <div
-                    @click="deleteArticleAjaxFnBox(scope.row.id)"
-                  >删除</div> 
-                  
+                  <div @click="deleteArticleAjaxFnBox(scope.row.id)">删除</div>
+
                   <!-- <el-popconfirm
                     title="确定删除吗？"
                     confirm-button-text="删除"
@@ -225,6 +252,7 @@ export default {
         label: "正文",
       },
     ];
+    const typeSelectValue = ref(null);
     //日期选择 数据
     const dateDefaultTime = ref("");
     const disabledDate = (time) => {
@@ -273,6 +301,7 @@ export default {
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
+        articleType: typeSelectValue.value || '',
         articleStatus: 0, //0 代表草稿
         currPage: page.value, //当前页
         pageSize: limit.value, //每页条数
@@ -344,21 +373,17 @@ export default {
     }
     // end of getArticleDraftListAjaxFn
 
-    function deleteArticleAjaxFnBox(idP){
+    function deleteArticleAjaxFnBox(idP) {
       //删除之前弹出确认框
-        ElMessageBox.confirm(
-          "确认删除选中稿件？",
-          "提示",
-          {
-            confirmButtonText: "是",
-            cancelButtonText: '否',
-            customClass:'selfElMessageBox'
-          }
-        )
-          .then(() => {
-            deleteArticleAjaxFn(idP)
-          })
-          .catch(() => {});
+      ElMessageBox.confirm("确认删除选中稿件？", "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        customClass: "selfElMessageBox",
+      })
+        .then(() => {
+          deleteArticleAjaxFn(idP);
+        })
+        .catch(() => {});
     }
     //草稿箱的删除，应该删除到回收站
     function deleteArticleAjaxFn(idP) {
@@ -394,17 +419,16 @@ export default {
      */
     function getFindByIdAjaxFn(scopeP) {
       //原创
-      let c
+      let c;
       if (scopeP.row.articleType == 0) {
-         c= router.resolve({
+        c = router.resolve({
           path: "/OriginDetail",
           query: {
             id: scopeP.row.id,
           },
         });
-      }
-      else{
-        c= router.resolve({
+      } else {
+        c = router.resolve({
           path: "/ReproductionDetail",
           query: {
             id: scopeP.row.id,
@@ -424,6 +448,7 @@ export default {
       disabledDate,
       router,
 
+      typeSelectValue,
       searchInput,
       searchSelectValue,
       searchOptions,

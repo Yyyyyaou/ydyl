@@ -47,6 +47,7 @@
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
+                @change="getNoticeListAjaxFn"
               />
             </el-config-provider>
             <el-button type="primary" class="marl10" style="width: 78px"

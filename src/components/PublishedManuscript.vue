@@ -42,6 +42,17 @@
             @keydown.enter="getBrokeListAjaxFn"
           />
         </div>
+        <el-select
+          v-model="typeSelectValue"
+          placeholder="稿件类型"
+          style="width: 140px"
+          class="marl10"
+          @change="getBrokeListAjaxFn"
+        >
+          <el-option label="全部类型" value='' />
+          <el-option label="原创稿件" value=0 />
+          <el-option label="转载稿件" value=1 />
+        </el-select>
         <div class="marl10">
           <el-autocomplete
             v-model="originInput"
@@ -50,6 +61,8 @@
             :fetch-suggestions="querySearch"
             clearable
             placeholder="稿件来源"
+            @select="getBrokeListAjaxFn"
+            @clear="getBrokeListAjaxFn"
           />
         </div>
         <el-select
@@ -57,6 +70,7 @@
           placeholder="语种"
           style="width: 140px"
           class="marl10"
+          @change="getBrokeListAjaxFn"
         >
           <el-option
             v-for="item in langOptions"
@@ -73,6 +87,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             style="margin-left: 10px; width: 270px"
+            @change="getBrokeListAjaxFn"
           />
         </el-config-provider>
         <el-button
@@ -143,6 +158,17 @@
             >
               {{ scope.row.articleTitle }}
             </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="articleType"
+          label="稿件类型"
+          header-align="center"
+          align="center"
+          width="125"
+        >
+          <template #default="scope">
+            <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -241,6 +267,7 @@ export default {
       },
     ];
 
+    const typeSelectValue = ref(null);
     //语种select数据
     const langSelectValue = ref("");
     const langOptions = reactive([]);
@@ -349,6 +376,7 @@ export default {
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       getSourceId(originInput)
       const paramsO = {
+        articleType: typeSelectValue.value || '',
         articleSource: articleSource,
         language:langSelectValue.value||0,//0 可能代表 所有语种，文档里有提示 写 0
         currPage:page1.value,//当前页
@@ -540,6 +568,8 @@ export default {
       statusOptions,
 
       langSelectValue,
+      typeSelectValue,
+      
       langOptions,
 
       paperSelectValue,

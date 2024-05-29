@@ -111,7 +111,7 @@ export function initLanguageListFn(){
       // }
       _message.unshift({
         id:0,
-        desc:'全部',
+        desc:'全部语种',
       });
       store.commit('MGlobalLanguageList',_message);//记录语种列表
     

@@ -36,6 +36,7 @@
                 v-model="searchExcelTyepValue"
                 placeholder=""
                 style="width: 200px"
+                @change="getExcelListAjaxFn"
               >
                 <el-option
                   v-for="item in searchExcelTyepOptions"
@@ -55,6 +56,7 @@
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
+                @change="getExcelListAjaxFn"
               />
             </el-config-provider>
             <el-button
