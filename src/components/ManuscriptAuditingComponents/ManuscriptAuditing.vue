@@ -179,7 +179,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>稿件来源：</span><span>生态环境部</span>
+                        <span>稿件来源：</span><span>{{ scope.row.sourceName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -528,7 +528,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>稿件来源：</span><span>生态环境部</span>
+                        <span>稿件来源：</span><span>{{ scope.row.sourceName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
