@@ -141,12 +141,12 @@
                   </div>
                   <span></span>
 
-                  <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认
+                  <!-- 注释于20240519.1613 jira YDYL-4 我的投稿、草稿箱、回收站 删除稿件需要增加确认-->
                   <div
-                    @click="deleteArticleAjaxFn(scope.row.id)"
+                    @click="deleteArticleAjaxFnBox(scope.row.id)"
                   >删除</div> 
-                  -->
-                  <el-popconfirm
+                  
+                  <!-- <el-popconfirm
                     title="确定删除吗？"
                     confirm-button-text="删除"
                     cancel-button-text="取消"
@@ -155,7 +155,7 @@
                     <template #reference>
                       <div>删除</div>
                     </template>
-                  </el-popconfirm>
+                  </el-popconfirm> -->
 
                   <span></span>
                 </div>
@@ -204,6 +204,7 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { ElMessage, ElLoading } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
+import { ElMessageBox } from "element-plus";
 export default {
   setup() {
     //路由实例
@@ -343,6 +344,22 @@ export default {
     }
     // end of getArticleDraftListAjaxFn
 
+    function deleteArticleAjaxFnBox(idP){
+      //删除之前弹出确认框
+        ElMessageBox.confirm(
+          "确认删除选中稿件？",
+          "提示",
+          {
+            confirmButtonText: "是",
+            cancelButtonText: '否',
+            customClass:'selfElMessageBox'
+          }
+        )
+          .then(() => {
+            deleteArticleAjaxFn(idP)
+          })
+          .catch(() => {});
+    }
     //草稿箱的删除，应该删除到回收站
     function deleteArticleAjaxFn(idP) {
       httpAxiosO({
@@ -422,6 +439,8 @@ export default {
 
       getArticleDraftListAjaxFn,
       deleteArticleAjaxFn,
+      deleteArticleAjaxFnBox,
+
       getFindByIdAjaxFn,
     };
   },
