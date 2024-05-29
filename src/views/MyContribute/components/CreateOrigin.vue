@@ -201,7 +201,7 @@ before-remove 在附件列表删除文件钩子
 import Editor from '@tinymce/tinymce-vue';
 import PubDetail from '@/views/Notice/views/PubDetail.vue';
 
-import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount,watch, } from "vue";
+import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount, } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
@@ -409,7 +409,7 @@ export default {
     const auditingUploadFilesPostUrl = ref('');
     process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
 
-    //附件id集合，袁冰写的代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds，提交使用
+    //附件id集合，袁冰写的接口代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds，提交使用
     const auditingUploadFilesFileIds = reactive([]);
 
     //审核单附件列表
@@ -642,9 +642,6 @@ export default {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (progressEvent) => {
-          console.log(progressEvent);
-          console.log(progressEvent.loaded);
-          console.log(progressEvent.total);
           videoUploadProgressValue.value = Math.floor(progressEvent.loaded/progressEvent.total) * 100;
         },
       })
@@ -674,7 +671,16 @@ export default {
       
         const { fileName } =  data[0];
         // succFun(`/tougaoadmin/web/article/getobj?fileName=${fileName}`);
-        return `/tougaoadmin/web/article/getobj?fileName=${fileName}`
+        //用于插入 正文 预览
+        if(//开发环境
+          process.env.NODE_ENV === 'development'
+        ){
+          return `api/tougaoadmin/web/article/getobj?fileName=${fileName}`
+        }else{
+          return `/tougaoadmin/web/article/getobj?fileName=${fileName}`
+        }
+        // end of if
+
       })
       .finally(()=>{
         videoUploadProgressValue.value = 0;
@@ -719,9 +725,6 @@ export default {
               "Content-Type": "multipart/form-data",
             },
             onUploadProgress: (progressEvent) => {
-              console.log(progressEvent);
-              console.log(progressEvent.loaded);
-              console.log(progressEvent.total);
               videoUploadProgressValue.value = Math.floor(progressEvent.loaded/progressEvent.total) * 100;
             },
           })
@@ -745,12 +748,26 @@ export default {
               auditingUploadFilesArray2.value.push(data[0]);
             }
 
-            callbackP(
-              `/tougaoadmin/web/article/getobj?fileName=${fileName}`,
-              {
-                title:fileName,
-              }
-            )
+            //用于插入 正文 预览
+            if(//开发环境
+              process.env.NODE_ENV === 'development'
+            ){
+              callbackP(
+                `api/tougaoadmin/web/article/getobj?fileName=${fileName}`,
+                {
+                  title:fileName,
+                }
+              )
+
+            }else{
+              callbackP(
+                `/tougaoadmin/web/article/getobj?fileName=${fileName}`,
+                {
+                  title:fileName,
+                }
+              )
+            }
+            // end of if
 
           })
           .finally(()=>{
@@ -885,6 +902,15 @@ export default {
         articleSourceName:formData.articleSourceName?.trim(),//稿件来源用来显示的字段,String类型
       };
 
+      //过滤editorHTMLContent 的 预览地址 api/tougaoadmin/web/article/getobj
+      // 保证 存入数据库的目录为 /tougaoadmin/web/article/getobj
+      if(
+        editorHTMLContent.value.match(/(api){1}(?=\/tougaoadmin\/web\/article\/getobj)/img)
+        &&editorHTMLContent.value.match(/(api){1}(?=\/tougaoadmin\/web\/article\/getobj)/img).length > 0
+      ){
+        editorHTMLContent.value = editorHTMLContent.value.replace(/(api){1}(?=\/tougaoadmin\/web\/article\/getobj)/img,'');
+      }
+
 
       datasO.articleHtmlCon = editorHTMLContent.value||'';//稿件HTML内容
 
@@ -928,28 +954,64 @@ export default {
       //接口 接受附件 字符串 'x1,x2,x3'
       datasO.fileAccessory =  _fileAccessory.toString();
 
+
       //正文附件列表
-      const _fileHtmlCon = auditingUploadFilesArray2.value.map((o)=>{
-          //收集附件id
-          if(
-            !auditingUploadFilesFileIds.includes(o.id)
-            && o.id !== '' 
-          ){
-            auditingUploadFilesFileIds.push(o.id);
-          }
-          return o.fileName
-      });
-      //接口 接受附件 字符串 'x1,x2,x3'
-      datasO.fileHtmlCon = _fileHtmlCon.toString();
-      //正文附件 特殊，∵用户可以随时 用退格键删除正文区附件  ∴要和 articleHtmlCon 对比 一下
+      //此刻要观察 editorHTMLContent 中的有的 图片、视频 与 auditingUploadFilesArray2 中 保存的 对比一下，如果有被 用户退格键删除的 图片、视频 需要 执行一下 删除附件接口
       // eslint-disable-next-line no-useless-escape
-      const articleHtmlConRegExp = new RegExp('(?<=api/tougaoadmin/web/article/getobj\?fileName=).+?(\.jpg|\.jpeg|\.png|\.gif|\.svg|\.webp|\.avif|\.ico|\.bmp|\.tiff|\.tif|\.raw|\.cr2|\.nef)','img');
-      auditingUploadFilesArray2.value
-      editorHTMLContent.value.match(articleHtmlConRegExp)
+      const articleHtmlConRegExp = new RegExp('(?<=\/tougaoadmin\/web\/article\/getobj\\?fileName=).+?(\.jpg|\.jpeg|\.png|\.gif|\.svg|\.webp|\.avif|\.ico|\.bmp|\.tiff|\.tif|\.raw|\.cr2|\.nef)','img');
+
+      const articleHtmlConRegExpMatchFileNameArr =  `${editorHTMLContent.value}`.match(articleHtmlConRegExp);
 
 
-      //附件id 接口 接收字符串
-      datasO.fileIds = auditingUploadFilesFileIds.toString();
+      console.log('articleHtmlConRegExpMatchFileNameArr',articleHtmlConRegExpMatchFileNameArr);
+      console.log('auditingUploadFilesArray2.value',auditingUploadFilesArray2.value);
+
+      if(//正文有附件再执行
+        articleHtmlConRegExpMatchFileNameArr
+        &&articleHtmlConRegExpMatchFileNameArr.length>0
+      ){
+
+
+        const Copy_arr = JSON.parse(JSON.stringify(auditingUploadFilesArray2.value));
+
+        console.log('Copy_arr',Copy_arr);
+        Copy_arr.forEach((o)=>{
+          if(//提交时候，正文中没有先前保存的 图片、视频 就 删除它
+            !articleHtmlConRegExpMatchFileNameArr.includes(o.fileName)
+          ){
+            deleteArticleDelFileObjFn(o.fileName);//请求接口删除附件
+
+            //过滤掉 已删掉的附件
+            auditingUploadFilesArray2.value = auditingUploadFilesArray2.value.filter((o1)=>{
+              if(o1.fileName !== o.fileName){
+                return o1
+              }
+            });
+
+          }
+        });        
+        console.log('auditingUploadFilesArray2.value',auditingUploadFilesArray2.value);
+
+        const _fileHtmlCon = auditingUploadFilesArray2.value.map((o)=>{
+            //收集附件id
+            if(
+              o.id
+              &&o.id !== ''
+              &&!auditingUploadFilesFileIds.includes(o.id)
+            ){
+              auditingUploadFilesFileIds.push(o.id);
+            }
+            return o.fileName
+        });
+        //接口 接受附件 字符串 'x1,x2,x3'
+        datasO.fileHtmlCon = _fileHtmlCon.toString();
+
+        //附件id 接口 接收字符串
+        datasO.fileIds = auditingUploadFilesFileIds.toString();
+
+      }
+      // end of if  正文有附件再执行
+
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       const _regExp1 = /\n$/;
@@ -1125,7 +1187,19 @@ export default {
 
       console.log('getPropsFn formData',formData);
 
-      editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
+      if(//开发环境
+        process.env.NODE_ENV === 'development'
+      ){
+        //过滤一下 预览地址 /tougaoadmin/web/article/getobj
+        // ——> api/tougaoadmin/web/article/getobj
+        let _regExp1 = new RegExp('/tougaoadmin/web/article/getobj','img');
+        editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon.replace(_regExp1,(str)=>{
+          return 'api'+str
+        });     
+      }else{
+        editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
+      }
+
 
       editorTEXTContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleContent||'';//稿件文本内容
 
@@ -1227,10 +1301,6 @@ export default {
 
     }
     // end of resetFormFn
-
-    watch(()=>{
-
-    });
 
     onMounted(()=>{
       //to do
