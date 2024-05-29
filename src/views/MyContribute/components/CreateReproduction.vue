@@ -911,7 +911,7 @@ export default {
       align-items: center;
     }
     :deep(.el-form-item__label) {
-      font-size: 16px;
+      font-size: 16px;width:120px;
     }
     :deep(.el-input__wrapper),
     :deep(.el-select__wrapper) {

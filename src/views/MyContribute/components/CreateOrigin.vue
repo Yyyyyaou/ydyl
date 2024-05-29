@@ -19,7 +19,7 @@
             />
           </el-form-item>
         </el-col>
-        <el-col :span="11">
+        <el-col :span="12">
           <el-form-item label="语种" prop="language">
             <el-select v-model="formData.language" placeholder="" @change="langSelectChange">
               <el-option
@@ -120,7 +120,7 @@ before-remove 在附件列表删除文件钩子
 
           </el-form-item>
         </el-col>
-        <el-col :span="11">
+        <el-col :span="12">
           <el-form-item
             label="附件上传"
             prop="file"
@@ -201,7 +201,7 @@ before-remove 在附件列表删除文件钩子
 import Editor from '@tinymce/tinymce-vue';
 import PubDetail from '@/views/Notice/views/PubDetail.vue';
 
-import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount } from "vue";
+import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount,watch, } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
@@ -420,7 +420,7 @@ export default {
     const auditingUploadFilesArray2 = ref([]);//fileText=2
     //正文视频上传进度条相关
     const videoUploadProgressValue = ref(0);
-    const URL_IS_API = process.env.NODE_ENV === 'development'?'/api/tougaoadmin':'/tougaoadmin';
+
 
     //审核资质附件
     // const postAddEditAjaxFormData = new FormData();
@@ -613,8 +613,8 @@ export default {
      * 监听编辑器输入
      * a、b 两个参数暂时不知道是什么
      */
-    function editorChangeFn(a,b){
-      a
+    function editorChangeFn(a,b){a;
+
       //收集正文 TEXT 格式
       editorTEXTContent.value = b.getContent({
         format: 'text'
@@ -673,8 +673,8 @@ export default {
 
       
         const { fileName } =  data[0];
-        // succFun(`${URL_IS_API}/web/article/getobj?fileName=${fileName}`);
-        return `${URL_IS_API}/web/article/getobj?fileName=${fileName}`
+        // succFun(`/tougaoadmin/web/article/getobj?fileName=${fileName}`);
+        return `/tougaoadmin/web/article/getobj?fileName=${fileName}`
       })
       .finally(()=>{
         videoUploadProgressValue.value = 0;
@@ -746,7 +746,7 @@ export default {
             }
 
             callbackP(
-              `${URL_IS_API}/web/article/getobj?fileName=${fileName}`,
+              `/tougaoadmin/web/article/getobj?fileName=${fileName}`,
               {
                 title:fileName,
               }
@@ -1228,6 +1228,9 @@ export default {
     }
     // end of resetFormFn
 
+    watch(()=>{
+
+    });
 
     onMounted(()=>{
       //to do
@@ -1264,7 +1267,6 @@ export default {
       auditingUploadFilesArray1,
       auditingUploadFilesArray2,
       videoUploadProgressValue,
-      URL_IS_API,
 
       handleAuditingUploadChangeFn,
       handleAuditingUploadErrorFn,
@@ -1289,7 +1291,7 @@ export default {
     align-items: center;
   }
   :deep(.el-form-item__label) {
-    font-size: 16px;
+    font-size: 16px;width:120px;
   }
   :deep(.el-input__wrapper),
   :deep(.el-select__wrapper) {
