@@ -16,6 +16,7 @@
               </div>
               <div class="flexcenter hoverpointer"
                 @click="$router.push('/StatisticsManuscript')"
+                v-if="userAuthority != '国家信息中心用户'"
               >
                 <el-icon><DArrowRight /></el-icon>
               </div>

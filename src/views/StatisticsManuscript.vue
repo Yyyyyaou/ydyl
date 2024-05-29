@@ -18,16 +18,17 @@
         <el-autocomplete
           v-if="userAuthority == '国家发改委用户'"
           v-model="companySelectValue"
-          style="width: 140px"
+          :popper-append-to-body="false"
           :fetch-suggestions="querySearch"
           :value-key="'sourceName'"
           clearable
           placeholder="投稿单位"
           @select="autocompleteSelect"
           @clear="autocompleteClear"
+          @input="autocompleteChange"
         />
         <el-select
-        ref="dateRef1"
+          ref="dateRef1"
           v-model="timeSelectValue"
           placeholder="时间范围"
           style="width: 140px"
@@ -47,7 +48,7 @@
             :disabled-date="disabledDate"
             v-model="dateDefaultTime"
             type="daterange"
-            start-placeholder="起始日期"
+            start-placeholder="开始日期"
             end-placeholder="结束日期"
             :locale="locale"
             style="margin-left: 10px; width: 270px"
@@ -398,7 +399,7 @@ export default {
     //时间范围选择器change（7天 30天）
     let endTime = new Date();
     let startTime = timeForMat(29);
-    const { proxy } = getCurrentInstance()
+    const { proxy } = getCurrentInstance();
     function timeSelectChange(val) {
       if (val == 0) {
         startTime = timeForMat(6);
@@ -408,12 +409,15 @@ export default {
         startTime = timeForMat(90);
       }
       dateDefaultTime.value = [startTime, new Date()]; //日期范围选择初始化
-      getArticleCountAjaxFn(true);
-
-      if(val == 3){
+      if (val === 3) {
+        dateDefaultTime.value = null;
+      } else {
+        getArticleCountAjaxFn(true);
+      }
+      if (val == 3) {
         setTimeout(() => {
-          proxy.$refs.dateRef.handleOpen()
-          }, 0);
+          proxy.$refs.dateRef.handleOpen();
+        }, 0);
       }
     }
     function timeForMat(count) {
@@ -424,9 +428,36 @@ export default {
     let articleSource = 0;
     //稿件单位选择后调用接口
     function autocompleteSelect(item) {
+      if (dateDefaultTime.value == null) {
+        ElMessage({
+          message: "请先选择时间范围",
+          type: "warning",
+          plain: true,
+        });
+        return;
+      }
       console.log(item);
       articleSource = item.id ? item.id : 0;
       getArticleCountAjaxFn();
+    }
+    function autocompleteChange(val) {
+      let len = strlen(val);
+      let doc = document.getElementsByClassName("el-autocomplete")[0];
+      if (len > 120) {
+        doc.querySelector(".el-input__inner").style.width = len + "px";
+      } else {
+        doc.querySelector(".el-input__inner").style.width = "120px";
+      }
+    }
+
+    //计算字符串长度
+    function strlen(str) {
+      var canvas = document.createElement("canvas"); //首先创建一个canvas标签
+      var ctx = canvas.getContext("2d"); //把canvas的画笔给调出来
+      ctx.font = "16px Arial"; //设置字体大小和字体，这一步很重要，直接影响了测量结果，因为14px和16px的字体的宽度是不一样的
+      var len = ctx.measureText(str).width; //开始测量字体的宽度
+      //console.log("text的宽度为" + len);
+      return len;
     }
     //清除稿件单位
     function autocompleteClear() {
@@ -472,6 +503,7 @@ export default {
       companySelectValue,
       querySearch,
       autocompleteSelect,
+      autocompleteChange,
       autocompleteClear,
       // companyOptions,
       timeSelectValue,
@@ -658,12 +690,19 @@ export default {
     :deep(.el-date-editor .el-range__icon),
     :deep(.el-range-input),
     :deep(.el-range-separator),
-    :deep(.el-input__inner) {
+    :deep(.el-input__inner),
+    :deep(.el-input__clear) {
       color: #fff;
       &::placeholder {
         color: #fff;
       }
     }
+  }
+}
+:deep(.el-autocomplete) {
+  .el-input__inner {
+    width: 140px;
+    max-width: 320px;
   }
 }
 .marl10 {

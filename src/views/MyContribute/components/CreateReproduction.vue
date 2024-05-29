@@ -530,11 +530,12 @@ export default {
         datasOP.language === zhCNValue
       ) {
         //预览前要先 检测一下 标题语种，非中文要给提示
-        ElMessageBox.alert(
-          "您输入的“稿件标题”语种不是中文，请修改语种",
+        ElMessageBox.confirm(
+          "是否确认提交转载稿件？",
           "提示",
           {
-            confirmButtonText: "取消，去修改",
+            confirmButtonText: "是",
+            cancelButtonText: '否',
             customClass:'selfElMessageBox'
           }
         )

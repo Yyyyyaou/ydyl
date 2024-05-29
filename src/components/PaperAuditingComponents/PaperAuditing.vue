@@ -75,7 +75,7 @@
             :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
-                start-placeholder="起始日期"
+                start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :locale="locale"
                 style="margin-left: 10px; width: 270px"
@@ -563,7 +563,7 @@
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
-                  <div :title="scope.row.articleTitle">查看</div>
+                  <div @click="externalAuditArticleFindByIdFn(scope)">查看</div>
                 </div>
               </template>
             </el-table-column>
