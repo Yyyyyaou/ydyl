@@ -126,8 +126,9 @@
                         cursor: pointer;
                       "
                       :class="{
-                        isClicked: isClickedArr.includes(scope.$index),
+                        isClicked: scope.row.isRead == 1,
                       }"
+                      class="noClicked"
                       @click="rowTitleClick(scope)"
                     >
                       {{ scope.row.title }}
@@ -444,7 +445,12 @@ export default {
     }
   }
 }
+.noClicked {
+  font-weight: 700;
+  color: #555b73;
+}
 .isClicked {
+  font-weight: 400;
   color: #a7a9b2;
 }
 .elpopover-style {

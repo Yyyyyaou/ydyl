@@ -531,11 +531,11 @@ export default {
       ) {
         //预览前要先 检测一下 标题语种，非中文要给提示
         ElMessageBox.confirm(
-          "是否确认提交转载稿件？",
+          "确认提交转载稿件？",
           "提示",
           {
-            confirmButtonText: "是",
-            cancelButtonText: '否',
+            confirmButtonText: "确定",
+            cancelButtonText: '取消',
             customClass:'selfElMessageBox'
           }
         )

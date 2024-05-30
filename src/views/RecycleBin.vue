@@ -392,8 +392,8 @@ export default {
           "确认清除回收站中所有稿件？",
           "提示",
           {
-            confirmButtonText: "是",
-            cancelButtonText: '否',
+            confirmButtonText: "确定",
+            cancelButtonText: '取消',
             customClass:'selfElMessageBox'
           }
         )
@@ -433,8 +433,8 @@ export default {
           "确认删除选中稿件？",
           "提示",
           {
-            confirmButtonText: "是",
-            cancelButtonText: '否',
+            confirmButtonText: "确定",
+            cancelButtonText: '取消',
             customClass:'selfElMessageBox'
           }
         )

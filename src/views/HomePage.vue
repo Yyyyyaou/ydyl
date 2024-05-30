@@ -629,7 +629,8 @@ export default {
       // if (!isClickedArr.value.includes(scope.$index)) {
       //   isClickedArr.value.push(scope.$index);
       // }
-
+      activities.length = 0;
+      getSYNoticeListAjaxFn();//点击之后重新获取列表 刷新noticerRead字段
       const c = router.resolve({
         path: "/NoticeDetail",
         query: {

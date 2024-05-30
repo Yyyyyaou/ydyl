@@ -90,6 +90,7 @@
                     cursor: pointer;
                   "
                   :class="{ isClicked: scope.row.noticeRead == 1 }"
+                  class="noClicked"
                   @click="rowTitleClick(scope)"
                   :title="scope.row.noticeTitle"
                 >
@@ -180,9 +181,10 @@ export default {
     const isClickedArr = ref([]);
     const router = useRouter();
     function rowTitleClick(scope) {
-      if (!isClickedArr.value.includes(scope.$index)) {
-        isClickedArr.value.push(scope.$index);
-      }
+      // if (!isClickedArr.value.includes(scope.$index)) {
+      //   isClickedArr.value.push(scope.$index);
+      // }
+      getNoticeListAjaxFn()//点击之后重新获取列表 刷新noticerRead字段
       const c = router.resolve({
         path: "/NoticeDetail",
         query: {
@@ -381,7 +383,12 @@ export default {
     }
   }
 }
+.noClicked {
+  font-weight: 700;
+  color: #555b73;
+}
 .isClicked {
   font-weight: 400;
+  color: #a7a9b2;
 }
 </style>
