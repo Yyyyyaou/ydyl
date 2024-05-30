@@ -175,7 +175,7 @@ before-remove 在附件列表删除文件钩子
     >重 置</el-button>
   </div>
 
-  <el-dialog v-model="dialogNoticeDetailVisible" width="100%" height="80vh">
+  <el-dialog v-model="dialogNoticeDetailVisible" width="90%" height="80vh">
     <PubDetail ref="NoticeDetailRef" :propsArticleO="formData" :propsId="forPropsGetFindByIdAjaxFnReturnO.id" />
     <div class="createorigin-btngroup flexcenter">
       <el-button class="createorigin-btngroup-submit" @click="postAddEditAjaxFn(1)">提 交</el-button>
@@ -1142,20 +1142,20 @@ export default {
       ){
         //预览前要先 检测一下 标题语种，非中文要给提示
         ElMessageBox.confirm(
-          '您输入的“稿件标题”语种不是中文，请修改语种',
-          '提示',
+          '您输入的“稿件标题”语种不是“中文”，请修改语种。是否需要修改?',
+          '修改语种',
           {
-            confirmButtonText: '继续预览',
-            cancelButtonText: '取消，去修改',
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
             type: 'warning',
             customClass:'selfElMessageBox'
           }
         )
         .then(() => {
-          forFormDataValue();
+          
         })
         .catch(() => {
-
+          forFormDataValue();
         })
         return;
       }
