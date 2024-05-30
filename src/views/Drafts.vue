@@ -375,7 +375,7 @@ export default {
 
     function deleteArticleAjaxFnBox(idP) {
       //删除之前弹出确认框
-      ElMessageBox.confirm("确认删除选中稿件？", "操作", {
+      ElMessageBox.confirm("确认删除选中稿件？", "删除稿件", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         customClass: "selfElMessageBox",
