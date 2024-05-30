@@ -685,6 +685,66 @@ export default {
         )
           .then(() => {})
           .catch(() => {
+                  if(articleStatusP == 0){//提交草稿箱 不弹确认框 直接调用接口
+            const loadingInstance1 = ElLoading.service({
+              fullscreen: true,
+            });
+
+            // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
+            const httpAxiosOUrl = (() => {
+              let _url = "";
+              if (forPropsGetFindByIdAjaxFnReturnO.value.id) {
+                _url = "/web/article/update.do";
+                dataList.value.forEach((o, i) => {
+                  //如果是 继续采用、编辑，只能是第一个稿件是旧稿件，其它的是新稿，是没 稿件id的
+                  if (i === 0) {
+                    o.id = forPropsGetFindByIdAjaxFnReturnO.value.id; //父组件传下来的id
+                  }
+                });
+              } else {
+                _url = "/web/article/addEditReprint.do";
+              }
+              return _url;
+            })();
+
+            httpAxiosO({
+              url: httpAxiosOUrl,
+              method: "post",
+              headers: {
+                //这个接口不写 这行会报错
+                "Content-Type": "application/json;charset=UTF-8",
+              },
+              data: JSON.stringify(dataList.value),
+            })
+              .then((D) => {
+                console.log("转载稿件提交 D", D);
+                const { data, success } = D.data;
+                data;
+                if (!success) {
+                  ElMessage({
+                    message: "转载稿件提交 接口传参可能有误",
+                    type: "error",
+                    plain: true,
+                  });
+                  return;
+                }
+                //注释于 20240515.1530 jira YDYL-5 建议删除
+                // ElMessage({
+                //   message: "转载稿件提交成功",
+                //   type: "success",
+                //   plain: true,
+                // });
+
+                //操作完后返回上一级页面
+                router.go(-1);
+              })
+              .catch((error) => {
+                console.log("转载稿件提交 error", error);
+              })
+              .finally(() => {
+                loadingInstance1.close();
+              });
+      }else{
             console.log("postAddEditReprintAjaxFn dataList", dataList);
             ElMessageBox.confirm("确认提交转载稿件？", "提交转载稿件", {
               confirmButtonText: "确定",
@@ -755,8 +815,70 @@ export default {
                 //取消提交
                 return;
               });
+      }
           });
       } else {//无语言校验时 直接调用接口
+      if(articleStatusP == 0){//提交草稿箱 不弹确认框 直接调用接口
+            const loadingInstance1 = ElLoading.service({
+              fullscreen: true,
+            });
+
+            // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
+            const httpAxiosOUrl = (() => {
+              let _url = "";
+              if (forPropsGetFindByIdAjaxFnReturnO.value.id) {
+                _url = "/web/article/update.do";
+                dataList.value.forEach((o, i) => {
+                  //如果是 继续采用、编辑，只能是第一个稿件是旧稿件，其它的是新稿，是没 稿件id的
+                  if (i === 0) {
+                    o.id = forPropsGetFindByIdAjaxFnReturnO.value.id; //父组件传下来的id
+                  }
+                });
+              } else {
+                _url = "/web/article/addEditReprint.do";
+              }
+              return _url;
+            })();
+
+            httpAxiosO({
+              url: httpAxiosOUrl,
+              method: "post",
+              headers: {
+                //这个接口不写 这行会报错
+                "Content-Type": "application/json;charset=UTF-8",
+              },
+              data: JSON.stringify(dataList.value),
+            })
+              .then((D) => {
+                console.log("转载稿件提交 D", D);
+                const { data, success } = D.data;
+                data;
+                if (!success) {
+                  ElMessage({
+                    message: "转载稿件提交 接口传参可能有误",
+                    type: "error",
+                    plain: true,
+                  });
+                  return;
+                }
+                //注释于 20240515.1530 jira YDYL-5 建议删除
+                // ElMessage({
+                //   message: "转载稿件提交成功",
+                //   type: "success",
+                //   plain: true,
+                // });
+
+                //操作完后返回上一级页面
+                router.go(-1);
+              })
+              .catch((error) => {
+                console.log("转载稿件提交 error", error);
+              })
+              .finally(() => {
+                loadingInstance1.close();
+              });
+      }
+      else{
         console.log("postAddEditReprintAjaxFn dataList", dataList);
         ElMessageBox.confirm("确认提交转载稿件？", "提交转载稿件", {
           confirmButtonText: "确定",
@@ -827,6 +949,8 @@ export default {
             //取消提交
             return;
           });
+      }
+
       }
     }
     // end of postAddEditReprintAjaxFn
