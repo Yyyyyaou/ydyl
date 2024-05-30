@@ -509,7 +509,7 @@ export default {
 
     function triggerDeleteLogicDeleteFnBox(scopeP) {
       //删除之前弹出确认框
-      ElMessageBox.confirm("确认删除选中稿件？", "提示", {
+      ElMessageBox.confirm("确认删除选中稿件？", "操作", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         customClass: "selfElMessageBox",

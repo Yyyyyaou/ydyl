@@ -1143,7 +1143,7 @@ export default {
         //预览前要先 检测一下 标题语种，非中文要给提示
         ElMessageBox.confirm(
           '您输入的“稿件标题”语种不是中文，请修改语种',
-          '提示',
+          '操作',
           {
             confirmButtonText: '继续预览',
             cancelButtonText: '取消，去修改',

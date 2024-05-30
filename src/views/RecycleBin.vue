@@ -390,7 +390,7 @@ export default {
       //删除之前弹出确认框
         ElMessageBox.confirm(
           "确认清除回收站中所有稿件？",
-          "提示",
+          "操作",
           {
             confirmButtonText: "确定",
             cancelButtonText: '取消',
@@ -431,7 +431,7 @@ export default {
       //删除之前弹出确认框
         ElMessageBox.confirm(
           "确认删除选中稿件？",
-          "提示",
+          "操作",
           {
             confirmButtonText: "确定",
             cancelButtonText: '取消',
