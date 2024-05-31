@@ -49,7 +49,7 @@
 
             <el-config-provider :locale="locale">
               <el-date-picker
-            :disabled-date="disabledDate"
+                :disabled-date="disabledDate"
                 v-model="dateDefaultTime"
                 type="daterange"
                 start-placeholder="开始日期"
@@ -78,20 +78,22 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              'color': '#6a6d74',
+              color: '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              'color': '#727789',
+              color: '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
           >
             <!-- <el-table-column type="selection" width="55" /> -->
-            <el-table-column label="序号" width="100"
+            <el-table-column
+              label="序号"
+              width="100"
               header-align="center"
-              align="center" 
+              align="center"
             >
               <template #default="scope">
                 {{ scope.$index + 1 }}
@@ -107,24 +109,23 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="crtimeFormat" label="创建日期" width="140"
+            <el-table-column
+              prop="crtimeFormat"
+              label="创建日期"
+              width="140"
               header-align="center"
-              align="center" 
+              align="center"
             />
             <el-table-column prop="articleUseStatus" label="操作" width="180">
               <template #default="scope">
                 <div class="mid-content-mycontribute-table-tabledata-operate">
                   <div
-                    :title="scope.row.excelTitle"
-                    @click="
-                      router.push(
-                        '/MyContribute/CreateContribute?id=' + scope.row.id
-                      )
-                    "
+                    @click="dataCheckFn(scope.row)"
+                    v-if="scope.row.auditLabel == 0"
                   >
                     审核
                   </div>
-                  <span></span>
+                  <span v-if="scope.row.auditLabel == 0"></span>
                   <div>下载</div>
                   <span></span>
                   <div>删除</div>
@@ -166,12 +167,8 @@
     </div>
   </div>
 
-  <el-dialog
-    v-model="dialogVisible"
-    title="数据上传"
-    width="1450"
-  >
-  <CreateUpdate />
+  <el-dialog v-model="dialogVisible" title="数据上传" width="1450">
+    <CreateUpdate />
   </el-dialog>
 </template>
 
@@ -185,8 +182,8 @@ import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import CreateUpdate from "@/views/MyContribute/components/CreateUpdate.vue";
 export default {
-  components:{
-    CreateUpdate
+  components: {
+    CreateUpdate,
   },
   setup() {
     //路由实例
@@ -256,8 +253,12 @@ export default {
 
       //时间段
       if (dateDefaultTime.value) {
-        paramsO.crTime = timeFormatFn(dateDefaultTime.value[0])["YYYY-MM-DD hh:mm:ss"]; //起始时间
-        paramsO.endTime = timeFormatFn(dateDefaultTime.value[1])["YYYY-MM-DD hh:mm:ss"]; //结束时间
+        paramsO.crTime = timeFormatFn(dateDefaultTime.value[0])[
+          "YYYY-MM-DD hh:mm:ss"
+        ]; //起始时间
+        paramsO.endTime = timeFormatFn(dateDefaultTime.value[1])[
+          "YYYY-MM-DD hh:mm:ss"
+        ]; //结束时间
       }
 
       httpAxiosO({
@@ -307,7 +308,7 @@ export default {
     // end of getExcelListAjaxFn
 
     //由“数据上传” 按钮触发
-    const dialogVisible = ref(false)
+    const dialogVisible = ref(false);
     const dataUpdataFn = () => {
       //store
       console.log("dataUpdataFn");
@@ -368,7 +369,45 @@ export default {
       //   })
       // });
     };
-
+    function dataCheckFn(scopeP) {
+      httpAxiosO({
+        method: "get",
+        url: "/web/excel/update",
+        params: {
+          id: scopeP.id,
+          auditLabel: 2,
+        },
+      })
+        .then((D) => {
+          console.log("审核 D", D);
+          const { data, success } = D?.data;
+          data;
+          if (!success) {
+            ElMessage({
+              message: "审核接口请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            ElMessage({
+              message: "审核接口请求成功",
+              type: "success",
+              plain: true,
+            });
+            getExcelListAjaxFn();
+          }
+        })
+        .catch((error) => {
+          console.log("审核接口请求 error", error);
+          ElMessage({
+            message: "审核接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
     onMounted(() => {
       getExcelListAjaxFn();
     });
@@ -397,8 +436,9 @@ export default {
 
       getExcelListAjaxFn,
       dataUpdataFn,
+      dataCheckFn,
       continueUsingFn,
-      
+
       dialogVisible,
     };
   },

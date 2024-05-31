@@ -42,9 +42,9 @@
           class="marl10"
           @change="getArticleListAjaxFn"
         >
-          <el-option label="全部类型" value='' />
-          <el-option label="原创稿件" value=0 />
-          <el-option label="转载稿件" value=1 />
+          <el-option label="全部类型" value="" />
+          <el-option label="原创稿件" value="0" />
+          <el-option label="转载稿件" value="1" />
         </el-select>
         <el-select
           v-model="langSelectValue"
@@ -158,7 +158,9 @@
           width="125"
         >
           <template #default="scope">
-            <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
+            <span>{{
+              scope.row.articleType == 0 ? "原创稿件" : "转载稿件"
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -206,17 +208,63 @@
           label="操作"
           header-align="center"
           align="center"
-          width="130"
+          width="175"
         >
           <template #default="scope">
             <div class="mid-content-statistics-table-tabledata-operate">
               <div @click="getFindByIdAjaxFn(scope)">查看</div>
               <span></span>
-              <div v-if="scope.row.articleUseStatus === 3" data-desc="已发布">
-                链接
-              </div>
+              <el-popover
+                :visible="scope.row.visible ? true : false"
+                placement="left"
+                :width="600"
+                trigger="click"
+                popper-class="elpopover-style1"
+              >
+                <div class="linktitle flexcenter">
+                  <div>稿件发布地址链接</div>
+                  <div class="flexcenter">
+                    <el-icon
+                      class="hoverpointer"
+                      @click="
+                        scope.row.visible = false;
+                        popoverShowFlag = false;
+                      "
+                      ><CircleClose
+                    /></el-icon>
+                  </div>
+                </div>
+                <div class="linkcontent">
+                  <ul>
+                    <li
+                      v-for="(item, index) in linkdata"
+                      :key="index"
+                      class="flexcenter"
+                    >
+                      <div class="flexcenter">
+                        <div @click="linkopen(item.link)" class="hoverpointer">{{ item.link }}</div>
+                        <div>{{ item.time }}</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <template #reference>
+                  <!-- v-if="scope.row.articleUseStatus === 3" -->
+              <!-- 0531注释 -->
+                  <div
+                    v-if="scope.row.articleTitle=='李强出席第八届中日韩工商峰会'"
+                    data-desc="已发布"
+                    @click="getLinkFn(scope)"
+                  >
+                    链接
+                  </div>
+                </template>
+              </el-popover>
+              <!-- v-if="scope.row.articleUseStatus === 3" -->
+              <!-- 0531注释 -->
               <span
-                v-if="scope.row.articleUseStatus === 3"
+                
+                v-if="scope.row.articleTitle=='李强出席第八届中日韩工商峰会'"
                 data-desc="已发布"
               ></span>
               <!-- 
@@ -397,7 +445,7 @@ export default {
       const articleUseStatusNameArr = ["待处理", "审核中", "已发布", "未采用"];
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
-        articleType: typeSelectValue.value || '',
+        articleType: typeSelectValue.value || "",
         articleUseStatus: "",
         language: langSelectValue.value || 0, //0 可能代表 所有语种，文档里有提示 写 0
         currPage: page.value, //当前页
@@ -554,6 +602,38 @@ export default {
         });
     }
 
+    //获取稿件链接页面
+    const popoverShowFlag = ref(false);
+    const linkdata = [
+      {
+        link: "https://www.yidaiyilu.gov.cn/",
+        time: "2024-03-21 14:25:32",
+      },
+      {
+        link: "https://www.ceis.cn/",
+        time: "2024-03-21 14:25:35",
+      },
+      {
+        link: "https://www.ceis.cn/list/gsjj/index.html",
+        time: "2024-03-21 14:25:39",
+      },
+    ];
+    function linkopen(link){
+      window.open(link, "_blank");
+    }
+    function getLinkFn(scopeP) {
+      // if (scopeP.arr.length == 1) {
+      //   link(scopeP.arr[0])
+      // } else {
+      //   popoverShowFlag = true;//有浮窗打开
+      //   scopeP.row.visible = true;
+      // }
+      if(popoverShowFlag.value){
+        return
+      }
+      popoverShowFlag.value = true; //有浮窗打开
+      scopeP.row.visible = true;
+    }
     onMounted(() => {
       getArticleListAjaxFn(); //我的投稿列表
     });
@@ -580,6 +660,12 @@ export default {
       handleSizeChange,
       handleCurrentChange,
       locale: zhCn, //date-range 语言设置
+
+      //链接浮窗
+      popoverShowFlag,
+      linkdata,
+      linkopen,
+      getLinkFn,
 
       //接口请求
       getFindByIdAjaxFn,
@@ -655,6 +741,47 @@ export default {
         width: 1px;
         height: 17px;
         background: #3652d2;
+      }
+    }
+  }
+}
+</style>
+<style lang="less">
+.elpopover-style1 {
+  padding: 0 !important;
+}
+.linktitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 45px;
+  line-height: 45px;
+  color: #333;
+  font-size: 16px;
+  background: #f6f6f7;
+  padding: 0 20px;
+}
+.linkcontent {
+  ul {
+    padding: 10px 0 30px 0;
+    li:before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background-color: #0b77cd;
+      /* border-radius:；圆角，使方形div变圆形 */
+      border-radius: 50%;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    li{
+      padding: 0 30px;
+      >div{
+        width: 100%;
+        justify-content: space-between;
+        border-bottom: 1px dashed #ccc;
+        padding: 10px 0;
       }
     }
   }

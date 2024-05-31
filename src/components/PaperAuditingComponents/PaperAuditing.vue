@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mid-content-mycontribute" data-desc="审核稿件组件">
+    <div class="mid-content-mycontribute" data-desc="审核报题组件">
 
       <div
         class="mid-content-mycontribute-table-content"
@@ -50,14 +50,14 @@
             </div>
             <el-select
               v-model="typeSelectValue"
-              placeholder="稿件类型"
+              placeholder="报题类型"
               style="width: 140px"
               class="marl10"
               @change="getNeedAuditCountAjaxFn"
             >
               <el-option label="全部类型" value="" />
-              <el-option label="原创稿件" value="0" />
-              <el-option label="转载稿件" value="1" />
+              <el-option label="原创报题" value="0" />
+              <el-option label="转载报题" value="1" />
             </el-select>
             <div class="marl10">
               <el-autocomplete
@@ -66,7 +66,7 @@
                 style="width: 190px"
                 :fetch-suggestions="querySearch"
                 clearable
-                placeholder="稿件来源"
+                placeholder="报题来源"
                 @select="getNeedAuditCountAjaxFn"
                 @clear="getNeedAuditCountAjaxFn"
               />
@@ -130,7 +130,7 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="articleTitle" label="稿件标题">
+            <el-table-column prop="articleTitle" label="报题标题">
               <template #default="scope">
                 <el-popover
                   :visible="scope.row.visible ? true : false"
@@ -161,7 +161,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>稿件来源：</span><span>{{ scope.row.sourceName }}</span>
+                        <span>报题来源：</span><span>{{ scope.row.sourceName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -264,16 +264,16 @@
             </el-table-column>
             <el-table-column
               prop="articleType"
-              label="稿件类型"
+              label="报题类型"
               header-align="center"
               align="center"
               width="125"
             >
               <template #default="scope">
-                <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
+                <span>{{ scope.row.articleType==0?'原创报题':'转载报题' }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="sourceName" label="稿件来源" width="125" />
+            <el-table-column prop="sourceName" label="报题来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="postTimeFormat" label="提交日期" width="200" />
             <el-table-column prop="operate" label="操作" width="80">
@@ -358,14 +358,14 @@
             </div>
             <el-select
               v-model="typeSelectValue1"
-              placeholder="稿件类型"
+              placeholder="报题类型"
               style="width: 140px"
               class="marl10"
               @change="getNeedAuditCountAjaxFn1"
             >
               <el-option label="全部类型" value="" />
-              <el-option label="原创稿件" value="0" />
-              <el-option label="转载稿件" value="1" />
+              <el-option label="原创报题" value="0" />
+              <el-option label="转载报题" value="1" />
             </el-select>
             <div class="marl10">
               <el-autocomplete
@@ -374,7 +374,7 @@
                 style="width: 170px"
                 :fetch-suggestions="querySearch1"
                 clearable
-                placeholder="稿件来源"
+                placeholder="报题来源"
                 @select="getNeedAuditCountAjaxFn1"
                 @clear="getNeedAuditCountAjaxFn1"
               />
@@ -410,7 +410,7 @@
             </el-select>
             <el-select
               v-model="nodeSelectValue"
-              placeholder="稿件节点"
+              placeholder="报题节点"
               style="width: 140px"
               class="marl10"
               @change="getNeedAuditCountAjaxFn1"
@@ -464,7 +464,7 @@
                 {{ scope.$index + 1 }}
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="稿件标题">
+            <el-table-column prop="title" label="报题标题">
               <template #default="scope">
                 <el-popover
                   :visible="scope.row.visible ? true : false"
@@ -498,7 +498,7 @@
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
-                        <span>稿件来源：</span><span>{{ scope.row.sourceName }}</span>
+                        <span>报题来源：</span><span>{{ scope.row.sourceName }}</span>
                         <div
                           class="mid-content-mycontribute-table-btngroup-search-divide"
                         ></div>
@@ -593,16 +593,16 @@
             </el-table-column>
             <el-table-column
               prop="articleType"
-              label="稿件类型"
+              label="报题类型"
               header-align="center"
               align="center"
               width="125"
             >
               <template #default="scope">
-                <span>{{ scope.row.articleType==0?'原创稿件':'转载稿件' }}</span>
+                <span>{{ scope.row.articleType==0?'原创报题':'转载报题' }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="sourceName" label="稿件来源" width="125" />
+            <el-table-column prop="sourceName" label="报题来源" width="125" />
             <el-table-column prop="languageName" label="语种" width="120" />
             <el-table-column prop="articleUseStatus" label="状态" width="110">
               <template #default="scope">
@@ -616,7 +616,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="currentNodeName" label="稿件节点" width="120" />
+            <el-table-column prop="currentNodeName" label="报题节点" width="120" />
             <el-table-column prop="postTimeFormat" label="提交日期" width="140" />
             <el-table-column prop="operate" label="操作" width="80">
               <template #default="scope">
@@ -770,7 +770,7 @@ export default {
 
 
 
-    //稿件标题点击置灰
+    //报题标题点击置灰
     const isClickedArr = ref([]);
     const popoverShowFlag = ref(false);
 
@@ -812,10 +812,10 @@ export default {
      * 批量审核按钮触发
      */
     function dialogBatchProcessingFn(){
-      //如果没选中稿件，则退出
+      //如果没选中报题，则退出
       if(tableSelectedDataArray.length === 0){
         ElMessage({
-          message: '请先选择稿件',
+          message: '请先选择报题',
           type: 'warning',
         });
         return;
@@ -859,7 +859,7 @@ export default {
       { value: 2, label: "已发布" },
       { value: 3, label: "未通过" },
     ];
-    //稿件节点select数据
+    //报题节点select数据
     const nodeSelectValue = ref(null);
     const nodeOptions = [//0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布 显示为空字符
       { value: '', label: "全部节点" },
@@ -882,7 +882,7 @@ export default {
     function handleCurrentChange1(val) {
       page1.value = val;
     }
-    //稿件标题点击置灰
+    //报题标题点击置灰
     const isClickedArr1 = ref([]);
     const popoverShowFlag1 = ref(false);
     function rowTitleClick1(scope) {
@@ -905,17 +905,17 @@ export default {
       // call callback function to return suggestions
       cb(results);
     };
-    //获取稿件来源list
+    //获取报题来源list
     function findSourceListAjaxFn() {
       httpAxiosO({
         method: "get",
         url: "/web/source/findSourceList",
       })
         .then((D) => {
-          console.log("审核稿件-稿件来源", D);
+          console.log("审核报题-报题来源", D);
           if (D.status != 200) {
             ElMessage({
-              message: "稿件来源数据请求失败",
+              message: "报题来源数据请求失败",
               type: "error",
               plain: true,
             });
@@ -926,7 +926,7 @@ export default {
         })
         .catch(() => {
           ElMessage({
-            message: "稿件来源接口请求失败",
+            message: "报题来源接口请求失败",
             type: "error",
             plain: true,
           });
@@ -945,7 +945,7 @@ export default {
     const timelineData = reactive([]);
     
     /**
-     * 查询 稿件详情
+     * 查询 报题详情
      */
     function externalAuditArticleFindByIdFn(scopeP){
 
@@ -966,11 +966,11 @@ export default {
 
       store.dispatch('externalAuditArticleFindByIdFn',scopeP.row.externalAuditArticleId)
       .then((D)=>{
-        console.log('D 稿件详情',D);
+        console.log('D 报题详情',D);
         const { data,success } = D.data
         if(!success){
           ElMessage({
-            message: '稿件详情请求失败',
+            message: '报题详情请求失败',
             type: 'error',
             plain: true,
           })
@@ -979,7 +979,7 @@ export default {
 
         //注释于 20240515.1530 jira YDYL-5 建议删除
         // ElMessage({
-        //   message: '稿件详情请求成功',
+        //   message: '报题详情请求成功',
         //   type: 'success',
         //   plain: true,
         // });
@@ -989,7 +989,7 @@ export default {
         scopeP.row.visible = true;
         scopeP.row.articleHtmlCon = data.articleHtmlCon;//在element-ui中，table的列中 赋值 articleHtmlCon
         scopeP.row.trueName = data.trueName;//在element-ui中，table的列中 赋值 trueName
-        scopeP.row.crtime = data.crtime;//稿件创建时间 2024-04-11 09:18:29
+        scopeP.row.crtime = data.crtime;//报题创建时间 2024-04-11 09:18:29
 
 
         //把当前打开的详情信息储存起来
@@ -1005,7 +1005,7 @@ export default {
 
       })
       .catch((error)=>{
-        console.log('error 稿件详情',error);
+        console.log('error 报题详情',error);
       })
       .finally(()=>{
         loadingInstance1.close();
@@ -1031,7 +1031,7 @@ export default {
     }
 
     /**
-     * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
+     * 查询“外审”列表页接口（包括左侧导航的“审核报题”“审核报题” 两个栏目）
      * radio = '待审核'
      */
      function getNeedAuditCountAjaxFn(){
@@ -1044,7 +1044,7 @@ export default {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
         // currentNode:2,//非必传 0 编辑 1 国家信息中心  2 国家发改委  4 空 未通过或已发布（显示空字符）
         articleType: typeSelectValue.value || '',
-        articleKind:1,//0外审稿件  1外审报题   （属于哪个栏目）
+        articleKind:1,//0外审报题  1外审报题   （属于哪个栏目）
         listStatus:0,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
         pageSize:limit.value,
         currPage:page.value,
@@ -1078,7 +1078,7 @@ export default {
         params:paramsO,
       })
       .then((D)=>{
-        console.log('D 查询审核稿件、报题',D);
+        console.log('D 查询审核报题、报题',D);
         const { data,success } = D.data
         if(!success){
           ElMessage({
@@ -1106,7 +1106,7 @@ export default {
         pageTotal.value = data.totalResults;
       })
       .catch((error)=>{
-        console.log('error 查询审核稿件、报题',error);
+        console.log('error 查询审核报题、报题',error);
       })
       .finally(()=>{
         loadingInstance1.close();
@@ -1116,7 +1116,7 @@ export default {
     // end of getNeedAuditCountAjaxFn
 
     /**
-     * 查询“外审”列表页接口（包括左侧导航的“审核稿件”“审核报题” 两个栏目）
+     * 查询“外审”列表页接口（包括左侧导航的“审核报题”“审核报题” 两个栏目）
      * radio = '已处理'
      */
      function getNeedAuditCountAjaxFn1(){
@@ -1129,7 +1129,7 @@ export default {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
         articleStatus:statusSelectValue.value|| '',//非必传 //1：审核中 2：已发布 3：未通过
         articleType: typeSelectValue1.value || '',
-        articleKind:1,//0外审稿件  1外审报题   （属于哪个栏目）
+        articleKind:1,//0外审报题  1外审报题   （属于哪个栏目）
         listStatus:2,//必传	0 待处理 2 已处理  国家信息中心/国家发改委
         pageSize:limit1.value,
         currPage:page1.value,
@@ -1173,7 +1173,7 @@ export default {
         params:paramsO,
       })
       .then((D)=>{
-        console.log('D 查询审核稿件、报题 已处理',D);
+        console.log('D 查询审核报题、报题 已处理',D);
         const { data,success } = D.data
         if(!success){
           ElMessage({
@@ -1231,7 +1231,7 @@ export default {
         pageTotal1.value = data.totalResults;
       })
       .catch((error)=>{
-        console.log('error 查询审核稿件、报题',error);
+        console.log('error 查询审核报题、报题',error);
       })
       .finally(()=>{
         loadingInstance1.close();

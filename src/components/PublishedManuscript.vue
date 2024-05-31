@@ -11,6 +11,7 @@
           placeholder="全部"
           style="width: 140px"
           class="marl10"
+          v-if="userAuthority === '外部用户'"
         >
           <el-option
             v-for="item in paperOptions"
@@ -63,6 +64,7 @@
             placeholder="稿件来源"
             @select="getBrokeListAjaxFn"
             @clear="getBrokeListAjaxFn"
+            v-if="userAuthority !== '外部用户'"
           />
         </div>
         <el-select
@@ -277,7 +279,7 @@ export default {
         label: o.desc,
       });
     });
-    const paperSelectValue = ref("");
+    const paperSelectValue = ref(1);
     const paperOptions = reactive([
       { label: "全部", value: 0 },
       { label: "我的投稿", value: 1 },
