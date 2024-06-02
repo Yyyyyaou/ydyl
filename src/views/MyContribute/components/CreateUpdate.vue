@@ -22,7 +22,7 @@
         >
           <el-upload
             v-model:file-list="fileList"
-            action="http://yapi.trsmedia.cn/mock/84/web/excel/upload"
+            :action="auditingUploadFilesPostUrl"
           >
             <el-button type="primary">上传文件</el-button>
             <p v-if="fileList.length == 0">（未选择任何文件）</p>
@@ -53,10 +53,14 @@ export default {
       console.log(radio.value);
     }
     const fileList = ref([]);
+    //附件上传接口地址
+    const auditingUploadFilesPostUrl = ref('');
+    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/excel/upload':auditingUploadFilesPostUrl.value ='/web/excel/upload'
     return {
       radio,
       submitclick,
       fileList,
+      auditingUploadFilesPostUrl,
     };
   },
 };
