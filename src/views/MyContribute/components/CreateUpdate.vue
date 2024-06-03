@@ -21,15 +21,23 @@
           style="margin-top: 40px"
         >
           <el-upload
+            ref="upload"
             v-model:file-list="fileList"
             :action="auditingUploadFilesPostUrl"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :auto-upload="false"
           >
             <el-button type="primary">上传文件</el-button>
             <p v-if="fileList.length == 0">（未选择任何文件）</p>
             <template #tip>
               <div class="el-upload__tip">
                 （ 如有需要，请点击下载EXCEL文件的
-                <a href="" download>海上丝路贸易指数模版</a>、<a href="" download>“一带一路”航贸指数模版</a>）
+                <a href="" download>海上丝路贸易指数模版</a>、<a
+                  href=""
+                  download
+                  >“一带一路”航贸指数模版</a
+                >）
               </div>
             </template>
           </el-upload>
@@ -38,29 +46,89 @@
     </div>
 
     <div class="createupdate-btn">
-      <el-button @click="submitclick">提&nbsp;&nbsp;&nbsp;&nbsp;交</el-button>
-      <el-button>重&nbsp;&nbsp;&nbsp;&nbsp;置</el-button>
+      <el-button @click="submitFn">提&nbsp;&nbsp;&nbsp;&nbsp;交</el-button>
+      <el-button @click="reSetFn">重&nbsp;&nbsp;&nbsp;&nbsp;置</el-button>
     </div>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
+import { genFileId, ElMessage } from "element-plus";
+import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
-  setup() {
+  emits: ["closeDialog"],
+  setup(props, context) {
+    props;
     const radio = ref(0);
-    function submitclick() {
-      console.log(radio.value);
-    }
+
     const fileList = ref([]);
     //附件上传接口地址
-    const auditingUploadFilesPostUrl = ref('');
-    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/excel/upload':auditingUploadFilesPostUrl.value ='/web/excel/upload'
+    const auditingUploadFilesPostUrl = ref("");
+    process.env.NODE_ENV === "development"
+      ? (auditingUploadFilesPostUrl.value = "api/tougaoadmin/web/excel/upload")
+      : (auditingUploadFilesPostUrl.value = "/web/excel/upload");
+
+    const upload = ref();
+
+    //文件数大于1触发钩子函数
+    const handleExceed = (files) => {
+      upload.value.clearFiles();
+      const file = files[0];
+      file.uid = genFileId();
+      upload.value.handleStart(file);
+    };
+    //提交
+    function submitFn() {
+      if (fileList.value.length == 0) {
+        ElMessage({
+          message: "请选择您要上传的数据文件",
+          type: "error",
+          plain: true,
+        });
+        return;
+      }
+      httpAxiosO({
+        url: "/web/excel/upload",
+        method: "post",
+        headers: {
+          //这个接口不写 这行会报错
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        data: fileList.value[0],
+      })
+        .then((D) => {
+          console.log("我的数据提交 D", D);
+          const { data, success } = D.data;
+          data;
+          if (!success) {
+            ElMessage({
+              message: "我的数据 提交失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          context.emit("closeDialog");
+        })
+        .catch((error) => {
+          console.log("我的数据提交 error", error);
+        })
+        .finally(() => {});
+    }
+    //重置
+    function reSetFn() {
+      fileList.value.length = 0;
+    }
     return {
       radio,
-      submitclick,
       fileList,
       auditingUploadFilesPostUrl,
+      handleExceed,
+
+      submitFn,
+      reSetFn,
+      upload, //ref长传文件对象
     };
   },
 };
@@ -99,11 +167,11 @@ export default {
         font-size: 16px;
         margin-left: 30px;
       }
-      .el-upload__tip{
+      .el-upload__tip {
         color: #9d9898;
         font-size: 16px;
         margin-top: 20px;
-        a{
+        a {
           color: #015a9f;
         }
       }

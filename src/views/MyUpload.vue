@@ -126,9 +126,9 @@
                     审核
                   </div>
                   <span v-if="scope.row.auditLabel == 0"></span>
-                  <div>下载</div>
+                  <div @click="dataDownloadFn(scope.row)">下载</div>
                   <span></span>
-                  <div>删除</div>
+                  <div @click="dataDeleteFn(scope.row)">删除</div>
                   <span></span>
                 </div>
               </template>
@@ -167,8 +167,13 @@
     </div>
   </div>
 
-  <el-dialog v-model="dialogVisible" title="数据上传" width="1450">
-    <CreateUpdate />
+  <el-dialog
+    v-model="dialogVisible"
+    title="数据上传"
+    width="1450"
+    v-if="dialogVisible"
+  >
+    <CreateUpdate @closeDialog="closeDialog" />
   </el-dialog>
 </template>
 
@@ -177,7 +182,7 @@ import { ref, reactive, onMounted } from "vue";
 //import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import { ElMessage, ElLoading } from "element-plus";
+import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import { timeFormatFn } from "@/utils/timeFormat.js";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 import CreateUpdate from "@/views/MyContribute/components/CreateUpdate.vue";
@@ -369,13 +374,28 @@ export default {
       //   })
       // });
     };
+    //审核 先弹窗再调接口（传参：通过2 未通过1）
     function dataCheckFn(scopeP) {
+      ElMessageBox.confirm("数据审核是否通过？", "数据审核", {
+        confirmButtonText: "通过",
+        cancelButtonText: "不通过",
+        customClass: "selfElMessageBox",
+      })
+        .then(() => {
+          dataCheckAjaxFn(scopeP, 2); //通过
+        })
+        .catch(() => {
+          dataCheckAjaxFn(scopeP, 1);
+        });
+    }
+    //审核接口
+    function dataCheckAjaxFn(scopeP, flag) {
       httpAxiosO({
         method: "get",
         url: "/web/excel/update",
         params: {
           id: scopeP.id,
-          auditLabel: 2,
+          auditLabel: flag,
         },
       })
         .then((D) => {
@@ -408,12 +428,91 @@ export default {
         })
         .finally(() => {});
     }
+    //删除
+    function dataDeleteFn(scopeP) {
+      httpAxiosO({
+        method: "get",
+        url: "/web/excel/del",
+        params: {
+          id: scopeP.id,
+        },
+      })
+        .then((D) => {
+          console.log("数据删除 D", D);
+          const { data, success } = D?.data;
+          data;
+          if (!success) {
+            ElMessage({
+              message: "数据删除接口请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            ElMessage({
+              message: "数据删除接口请求成功",
+              type: "success",
+              plain: true,
+            });
+            getExcelListAjaxFn();
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "数据删除接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
+    //下载
+    function dataDownloadFn(scopeP) {
+      httpAxiosO({
+        method: "get",
+        url: "/web/excel/download",
+        params: {
+          id: scopeP.id,
+          path: "C://Users//Admin//Desktop",
+        },
+      })
+        .then((D) => {
+          console.log("数据下载 D", D);
+          const { data, success } = D?.data;
+          data;
+          if (!success) {
+            ElMessage({
+              message: "数据下载接口请求失败",
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            ElMessage({
+              message: "数据下载接口请求成功",
+              type: "success",
+              plain: true,
+            });
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "数据下载接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
     onMounted(() => {
       getExcelListAjaxFn();
     });
 
     function tableSelectionChange(val) {
       console.log(val);
+    }
+    function closeDialog() {
+      dialogVisible.value = false;
     }
     return {
       disabledDate,
@@ -440,6 +539,10 @@ export default {
       continueUsingFn,
 
       dialogVisible,
+      closeDialog,
+
+      dataDeleteFn,
+      dataDownloadFn,
     };
   },
 };
