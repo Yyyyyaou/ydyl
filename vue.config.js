@@ -44,17 +44,18 @@ module.exports = {
         ws:false,
         // target:'http://192.168.201.68:8090',//连上vpn后服务接口地址
         // target:'http://192.168.200.7',//连上vpn后 公司环境容器内应用
-        // target:'http://gzmh-dev.xhszjs.cn/',//中经社线上环境
+        target:'http://gzmh-dev.xhszjs.cn/',//中经社线上环境
 
         // target:'http://172.27.37.163:8899',//连袁冰本地服务接口地址
         // target:'http://172.27.37.149:8090',//连袁冰本地服务接口地址
         // target:'http://192.168.137.1:8899',//连程雪飞本地服务接口地址
-        target:'http://172.27.40.91:8090',//连程雪飞本地服务接口地址
+        // target:'http://172.27.40.91:8090',//连程雪飞本地服务接口地址
 
         changeOrigin:true,//开启代理： 在本地会创建一个虚拟服务端，然后发送请求数据，并且同时接收请求数据，这样客户端和服务端进行数据的交互就不会有跨域问题
         pathRewrite:{
           '^/api':''
-        }
+        },
+        cookieDomainRewrite: "localhost",
       },
       '/webSocket':{
         // target:'ws://192.168.137.1:8090/',
