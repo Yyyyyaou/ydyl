@@ -1,15 +1,16 @@
 <template>
   <div class="head-style">
     <div class="head-left flexcenter"
-      @click="router.replace({ path: '/' })"
     >
       <div
-        class="head-logo"
+        class="head-logo hoverpointer"
+        @click="router.replace({ path: '/' })"
       >
         logo
       </div>
       <div
-        class="head-name"
+        class="head-name hoverpointer"
+        @click="router.replace({ path: '/' })"
       >
         中国一带一路网投稿平台
       </div>
@@ -87,7 +88,8 @@ export default {
 .head-name{font-size: 20px; color: #4c4d62; font-weight: 700;}
 .head-style {
   height: 58px;
-  .head-left {cursor: pointer;
+  .head-left {
+    //cursor: pointer;
     height: 100%;
     border: 1px solid #e9e7f4;
   }
