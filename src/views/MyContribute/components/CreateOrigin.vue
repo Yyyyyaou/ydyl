@@ -157,6 +157,7 @@ before-remove 在附件列表删除文件钩子
           v-model="formData.remark"
           clearable
           type="textarea"
+          maxlength="500"
           :rows="6"
           placeholder="请输入备注信息"
           height
@@ -201,7 +202,7 @@ before-remove 在附件列表删除文件钩子
 import Editor from '@tinymce/tinymce-vue';
 import PubDetail from '@/views/Notice/views/PubDetail.vue';
 
-import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount, } from "vue";
+import { onMounted, reactive,ref,nextTick, toRefs, onBeforeUnmount,watch, } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage,ElLoading,ElMessageBox, } from "element-plus";
@@ -313,6 +314,7 @@ export default {
       ]
     });
 
+    
 
     /**
      * 选中已有来源
@@ -407,7 +409,7 @@ export default {
 
     //附件上传接口地址
     const auditingUploadFilesPostUrl = ref('');
-    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='/web/article/upload'
+    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='tougaoadmin/web/article/upload'
 
     //附件id集合，袁冰写的接口代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds，提交使用
     const auditingUploadFilesFileIds = reactive([]);
@@ -1195,7 +1197,7 @@ export default {
         let _regExp1 = new RegExp('/tougaoadmin/web/article/getobj','img');
         editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon.replace(_regExp1,(str)=>{
           return 'api'+str
-        });     
+        });
       }else{
         editorHTMLContent.value = forPropsGetFindByIdAjaxFnReturnO.value.articleHtmlCon||'';//稿件HTML内容
       }
@@ -1302,6 +1304,23 @@ export default {
     }
     // end of resetFormFn
 
+    watch(
+      ()=>{
+        return formData
+      },
+      (
+        NewFormData,OldFormData
+      )=>{
+        OldFormData
+        if(
+          NewFormData.remark.length<=500
+        ){//备注
+          console.log('NewFormData.remark.length',NewFormData.remark,NewFormData.remark.length);
+        }
+      },
+      { deep: true }
+    );
+
     onMounted(()=>{
       //to do
       getPropsFn();
@@ -1310,6 +1329,8 @@ export default {
     onBeforeUnmount(()=>{
       deleteUncommittedArticleDelFileObjFn();
     });
+
+
 
     return {
       router,
@@ -1442,5 +1463,7 @@ export default {
 .videoUploadProgressC{position:fixed;background:rgba(0,0,0,.3);top:0;bottom:0;left:0;right:0;z-index:2000;display:flex;justify-content:center;align-items:center;
   .el-progress{width:80%;}
 }
+
+
 
 </style>

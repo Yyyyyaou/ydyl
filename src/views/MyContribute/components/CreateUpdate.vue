@@ -66,9 +66,9 @@ export default {
     const fileList = ref([]);
     //附件上传接口地址
     const auditingUploadFilesPostUrl = ref("");
-    process.env.NODE_ENV === "development"
-      ? (auditingUploadFilesPostUrl.value = "api/tougaoadmin/web/excel/upload")
-      : (auditingUploadFilesPostUrl.value = "/web/excel/upload");
+    // process.env.NODE_ENV === "development"
+    //   ? (auditingUploadFilesPostUrl.value = "api/tougaoadmin/web/excel/upload")
+    //   : (auditingUploadFilesPostUrl.value = "/tougaoadmin/web/excel/upload");
 
     const upload = ref();
 
@@ -81,6 +81,7 @@ export default {
     };
     //提交
     function submitFn() {
+
       if (fileList.value.length == 0) {
         ElMessage({
           message: "请选择您要上传的数据文件",
@@ -89,8 +90,11 @@ export default {
         });
         return;
       }
+
+      const formData = new FormData();
+      formData.append('file',fileList.value[0].raw);
       httpAxiosO({
-        url: "/web/excel/upload",
+        url: '/web/excel/upload',
         method: "post",
         headers: {
           //这个接口不写 这行会报错

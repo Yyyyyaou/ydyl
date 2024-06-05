@@ -372,7 +372,7 @@ export default {
     process.env.NODE_ENV === "development"
       ? (auditingUploadFilesPostUrl.value =
           "api/tougaoadmin/web/article/upload")
-      : (auditingUploadFilesPostUrl.value = "/web/article/upload");
+      : (auditingUploadFilesPostUrl.value = "tougaoadmin/web/article/upload");
 
     //普通附件列表
     const auditingUploadFilesArrays = reactive([]);

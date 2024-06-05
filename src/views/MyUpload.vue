@@ -78,12 +78,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              color: '#6a6d74',
+              'color': '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              color: '#727789',
+              'color': '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
@@ -173,7 +173,10 @@
     width="1450"
     v-if="dialogVisible"
   >
-    <CreateUpdate @closeDialog="closeDialog" />
+    <CreateUpdate 
+      @closeDialog="closeDialog"
+      @refreshList="getExcelListAjaxFn"
+    />
   </el-dialog>
 </template>
 
