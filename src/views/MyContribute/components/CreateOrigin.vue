@@ -54,6 +54,7 @@
         label="稿件正文"
         prop="articleHtmlCon"
         class="createorigin-content-editor"
+        id="tinymce_Editor_ID"
       >
         <!-- <section id="QuillEditorEleID"></section> -->
         <!-- <textarea id="tinymceEditorEleID" placeholder="编辑正文"></textarea> -->
@@ -74,11 +75,16 @@
             menubar:false,//顶部菜单栏
             resize:false,
             statusbar: false,
-            
+            setup:function(editor){
+              editor.on('init',function(){
+                disabledEditorVedioDragFn();
+              })
+            }            
           }" 
           v-model="editorHTMLContent"
           model-events="change keydown blur focus paste"
           @change="editorChangeFn"
+
         />
 
       </el-form-item>
@@ -219,7 +225,8 @@ export default {
   props:{
     forPropsGetFindByIdAjaxFnReturnO:Object,
   },
-  setup(props,ctx) {ctx;
+  // eslint-disable-next-line
+  setup(props,ctx) {
     //路由实例
     const router = useRouter();
     
@@ -392,12 +399,14 @@ export default {
 
 
     const langOptions = reactive([]);
+    // eslint-disable-next-line
     store.state.GLOBAL_LANGUAGE_LIST.forEach((o,i)=>{
       //∵ 这个界面不需要全部
-      if(o.desc === '全部'){
+      if(o.desc === '全部语种'){
         return;
       }
-      if(i===1){
+
+      if(o.desc==='中文'){
         formData.language = o.id;
       }
       langOptions.push({
@@ -407,9 +416,10 @@ export default {
     });
 
 
+
     //附件上传接口地址
     const auditingUploadFilesPostUrl = ref('');
-    process.env.NODE_ENV === 'development' ?auditingUploadFilesPostUrl.value ='api/tougaoadmin/web/article/upload':auditingUploadFilesPostUrl.value ='tougaoadmin/web/article/upload'
+    auditingUploadFilesPostUrl.value =httpAxiosO.defaults.baseURL+'/web/article/upload';
 
     //附件id集合，袁冰写的接口代码是不管什么附件类型，都把它的id保存到一个字段里 fileIds，提交使用
     const auditingUploadFilesFileIds = reactive([]);
@@ -426,17 +436,17 @@ export default {
 
     //审核资质附件
     // const postAddEditAjaxFormData = new FormData();
-    function handleAuditingUploadChangeFn(file,files){file,files
-
-
+    // eslint-disable-next-line
+    function handleAuditingUploadChangeFn(file,files){
+      //to do
     }
     // end of handleAuditingUploadChange
 
     /**
      * 附件上传成功
      */
-    function handleAuditingUploadSuccessFn(response, uploadFile, files){uploadFile, files
-
+    // eslint-disable-next-line
+    function handleAuditingUploadSuccessFn(response, uploadFile, files){
       if(response.success){
         ElMessage({
           message: '附件上传成功',
@@ -480,7 +490,8 @@ export default {
     /**
      * 删除附件文件之前
      */
-    function handleAuditingUploadBeforeRemoveFn(uploadFile, uploadFiles){uploadFiles
+    // eslint-disable-next-line
+    function handleAuditingUploadBeforeRemoveFn(uploadFile, uploadFiles){
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const {fileName} = uploadFile.response.data[0];
 
@@ -611,11 +622,13 @@ export default {
     const editorHTMLContent = ref('');
     //富文本编辑器 文本正文内容
     const editorTEXTContent = ref('');
+
     /**
      * 监听编辑器输入
      * a、b 两个参数暂时不知道是什么
      */
-    function editorChangeFn(a,b){a;
+    // eslint-disable-next-line
+    function editorChangeFn(a,b){
 
       //收集正文 TEXT 格式
       editorTEXTContent.value = b.getContent({
@@ -624,6 +637,16 @@ export default {
 
     }
     // end of editorChangeFn
+
+    /**
+     * 
+     */
+    function disabledEditorVedioDragFn(){
+      const vedioIframeEleO = document.querySelector('#tinymce_Editor_ID iframe');
+      console.log('vedioIframeEleO',vedioIframeEleO);
+
+    }
+    // end of disabledEditorVedioDragFn
 
     /**
      * 正文图片插入（正文图片上传）
@@ -787,6 +810,7 @@ export default {
     /**
      * 视频上传返回格式
      */
+    // eslint-disable-next-line
     function editorVideoTemplateCallbackFn(data,b){
       console.log('data',data)
       console.log('b',b)
@@ -803,7 +827,7 @@ export default {
      * @param {*} datasOP 
      */
     function checkFieldValueFn(datasOP){
-      const { articleTitle,articleSource,language,articleHtmlCon,sourceName,articleSourceName,auditing } = datasOP;
+      const { articleTitle,articleSource,language,articleHtmlCon,sourceName,articleSourceName,fileUnit } = datasOP;
 
       // console.log('sourceName',sourceName);
       // console.log('articleSource',articleSource);
@@ -870,15 +894,16 @@ export default {
         checkResult = false;
       }      
       //上传失败 先注释
-       console.log(auditing)
-      // if(auditing == undefined){
-      //   ElMessage({
-      //     message: '请上传司局级审核单',
-      //     type: 'warning',
-      //     plain: true,
-      //   })
-      //   checkResult = false;
-      // }
+      if(
+        fileUnit === ''
+      ){
+        ElMessage({
+          message: '请上传司局级审核单',
+          type: 'warning',
+          plain: true,
+        })
+        checkResult = false;
+      }
       return checkResult
     }
 
@@ -935,8 +960,10 @@ export default {
           return;
         }
       });
+
       //接口 接受附件 字符串 'x1,x2,x3'
       datasO.fileUnit =  _fileUnit.toString();
+
 
       //普通附件列表
       const _fileAccessory = auditingUploadFilesArray1.value.map((o)=>{
@@ -1008,12 +1035,11 @@ export default {
         //接口 接受附件 字符串 'x1,x2,x3'
         datasO.fileHtmlCon = _fileHtmlCon.toString();
 
-        //附件id 接口 接收字符串
-        datasO.fileIds = auditingUploadFilesFileIds.toString();
-
       }
       // end of if  正文有附件再执行
 
+      //附件id 接口 接收字符串
+      datasO.fileIds = auditingUploadFilesFileIds.toString();
 
       //接口传参需要去掉datasO.articleContent 结尾的 \n
       const _regExp1 = /\n$/;
@@ -1022,12 +1048,6 @@ export default {
       if(!checkFieldValueFn(datasO)){//验证各个字段
         return;
       }
-
-      //接口代码接收流
-      // const datasOFormData = new FormData();
-      // for(let key in datasO){
-      //   datasOFormData.append(key,datasO[key]); 
-      // }
 
 
       // 如果有 父组件传来的id 说明是 “继续采用”，需要对接口链接 和 请求判断一下，这俩接口应该只有 差 稿件id参数
@@ -1058,7 +1078,8 @@ export default {
       })
       .then((D)=>{
         console.log('原创稿件提交 D',D);
-        const { data,success } = D.data;data
+        // eslint-disable-next-line
+        const { data,success } = D.data;
         if(!success){
           ElMessage({
             message: '操作失败 接口传参可能有误',
@@ -1308,12 +1329,12 @@ export default {
       ()=>{
         return formData
       },
-      (
-        NewFormData,OldFormData
-      )=>{
-        OldFormData
+      // eslint-disable-next-line
+      (NewFormData,OldFormData)=>{
+        
         if(
-          NewFormData.remark.length<=500
+          NewFormData.remark
+          &&NewFormData.remark.length<=500
         ){//备注
           console.log('NewFormData.remark.length',NewFormData.remark,NewFormData.remark.length);
         }
@@ -1321,9 +1342,16 @@ export default {
       { deep: true }
     );
 
-    onMounted(()=>{
+
+    onMounted(async ()=>{
       //to do
+
+      await nextTick();
+
       getPropsFn();
+      
+      disabledEditorVedioDragFn();
+
     })
 
     onBeforeUnmount(()=>{
@@ -1352,6 +1380,7 @@ export default {
       editorImagesUploadHandlerFn,
       editorVideoTemplateCallbackFn,
       editorFilePickerCallbackFn,
+      disabledEditorVedioDragFn,
 
       auditingUploadFilesPostUrl,
       auditingUploadFilesArray,

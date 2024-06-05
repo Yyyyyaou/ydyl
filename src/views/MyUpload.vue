@@ -276,8 +276,9 @@ export default {
       })
         .then((D) => {
           console.log("我的数据 D", D);
+          // eslint-disable-next-line
           const { data, success } = D?.data;
-          data;
+
           if (!success) {
             ElMessage({
               message: "我的数据数据请求失败",
@@ -286,11 +287,13 @@ export default {
             });
             return;
           }
-          ElMessage({
-            message: "我的数据数据请求成功",
-            type: "success",
-            plain: true,
-          });
+
+          //注释于 20240515.1530 jira YDYL-5 建议删除
+          // ElMessage({
+          //   message: "我的数据数据请求成功",
+          //   type: "success",
+          //   plain: true,
+          // });
 
           tableData.splice(0, tableData.length); //清空tableData
           data.ldata.forEach((o) => {
@@ -342,8 +345,9 @@ export default {
      * 继续采用 ，实际上是“查看稿件”即跳转到 “创建稿件/原创稿件”界面
      * @param {*} scopeP
      */
+    // eslint-disable-next-line
     const continueUsingFn = (scopeP) => {
-      scopeP;
+
       // const {
       //   id,excelTitle,articleHtmlCon,articleContent,language,remark,articleStatus,aritleSource
       // } = scopeP.row;
@@ -403,8 +407,9 @@ export default {
       })
         .then((D) => {
           console.log("审核 D", D);
+          // eslint-disable-next-line
           const { data, success } = D?.data;
-          data;
+
           if (!success) {
             ElMessage({
               message: "审核接口请求失败",
@@ -442,8 +447,9 @@ export default {
       })
         .then((D) => {
           console.log("数据删除 D", D);
+          // eslint-disable-next-line
           const { data, success } = D?.data;
-          data;
+
           if (!success) {
             ElMessage({
               message: "数据删除接口请求失败",
@@ -481,8 +487,9 @@ export default {
       })
         .then((D) => {
           console.log("数据下载 D", D);
+          // eslint-disable-next-line
           const { data, success } = D?.data;
-          data;
+
           if (!success) {
             ElMessage({
               message: "数据下载接口请求失败",
@@ -632,14 +639,9 @@ export default {
           cursor: pointer;
           padding: 0 8px;
         }
-        span:nth-last-child(1) {
-          display: none;
-        }
-        span {
-          width: 1px;
-          height: 17px;
-          background: #3652d2;
-        }
+        span {width: 1px;height: 17px;background: #3652d2;}
+        span:nth-last-child(1) {display: none;}
+
       }
     }
   }

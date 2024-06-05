@@ -145,6 +145,7 @@ export default {
           languageName.value = o.desc;
         }
       });
+      
 
 
       //审核附件列表
@@ -386,6 +387,7 @@ export default {
     onMounted(() => {
       // readPropsArticleOFn();
       getFindByIdAjaxFn();
+
     });
 
     return {
@@ -447,7 +449,7 @@ ul,ol,li{list-style:auto;}
     }
   }
 }
-.htmlContentC{font-size:18px;line-height:1.88em;padding:20px;overflow:hidden;color: #000;
+.htmlContentC{font-size:18px;line-height:1.88em;padding:20px;overflow:hidden;color: #000;width:100%;
   :deep(&>*){padding:10px 0;word-break: break-all;margin-bottom:1.25em;}
   :deep(ul){display: block; list-style-type: disc; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px; unicode-bidi: isolate;
     li{list-style: initial;}

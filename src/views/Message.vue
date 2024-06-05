@@ -433,14 +433,8 @@ export default {
           cursor: pointer;
           padding: 0 8px;
         }
-        span:nth-last-child(1) {
-          display: none;
-        }
-        span {
-          width: 1px;
-          height: 17px;
-          background: #3652d2;
-        }
+        span {width: 1px;height: 17px;background: #3652d2;}
+        span:nth-last-child(1) {display: none;}
       }
     }
   }

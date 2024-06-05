@@ -58,8 +58,8 @@ import { genFileId, ElMessage } from "element-plus";
 import httpAxiosO from "ROOT_URL/api/http/httpAxios.js";
 export default {
   emits: ["closeDialog"],
+  // eslint-disable-next-line
   setup(props, context) {
-    props;
     const radio = ref(0);
 
     const fileList = ref([]);
@@ -103,8 +103,8 @@ export default {
       })
         .then((D) => {
           console.log("我的数据提交 D", D);
+          // eslint-disable-next-line
           const { data, success } = D.data;
-          data;
           if (!success) {
             ElMessage({
               message: "我的数据 提交失败",

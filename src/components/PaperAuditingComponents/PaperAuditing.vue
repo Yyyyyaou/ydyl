@@ -1036,9 +1036,7 @@ export default {
      */
      function getNeedAuditCountAjaxFn(){
       const loadingInstance1 = ElLoading.service({ fullscreen: true })
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
-        return o.desc
-      });
+
       getSourceId(originInput,0)
       const paramsO = {
         // articleStatus:,非必传 //1：审核中 2：已发布 3：未通过
@@ -1099,7 +1097,13 @@ export default {
         tableData.splice(0,tableData.length);
         data.ldata.forEach((o)=>{
           let _o = o;
-          _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
+          // _o.languageName = languageNameArr[o.language]//语种名称，接口只提供了语种对应的 编号
+          _o.languageName = store.state.GLOBAL_LANGUAGE_LIST.filter((o1) => {
+            if(o.language === o1.id){
+              return o1;
+            }
+          })[0]['desc'];
+
           _o.postTimeFormat = timeFormatFn(o.postTime)['YYYY-MM-DD']//时间格式化
           tableData.push(_o);
         });

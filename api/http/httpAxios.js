@@ -12,6 +12,7 @@ import {
 const httpAxiosO = axios.create({  
   // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url  
   baseURL: process.env.NODE_ENV === 'development'? '/api/tougaoadmin' : '/tougaoadmin', // 开发环境就加 /api 前缀
+  withCredentials:true,
   timeout: (1000*300) // 请求超时时间
 });
 

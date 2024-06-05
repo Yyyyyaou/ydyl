@@ -369,9 +369,6 @@ export default {
      */
 
     function getBrokeListAjaxFn() {
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o)=>{
-        return o.desc
-      });
 
       const articleUseStatusNameArr = ["待处理", "审核中", "已发布", "未采用"];
 
@@ -435,7 +432,14 @@ export default {
           tableData.splice(0,tableData.length); //清空tableData
           data.ldata.forEach((o) => {
             let _o = o;
-            _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            // _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+
+            _o.languageName = store.state.GLOBAL_LANGUAGE_LIST.filter((o1) => {
+              if(o.language === o1.id){
+                return o1;
+              }
+            })[0]['desc'];
+
             _o.articleUseStatusName = articleUseStatusNameArr[o.articleUseStatus]//状态名字，接口只提供了状态对应的 编号
             _o.crtimeFormat = timeFormatFn(o.crtime)["YYYY-MM-DD"]; //时间格式化
             tableData.push(_o);
@@ -652,14 +656,8 @@ export default {
         cursor: pointer;
         padding: 0 8px;
       }
-      span:nth-last-child(1) {
-        display: none;
-      }
-      span {
-        width: 1px;
-        height: 17px;
-        background: #3652d2;
-      }
+      span {width: 1px;height: 17px;background: #3652d2;}
+      span:nth-last-child(1) {display: none;}
     }
   }
 }

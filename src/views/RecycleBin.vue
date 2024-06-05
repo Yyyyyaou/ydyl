@@ -308,10 +308,6 @@ export default {
      * 接口返回数据字段，线上文档有写，很详细
      */
     function getArticleDraftListAjaxFn() {
-      const languageNameArr = store.state.GLOBAL_LANGUAGE_LIST.map((o) => {
-        return o.desc;
-      });
-      //languageNameArr.unshift("全部");
 
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       const paramsO = {
@@ -366,7 +362,13 @@ export default {
           tableData.splice(0, tableData.length); //清空tableData
           data.ldata.forEach((o) => {
             let _o = o;
-            _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            // _o.languageName = languageNameArr[o.language]; //语种名称，接口只提供了语种对应的 编号
+            _o.languageName = store.state.GLOBAL_LANGUAGE_LIST.filter((o1) => {
+              if(o.language === o1.id){
+                return o1;
+              }
+            })[0]['desc'];
+
             _o.deleteTimeFormat = timeFormatFn(o.deleteTime)["YYYY-MM-DD"]; //时间格式化
             tableData.push(_o);
           });
@@ -621,14 +623,8 @@ export default {
           cursor: pointer;
           padding: 0 8px;
         }
-        span:nth-last-child(1) {
-          display: none;
-        }
-        span {
-          width: 1px;
-          height: 17px;
-          background: #3652d2;
-        }
+        span {width: 1px;height: 17px;background: #3652d2;}
+        span:nth-last-child(1) {display: none;}
       }
     }
   }

@@ -172,8 +172,8 @@ export default {
   props: {
     forPropsGetFindByIdAjaxFnReturnO: Object,
   },
+  // eslint-disable-next-line
   setup(props, ctx) {
-    ctx;
     //vuex实例
     const store = useStore();
 
@@ -237,8 +237,8 @@ export default {
         {
           required: true,
           trigger: "blur",
+          // eslint-disable-next-line
           validator: (rule, value, callback) => {
-            rule;
             if (!value) {
               return callback(
                 new Error("请输入稿件原地址 例：https://www.yidaiyilu.gov.cn/")
@@ -353,13 +353,17 @@ export default {
     // end of articleSourceQuerySearchFn
 
     const langOptions = reactive([]);
+    //中文语种 id
+    const zhCNValue = ref('');
+    // eslint-disable-next-line
     store.state.GLOBAL_LANGUAGE_LIST.forEach((o, i) => {
       //∵ 这个界面不需要全部
-      if (o.desc === "全部") {
+      if (o.desc === "全部语种") {
         return;
       }
-      if (i === 1) {
+      if(o.desc==='中文'){
         dataList.value[0].language = o.id;
+        zhCNValue.value = o.id
       }
       langOptions.push({
         value: o.id,
@@ -369,10 +373,7 @@ export default {
 
     //附件上传接口地址
     const auditingUploadFilesPostUrl = ref("");
-    process.env.NODE_ENV === "development"
-      ? (auditingUploadFilesPostUrl.value =
-          "api/tougaoadmin/web/article/upload")
-      : (auditingUploadFilesPostUrl.value = "tougaoadmin/web/article/upload");
+    auditingUploadFilesPostUrl.value =httpAxiosO.defaults.baseURL+'/web/article/upload';
 
     //普通附件列表
     const auditingUploadFilesArrays = reactive([]);
@@ -389,8 +390,8 @@ export default {
      *
      * 所以暂时搁置 上传附件开发
      */
+    // eslint-disable-next-line
     function handleAuditingUploadChangeFn(indexP, file, files) {
-      indexP, file, files;
       // if(
       //   !Array.isArray(auditingUploadFilesArrays[indexP])
       // ){
@@ -423,12 +424,9 @@ export default {
     /**
      * 删除附件文件之前
      */
-    function handleAuditingUploadBeforeRemoveFn(
-      indexP,
-      uploadFile,
-      uploadFiles
-    ) {
-      indexP, uploadFiles;
+    // eslint-disable-next-line
+    function handleAuditingUploadBeforeRemoveFn(indexP,uploadFile,uploadFiles) {
+
       const loadingInstance1 = ElLoading.service({ fullscreen: true });
       console.log("uploadFile", uploadFile);
       const { fileName } = uploadFile.response.data[0];
@@ -495,7 +493,7 @@ export default {
       });
       dataList.value.push({
         fold: false,
-        language: 1,
+        language: zhCNValue.value,
         articleSource: 0,
         articleSourceName: "",
         sourceName: "",
@@ -511,10 +509,6 @@ export default {
       auditingUploadFilesArrays.pop(); //同步更新附件列表变量
     }
     function checkLanguageFn(datasOP) {
-      //查看 中文 字段值 是多少，∵语种列表是不断变化的，中文字段值不一定是 1
-      const zhCNValue = langOptions.filter((o) => {
-        return o.label === "中文";
-      })[0]["value"];
 
       //非要判断 稿件标题是否含有中文，如果不含有中文则  字段 language === 1 时提醒....
       if (
@@ -522,7 +516,7 @@ export default {
         typeof datasOP.articleTitle !== undefined &&
         datasOP.articleTitle &&
         datasOP.articleTitle.trim() !== "" &&
-        datasOP.language === zhCNValue
+        datasOP.language === zhCNValue.value
       ) {
         return true;
       } else {
@@ -718,8 +712,8 @@ export default {
             })
               .then((D) => {
                 console.log("转载稿件提交 D", D);
+                // eslint-disable-next-line
                 const { data, success } = D.data;
-                data;
                 if (!success) {
                   ElMessage({
                     message: "转载稿件提交 接口传参可能有误",
@@ -784,8 +778,8 @@ export default {
                 })
                   .then((D) => {
                     console.log("转载稿件提交 D", D);
+                    // eslint-disable-next-line
                     const { data, success } = D.data;
-                    data;
                     if (!success) {
                       ElMessage({
                         message: "转载稿件提交 接口传参可能有误",
@@ -851,8 +845,8 @@ export default {
             })
               .then((D) => {
                 console.log("转载稿件提交 D", D);
+                // eslint-disable-next-line
                 const { data, success } = D.data;
-                data;
                 if (!success) {
                   ElMessage({
                     message: "转载稿件提交 接口传参可能有误",

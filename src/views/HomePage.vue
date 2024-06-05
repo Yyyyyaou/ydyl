@@ -798,8 +798,7 @@ export default {
               margin-left: 30px;
               justify-content: center;
             }
-            p:nth-child(2),
-            p:nth-child(5) {
+            p:nth-child(2),p:nth-child(5) {
               margin-left: 20px;
               font-size: 30px;
               color: #555b73;
@@ -810,8 +809,7 @@ export default {
               background-color: #dfddec;
               margin: 0 35px;
             }
-            p:nth-child(3),
-            p:nth-child(6) {
+            p:nth-child(3),p:nth-child(6) {
               margin-left: 10px;
               font-size: 16px;
               color: #555b73;
@@ -844,24 +842,15 @@ export default {
             .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active
           ) {
           border: none;
-          span {
-            color: #0b77cd;
-          }
+          span {color: #0b77cd;}
         }
         :deep(.el-tabs--border-card > .el-tabs__header .el-tabs__item) {
           transition: none;
           border: none;
         }
-        .custom-tabs-label {
-          color: #424f63;
-          font-size: 18px;
-          span {
-            margin-left: 15px;
-            font-weight: 700;
-          }
-          .el-icon {
-            color: #0b77cd !important;
-          }
+        .custom-tabs-label {color: #424f63;font-size: 18px;
+          span {margin-left: 15px;font-weight: 700;}
+          .el-icon {color: #0b77cd !important;}
         }
         :deep(.el-tabs--border-card > .el-tabs__content) {
           padding: 0;
@@ -957,14 +946,9 @@ export default {
               cursor: pointer;
               padding: 0 8px;
             }
-            span:nth-last-child(1) {
-              display: none;
-            }
-            span {
-              width: 1px;
-              height: 17px;
-              background: #3652d2;
-            }
+            span {width: 1px;height: 17px;background: #3652d2;}
+            span:nth-last-child(1) {display: none;}
+
           }
         }
       }
