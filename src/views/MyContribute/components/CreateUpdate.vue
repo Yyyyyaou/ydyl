@@ -34,11 +34,8 @@
             <template #tip>
               <div class="el-upload__tip">
                 （ 如有需要，请点击下载EXCEL文件的
-                <a href="" download>海上丝路贸易指数模版</a>、<a
-                  href=""
-                  download
-                  >“一带一路”航贸指数模版</a
-                >）
+                <a @click="downloadExcel(0)" class="hoverpointer">海上丝路贸易指数模版</a>、
+                <a @click="downloadExcel(1)" class="hoverpointer">“一带一路”航贸指数模版</a>）
               </div>
             </template>
           </el-upload>
@@ -137,6 +134,58 @@ export default {
     function reSetFn() {
       fileList.value.length = 0;
     }
+    //下载模板
+    function downloadExcel(format) {
+      httpAxiosO({
+        method: "get",
+        url: "/web/excel/template",
+        params: {
+          format: format,
+        },
+        responseType: "blob",
+      })
+        .then((D) => {
+          console.log("模板下载 D", D);
+          const { data } = D;
+          try {
+            let typeP = "application/vnd.ms-excel";
+            const blob = new Blob([data], {
+              type: typeP, //使用获取的excel格式
+            });
+            const a = document.createElement("a");
+            const id = "aDownloadID" + new Date().getTime();
+            // 创建下载的链接
+            a.href = window.URL.createObjectURL(blob);
+            let name =  format==0?'海上丝路贸易指数模版':'“一带一路”航贸指数模版';
+            a.download = name;
+            a.style.display = "none";
+            a.setAttribute("id", id);
+            //a标签追加元素到body内
+            document.body.appendChild(a);
+            //模拟点击下载
+            a.click();
+            // 下载完成移除元素
+            //document.body.removeChild(a);
+            document.querySelector("#" + id).remove();
+            // 释放掉blob对象
+            window.URL.revokeObjectURL(a.href);
+          } catch {
+            ElMessage({
+              message: "模板下载失败",
+              type: "error",
+              plain: true,
+            });
+          }
+        })
+        .catch(() => {
+          ElMessage({
+            message: "模板下载接口请求失败",
+            type: "error",
+            plain: true,
+          });
+        })
+        .finally(() => {});
+    }
     return {
       radio,
       fileList,
@@ -146,6 +195,7 @@ export default {
       submitFn,
       reSetFn,
       upload, //ref长传文件对象
+      downloadExcel,
     };
   },
 };
