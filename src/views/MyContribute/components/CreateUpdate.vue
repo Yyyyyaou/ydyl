@@ -27,6 +27,7 @@
             :limit="1"
             :on-exceed="handleExceed"
             :auto-upload="false"
+            accept=".xls, .xlsx"
           >
             <el-button type="primary">上传文件</el-button>
             <p v-if="fileList.length == 0">（未选择任何文件）</p>
@@ -95,7 +96,7 @@ export default {
           //这个接口不写 这行会报错
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        data: fileList.value[0],
+        data: { file: fileList.value[0], format: radio.value },
       })
         .then((D) => {
           console.log("我的数据提交 D", D);
@@ -108,8 +109,14 @@ export default {
               plain: true,
             });
             return;
+          } else {
+            ElMessage({
+              message: "我的数据提交成功",
+              type: "success",
+              plain: true,
+            });
+            context.emit("closeDialog");
           }
-          context.emit("closeDialog");
         })
         .catch((error) => {
           console.log("我的数据提交 error", error);

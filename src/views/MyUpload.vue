@@ -384,7 +384,10 @@ export default {
         .then(() => {
           dataCheckAjaxFn(scopeP, 2); //通过
         })
-        .catch(() => {
+        .catch((action) => {
+          if (action === "cancel") {
+            return;
+          }
           dataCheckAjaxFn(scopeP, 1);
         });
     }
@@ -473,7 +476,6 @@ export default {
         url: "/web/excel/download",
         params: {
           id: scopeP.id,
-          path: "C://Users//Admin//Desktop",
         },
       })
         .then((D) => {
@@ -493,6 +495,23 @@ export default {
               type: "success",
               plain: true,
             });
+            const blob = new Blob([data]);
+            const a = document.createElement("a");
+            const id = "aDownloadID" + new Date().getTime();
+            // 创建下载的链接
+            a.href = window.URL.createObjectURL(blob);
+            a.download = D.fileName;
+            a.style.display = "none";
+            a.setAttribute("id", id);
+            //a标签追加元素到body内
+            document.body.appendChild(a);
+            //模拟点击下载
+            a.click();
+            // 下载完成移除元素
+            //document.body.removeChild(a);
+            document.querySelector("#" + id).remove();
+            // 释放掉blob对象
+            window.URL.revokeObjectURL(a.href);
           }
         })
         .catch(() => {
@@ -513,6 +532,7 @@ export default {
     }
     function closeDialog() {
       dialogVisible.value = false;
+      getExcelListAjaxFn();
     }
     return {
       disabledDate,
