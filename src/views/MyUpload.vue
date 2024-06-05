@@ -34,7 +34,7 @@
             >
               <el-select
                 v-model="searchExcelTyepValue"
-                placeholder=""
+                placeholder="数据指数"
                 style="width: 200px"
                 @change="getExcelListAjaxFn"
               >
@@ -78,12 +78,12 @@
             style="width: 100%"
             :header-cell-style="{
               'text-align': 'center',
-              'color': '#6a6d74',
+              color: '#6a6d74',
               'font-size': '16px',
             }"
             :cell-style="{
               'text-align': 'center',
-              'color': '#727789',
+              color: '#727789',
               'font-size': '16px',
             }"
             @selection-change="tableSelectionChange"
@@ -108,7 +108,37 @@
                 </span>
               </template>
             </el-table-column>
-
+            <el-table-column
+              prop="uploadSource"
+              label="上传单位"
+              header-align="center"
+              align="center"
+              width="140"
+            />
+            <el-table-column
+              prop="auditLabel"
+              label="审核状态"
+              header-align="center"
+              align="center"
+              width="110"
+            >
+              <template #default="scope">
+                <span
+                  :class="{
+                    isdcl: scope.row.auditLabel === 0, //'待处理',
+                    isyfb: scope.row.auditLabel === 2, //'已通过',
+                    iswcy: scope.row.auditLabel === 1, //'未通过',
+                  }"
+                  >{{
+                    scope.row.auditLabel == 0
+                      ? "待处理"
+                      : scope.row.auditLabel == 1
+                      ? "未通过"
+                      : "已通过"
+                  }}
+                </span>
+              </template>
+            </el-table-column>
             <el-table-column
               prop="crtimeFormat"
               label="创建日期"
@@ -173,7 +203,7 @@
     width="1450"
     v-if="dialogVisible"
   >
-    <CreateUpdate 
+    <CreateUpdate
       @closeDialog="closeDialog"
       @refreshList="getExcelListAjaxFn"
     />
@@ -203,11 +233,15 @@ export default {
     const searchInput = ref("");
 
     //搜索条件 数据指数 选项
-    const searchExcelTyepValue = ref(0);
+    const searchExcelTyepValue = ref(null);
     const searchExcelTyepOptions = [
       {
+        value: "",
+        label: "全部数据指数",
+      },
+      {
         value: 0,
-        label: "数据指数全部", //贸易指数
+        label: "贸易指数", //贸易指数
       },
       {
         value: 1,
@@ -347,7 +381,6 @@ export default {
      */
     // eslint-disable-next-line
     const continueUsingFn = (scopeP) => {
-
       // const {
       //   id,excelTitle,articleHtmlCon,articleContent,language,remark,articleStatus,aritleSource
       // } = scopeP.row;
@@ -387,12 +420,13 @@ export default {
         confirmButtonText: "通过",
         cancelButtonText: "不通过",
         customClass: "selfElMessageBox",
+        distinguishCancelAndClose: true,
       })
         .then(() => {
           dataCheckAjaxFn(scopeP, 2); //通过
         })
         .catch((action) => {
-          if (action === "cancel") {
+          if (action === "close") {
             return;
           }
           dataCheckAjaxFn(scopeP, 1);
@@ -441,42 +475,50 @@ export default {
     }
     //删除
     function dataDeleteFn(scopeP) {
-      httpAxiosO({
-        method: "get",
-        url: "/web/excel/del",
-        params: {
-          id: scopeP.id,
-        },
+      ElMessageBox.confirm("确认删除选中数据？", "删除数据", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        customClass: "selfElMessageBox",
       })
-        .then((D) => {
-          console.log("数据删除 D", D);
-          // eslint-disable-next-line
-          const { data, success } = D?.data;
+        .then(() => {
+          httpAxiosO({
+            method: "get",
+            url: "/web/excel/del",
+            params: {
+              id: scopeP.id,
+            },
+          })
+            .then((D) => {
+              console.log("数据删除 D", D);
+              // eslint-disable-next-line
+              const { data, success } = D?.data;
 
-          if (!success) {
-            ElMessage({
-              message: "数据删除接口请求失败",
-              type: "error",
-              plain: true,
-            });
-            return;
-          } else {
-            ElMessage({
-              message: "数据删除接口请求成功",
-              type: "success",
-              plain: true,
-            });
-            getExcelListAjaxFn();
-          }
+              if (!success) {
+                ElMessage({
+                  message: "数据删除接口请求失败",
+                  type: "error",
+                  plain: true,
+                });
+                return;
+              } else {
+                ElMessage({
+                  message: "数据删除接口请求成功",
+                  type: "success",
+                  plain: true,
+                });
+                getExcelListAjaxFn();
+              }
+            })
+            .catch(() => {
+              ElMessage({
+                message: "数据删除接口请求失败",
+                type: "error",
+                plain: true,
+              });
+            })
+            .finally(() => {});
         })
-        .catch(() => {
-          ElMessage({
-            message: "数据删除接口请求失败",
-            type: "error",
-            plain: true,
-          });
-        })
-        .finally(() => {});
+        .catch(() => {});
     }
     //下载
     function dataDownloadFn(scopeP) {
@@ -486,31 +528,26 @@ export default {
         params: {
           id: scopeP.id,
         },
+        responseType: "blob",
       })
         .then((D) => {
           console.log("数据下载 D", D);
           // eslint-disable-next-line
-          const { data, success } = D?.data;
-
-          if (!success) {
-            ElMessage({
-              message: "数据下载接口请求失败",
-              type: "error",
-              plain: true,
+          const { data, success } = D;
+          try {
+            let typeP = "application/vnd.ms-excel";
+            if (D.headers["content-disposition"].indexOf("csv") != -1) {
+              typeP = "text/csv;charset=utf-8;";
+            }
+            const blob = new Blob([data], {
+              type: typeP, //使用获取的excel格式
             });
-            return;
-          } else {
-            ElMessage({
-              message: "数据下载接口请求成功",
-              type: "success",
-              plain: true,
-            });
-            const blob = new Blob([data]);
             const a = document.createElement("a");
             const id = "aDownloadID" + new Date().getTime();
             // 创建下载的链接
             a.href = window.URL.createObjectURL(blob);
-            a.download = D.fileName;
+            let name = scopeP.excelTitle || "EXCEL数据导出";
+            a.download = name;
             a.style.display = "none";
             a.setAttribute("id", id);
             //a标签追加元素到body内
@@ -522,7 +559,28 @@ export default {
             document.querySelector("#" + id).remove();
             // 释放掉blob对象
             window.URL.revokeObjectURL(a.href);
+          } catch {
+            ElMessage({
+              message: "数据下载失败",
+              type: "error",
+              plain: true,
+            });
           }
+          // if (!success) {
+          //   ElMessage({
+          //     message: "数据下载接口请求失败",
+          //     type: "error",
+          //     plain: true,
+          //   });
+          //   return;
+          // } else {
+          //   ElMessage({
+          //     message: "数据下载接口请求成功",
+          //     type: "success",
+          //     plain: true,
+          //   });
+
+          // }
         })
         .catch(() => {
           ElMessage({
@@ -659,9 +717,14 @@ export default {
           cursor: pointer;
           padding: 0 8px;
         }
-        span {width: 1px;height: 17px;background: #3652d2;}
-        span:nth-last-child(1) {display: none;}
-
+        span {
+          width: 1px;
+          height: 17px;
+          background: #3652d2;
+        }
+        span:nth-last-child(1) {
+          display: none;
+        }
       }
     }
   }

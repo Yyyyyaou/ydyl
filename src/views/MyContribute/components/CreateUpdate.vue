@@ -27,7 +27,7 @@
             :limit="1"
             :on-exceed="handleExceed"
             :auto-upload="false"
-            accept=".xls, .xlsx"
+            accept=".xls, .xlsx, .csv"
           >
             <el-button type="primary">上传文件</el-button>
             <p v-if="fileList.length == 0">（未选择任何文件）</p>
@@ -81,7 +81,6 @@ export default {
     };
     //提交
     function submitFn() {
-
       if (fileList.value.length == 0) {
         ElMessage({
           message: "请选择您要上传的数据文件",
@@ -92,23 +91,30 @@ export default {
       }
 
       const formData = new FormData();
-      formData.append('file',fileList.value[0].raw);
+      formData.append("file", fileList.value[0].raw);
+      formData.append("format", radio.value);
       httpAxiosO({
-        url: '/web/excel/upload',
+        url: "/web/excel/upload",
         method: "post",
         headers: {
           //这个接口不写 这行会报错
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        data: { file: fileList.value[0], format: radio.value },
+        data: formData,
       })
         .then((D) => {
           console.log("我的数据提交 D", D);
           // eslint-disable-next-line
           const { data, success } = D.data;
           if (!success) {
+            let msg = "";
+            if (D.data.message == "格式不对") {
+              msg = "格式不对，请下载相应的模板";
+            } else {
+              msg = D.data.message;
+            }
             ElMessage({
-              message: "我的数据 提交失败",
+              message: msg,
               type: "error",
               plain: true,
             });
